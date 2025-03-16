@@ -1,7 +1,7 @@
 {
-  "name": "astro-erudite",
+  "name": "hyuki.dev",
   "type": "module",
-  "version": "1.2.4",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "astro dev",
@@ -9,13 +9,13 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write ./src/**/*.{astro,ts,tsx,css}"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
-    "@astrojs/markdown-remark": "^6.1.0",
-    "@astrojs/mdx": "^4.0.8",
-    "@astrojs/react": "^4.2.0",
+    "@astrojs/markdown-remark": "^6.3.0",
+    "@astrojs/mdx": "^4.2.0",
+    "@astrojs/react": "^4.2.1",
     "@astrojs/rss": "^4.0.11",
     "@astrojs/sitemap": "^3.2.1",
     "@astrojs/tailwind": "^6.0.0",
@@ -31,7 +31,7 @@
     "@shikijs/transformers": "^1.24.4",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "astro": "^5.3.0",
+    "astro": "^5.5.2",
     "astro-icon": "^1.1.4",
     "bootstrap-icons": "^1.11.3",
     "class-variance-authority": "^0.7.1",
@@ -70,6 +70,12 @@
         "files": "*.astro",
         "options": {
           "parser": "astro"
+        }
+      },
+      {
+        "files": "*.mdx",
+        "options": {
+          "parser": "mdx"
         }
       }
     ]
