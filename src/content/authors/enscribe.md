@@ -1,10 +1,10 @@
 ---
-name: 'enscribe'
+name: 'hy'
 pronouns: 'he/him'
-avatar: 'https://gravatar.com/avatar/9bfdc4ec972793cf05cb91efce5f4aaaec2a0da1bf4ec34dad0913f1d845faf6.webp?size=256'
-bio: 'd(-_-)b'
-website: 'https://enscribe.dev'
-twitter: 'https://twitter.com/enscry'
-github: 'https://github.com/jktrn'
-mail: 'jason@enscribe.dev'
+avatar: 'https://gravatar.com/avatar/1661428cd3e33665fc6ee2c6fa3e40f2?size=256'
+bio: '-.-'
+website: 'https://hyuki.dev'
+twitter: 'https://twitter.com/snowflake597'
+github: 'https://github.com/snow0406'
+mail: 'snowland.dev@gmail.com'
 ---
