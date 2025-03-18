@@ -34,6 +34,8 @@
     --additive-foreground: 210 20% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    --success: 195 75% 75%;
+    --success-foreground: 195 40% 20%;
     --border: 210 40% 85%;
     --ring: 210 60% 75%;
   }
@@ -53,6 +55,8 @@
     --additive-foreground: var(--foreground);
     --destructive: var(--destructive);
     --destructive-foreground: var(--foreground);
+    --success: 210 50% 55%;
+    --success-foreground: 210 20% 98%;
     --border: var(--accent);
     --ring: var(--muted);
   }

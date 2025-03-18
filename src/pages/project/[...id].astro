@@ -1,0 +1,157 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import ProjectSidebar from '@/components/ProjectSidebar.astro'
+import { Badge, badgeVariants } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import Layout from '@/layouts/Layout.astro'
+import { getDevelopmentPeriod, getStatusInfo } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import { type CollectionEntry, getCollection, render } from 'astro:content'
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects')
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: project,
+  }))
+}
+type Props = CollectionEntry<'projects'>
+
+const project = Astro.props
+const { Content } = await render(project)
+
+const developmentPeriod = getDevelopmentPeriod(
+  project.data.startDate,
+  project.data.endDate,
+)
+
+const { variant, icon } = getStatusInfo(project.data.status)
+---
+
+<Layout
+  title={project.data.name}
+  description={project.data.description}
+  image={project.data.image?.src ?? '/static/twitter-card.png'}
+>
+  <section
+    class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
+  >
+    <Breadcrumbs
+      items={[
+        { href: '/project', label: 'Project', icon: 'lucide:archive' },
+        { label: project.data.name, icon: 'lucide:file-text' },
+      ]}
+      class="col-start-2"
+    />
+    {
+      project.data.image && (
+        <div class="col-span-full mx-auto w-full max-w-[1000px]">
+          <Image
+            src={project.data.image}
+            alt={project.data.name}
+            width={1200}
+            height={630}
+            class="rounded-xl object-cover"
+            decoding="async"
+          />
+        </div>
+      )
+    }
+    <section class="col-start-2 flex flex-col gap-y-6 text-center">
+      <div class="flex flex-col gap-y-4">
+        <div class="flex flex-col items-center gap-2">
+          <h1 class="text-4xl font-bold leading-tight sm:text-5xl">
+            {project.data.name}
+          </h1>
+
+          {
+            project.data.status && (
+              <Badge variant={variant} showHash={false}>
+                <Icon name={icon} class="mr-1 size-3.5" />
+                {project.data.status}
+              </Badge>
+            )
+          }
+        </div>
+
+        <div
+          class="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"
+        >
+          <span>{project.data.description}</span>
+        </div>
+
+        {
+          developmentPeriod && (
+            <div class="flex items-center justify-center text-sm text-muted-foreground">
+              <Icon name="lucide:calendar" class="mr-1 size-4" />
+              <span>{developmentPeriod}</span>
+            </div>
+          )
+        }
+
+        <div class="flex flex-wrap justify-center gap-2">
+          {
+            project.data.tags && project.data.tags.length > 0 ? (
+              project.data.tags.map((tag) => (
+                <span class={badgeVariants({ variant: 'secondary' })}>
+                  <Icon name="lucide:hash" class="size-3 -translate-x-0.5" />
+                  {tag}
+                </span>
+              ))
+            ) : (
+              <span class="text-sm text-muted-foreground">
+                No tags available
+              </span>
+            )
+          }
+        </div>
+      </div>
+    </section>
+
+    <ProjectSidebar project={project} />
+
+    <article
+      class="prose prose-neutral col-start-2 max-w-none dark:prose-invert"
+    >
+      <Content />
+    </article>
+  </section>
+
+  <Button
+    variant="outline"
+    size="icon"
+    className="group fixed bottom-8 right-8 z-50 hidden"
+    id="scroll-to-top"
+    title="Scroll to top"
+    aria-label="Scroll to top"
+  >
+    <Icon
+      name="lucide:arrow-up"
+      class="mx-auto size-4 transition-all group-hover:-translate-y-0.5"
+    />
+  </Button>
+
+  <script>
+    document.addEventListener('astro:page-load', () => {
+      const scrollToTopButton = document.getElementById('scroll-to-top')
+      const footer = document.querySelector('footer')
+
+      if (scrollToTopButton && footer) {
+        scrollToTopButton.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        })
+
+        window.addEventListener('scroll', () => {
+          const footerRect = footer.getBoundingClientRect()
+          const isFooterVisible = footerRect.top <= window.innerHeight
+
+          scrollToTopButton.classList.toggle(
+            'hidden',
+            window.scrollY <= 300 || isFooterVisible,
+          )
+        })
+      }
+    })
+  </script>
+</Layout>

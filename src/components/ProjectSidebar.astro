@@ -1,0 +1,210 @@
+---
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Icon } from 'astro-icon/components'
+import type { CollectionEntry } from 'astro:content'
+import Link from './Link.astro'
+
+interface Props {
+  project: CollectionEntry<'projects'>
+}
+
+const { project } = Astro.props
+
+const hasLinks = project.data.projectUrl || project.data.githubUrl
+const hasContributions =
+  project.data.contributions && project.data.contributions.length > 0
+const hasTeam = project.data.team && project.data.team.length > 0
+---
+
+<details
+  open
+  class="group col-start-2 mx-4 block rounded-xl border p-4 xl:hidden"
+>
+  <summary
+    class="flex cursor-pointer items-center justify-between text-xl font-semibold group-open:pb-4"
+  >
+    Project Info
+    <Icon
+      name="lucide:chevron-down"
+      class="size-5 transition-transform group-open:rotate-180"
+    />
+  </summary>
+  <ScrollArea
+    client:load
+    className="flex max-h-80 flex-col overflow-y-auto"
+    type="always"
+  >
+    <div class="space-y-4 pt-2">
+      {
+        hasLinks && (
+          <div>
+            <h3 class="text-sm font-medium text-foreground">Links</h3>
+            <ul class="mt-2 space-y-1">
+              {project.data.projectUrl && (
+                <li class="flex items-center gap-1">
+                  <Icon
+                    name="lucide:globe"
+                    class="size-3.5 text-muted-foreground"
+                  />
+                  <Link
+                    href={project.data.projectUrl}
+                    external
+                    underline
+                    class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
+                  >
+                    Visit Project
+                  </Link>
+                </li>
+              )}
+              {project.data.githubUrl && (
+                <li class="flex items-center gap-1">
+                  <Icon
+                    name="lucide:github"
+                    class="size-3.5 text-muted-foreground"
+                  />
+                  <Link
+                    href={project.data.githubUrl}
+                    external
+                    underline
+                    class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
+                  >
+                    View Source
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        hasContributions && (
+          <div>
+            <h3 class="text-sm font-medium text-foreground">
+              My Contributions
+            </h3>
+            <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
+              {project.data.contributions!.map((contribution) => (
+                <li>{contribution}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        hasTeam && (
+          <div>
+            <h3 class="text-sm font-medium text-foreground">Team</h3>
+            <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
+              {project.data.team!.map((member) => (
+                <li>
+                  {member.url ? (
+                    <Link
+                      href={member.url}
+                      external
+                      underline
+                      class="text-sm hover:text-foreground hover:decoration-foreground"
+                    >
+                      {member.name}
+                    </Link>
+                  ) : (
+                    member.name
+                  )}
+                  {member.role && <span class="text-xs"> - {member.role}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </ScrollArea>
+</details>
+
+<nav
+  class="sticky top-[5.5rem] col-start-1 hidden h-[calc(100vh-5.5rem)] text-xs leading-4 xl:block"
+>
+  <div class="flex justify-end">
+    <ScrollArea client:load className="max-h-[calc(100vh-8rem)]" type="always">
+      <div class="flex flex-col gap-y-4 overflow-y-auto px-8">
+        <h2 class="mb-2 text-lg font-semibold">Project Info</h2>
+
+        {
+          hasLinks && (
+            <div>
+              <h3 class="text-sm font-medium text-foreground">Links</h3>
+              <ul class="mt-2 space-y-1">
+                {project.data.projectUrl && (
+                  <li class="flex items-center gap-1">
+                    <Icon
+                      name="lucide:globe"
+                      class="size-3.5 text-muted-foreground"
+                    />
+                    <Link
+                      href={project.data.projectUrl}
+                      external
+                      underline
+                      class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
+                    >
+                      Visit Project
+                    </Link>
+                  </li>
+                )}
+                {project.data.githubUrl && (
+                  <li class="flex items-center gap-1">
+                    <Icon
+                      name="lucide:github"
+                      class="size-3.5 text-muted-foreground"
+                    />
+                    <Link
+                      href={project.data.githubUrl}
+                      external
+                      underline
+                      class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
+                    >
+                      View Source
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )
+        }
+
+        {
+          hasContributions && (
+            <div>
+              <h3 class="text-sm font-medium text-foreground">
+                My Contributions
+              </h3>
+              <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
+                {project.data.contributions!.map((contribution) => (
+                  <li>{contribution}</li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+
+        {
+          hasTeam && (
+            <div>
+              <h3 class="text-sm font-medium text-foreground">Team</h3>
+              <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
+                {project.data.team!.map((member) => (
+                  <li>
+                    member.name
+                    {member.role && (
+                      <span class="text-xs"> - {member.role}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </ScrollArea>
+  </div>
+</nav>

@@ -36,7 +36,8 @@ const authors = await parseAuthors(entry.data.authors ?? [])
             alt={entry.data.title}
             width={1200}
             height={630}
-            class="object-cover"
+            class="rounded-lg object-cover"
+            decoding="async"
           />
         </div>
       )
@@ -78,7 +79,9 @@ const authors = await parseAuthors(entry.data.authors ?? [])
         entry.data.tags && (
           <div class="flex flex-wrap gap-2">
             {entry.data.tags.map((tag) => (
-              <Badge variant="secondary">{tag}</Badge>
+              <Badge variant="secondary" showHash={true}>
+                {tag}
+              </Badge>
             ))}
           </div>
         )

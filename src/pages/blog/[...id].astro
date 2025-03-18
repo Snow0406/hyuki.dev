@@ -57,7 +57,7 @@ const authors = await parseAuthors(post.data.authors ?? [])
 <Layout
   title={post.data.title}
   description={post.data.description}
-  image={post.data.image?.src ?? '/static/1200x630.png'}
+  image={post.data.image?.src ?? '/static/twitter-card.png'}
 >
   <section
     class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
@@ -71,13 +71,15 @@ const authors = await parseAuthors(post.data.authors ?? [])
     />
     {
       post.data.image && (
-        <Image
-          src={post.data.image}
-          alt={post.data.title}
-          width={1200}
-          height={630}
-          class="col-span-full mx-auto w-full max-w-[1000px] object-cover"
-        />
+        <div class="col-span-full mx-auto w-full max-w-[1000px]">
+          <Image
+            src={post.data.image}
+            alt={post.data.title}
+            width={1200}
+            height={630}
+            class="rounded-xl object-cover"
+          />
+        </div>
       )
     }
     <section class="col-start-2 flex flex-col gap-y-6 text-center">
@@ -101,6 +103,7 @@ const authors = await parseAuthors(post.data.authors ?? [])
                         width={24}
                         height={24}
                         class="rounded-full"
+                        decoding="async"
                       />
                       {author.isRegistered ? (
                         <Link
