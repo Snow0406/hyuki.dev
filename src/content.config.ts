@@ -54,8 +54,15 @@ const projects = defineCollection({
       status: z
         .enum(['Completed', 'In Progress', 'Planned', 'Paused'])
         .optional(),
-      projectUrl: z.string().url().optional(),
-      githubUrl: z.string().url().optional(),
+      link: z
+        .array(
+          z.object({
+            icon: z.string().optional(),
+            name: z.string(),
+            url: z.string().url().optional(),
+          }),
+        )
+        .optional(),
       draft: z.boolean().optional(),
       contributions: z.array(z.string()).optional(),
       team: z
@@ -63,7 +70,6 @@ const projects = defineCollection({
           z.object({
             name: z.string(),
             role: z.string().optional(),
-            url: z.string().url().optional(),
           }),
         )
         .optional(),

@@ -10,7 +10,7 @@ interface Props {
 
 const { project } = Astro.props
 
-const hasLinks = project.data.projectUrl || project.data.githubUrl
+const hasLinks = project.data.link && project.data.link.length > 0
 const hasContributions =
   project.data.contributions && project.data.contributions.length > 0
 const hasTeam = project.data.team && project.data.team.length > 0
@@ -40,38 +40,28 @@ const hasTeam = project.data.team && project.data.team.length > 0
           <div>
             <h3 class="text-sm font-medium text-foreground">Links</h3>
             <ul class="mt-2 space-y-1">
-              {project.data.projectUrl && (
+              {project.data.link!.map((linkItem) => (
                 <li class="flex items-center gap-1">
                   <Icon
-                    name="lucide:globe"
+                    name={linkItem.icon || 'lucide:link'}
                     class="size-3.5 text-muted-foreground"
                   />
-                  <Link
-                    href={project.data.projectUrl}
-                    external
-                    underline
-                    class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
-                  >
-                    Visit Project
-                  </Link>
+                  {linkItem.url ? (
+                    <Link
+                      href={linkItem.url}
+                      external
+                      underline
+                      class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
+                    >
+                      {linkItem.name}
+                    </Link>
+                  ) : (
+                    <span class="text-sm text-muted-foreground">
+                      {linkItem.name}
+                    </span>
+                  )}
                 </li>
-              )}
-              {project.data.githubUrl && (
-                <li class="flex items-center gap-1">
-                  <Icon
-                    name="lucide:github"
-                    class="size-3.5 text-muted-foreground"
-                  />
-                  <Link
-                    href={project.data.githubUrl}
-                    external
-                    underline
-                    class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
-                  >
-                    View Source
-                  </Link>
-                </li>
-              )}
+              ))}
             </ul>
           </div>
         )
@@ -99,18 +89,7 @@ const hasTeam = project.data.team && project.data.team.length > 0
             <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
               {project.data.team!.map((member) => (
                 <li>
-                  {member.url ? (
-                    <Link
-                      href={member.url}
-                      external
-                      underline
-                      class="text-sm hover:text-foreground hover:decoration-foreground"
-                    >
-                      {member.name}
-                    </Link>
-                  ) : (
-                    member.name
-                  )}
+                  {member.name}
                   {member.role && <span class="text-xs"> - {member.role}</span>}
                 </li>
               ))}
@@ -129,48 +108,7 @@ const hasTeam = project.data.team && project.data.team.length > 0
     <ScrollArea client:load className="max-h-[calc(100vh-8rem)]" type="always">
       <div class="flex flex-col gap-y-4 overflow-y-auto px-8">
         <h2 class="mb-2 text-lg font-semibold">Project Info</h2>
-
-        {
-          hasLinks && (
-            <div>
-              <h3 class="text-sm font-medium text-foreground">Links</h3>
-              <ul class="mt-2 space-y-1">
-                {project.data.projectUrl && (
-                  <li class="flex items-center gap-1">
-                    <Icon
-                      name="lucide:globe"
-                      class="size-3.5 text-muted-foreground"
-                    />
-                    <Link
-                      href={project.data.projectUrl}
-                      external
-                      underline
-                      class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
-                    >
-                      Visit Project
-                    </Link>
-                  </li>
-                )}
-                {project.data.githubUrl && (
-                  <li class="flex items-center gap-1">
-                    <Icon
-                      name="lucide:github"
-                      class="size-3.5 text-muted-foreground"
-                    />
-                    <Link
-                      href={project.data.githubUrl}
-                      external
-                      underline
-                      class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
-                    >
-                      View Source
-                    </Link>
-                  </li>
-                )}
-              </ul>
-            </div>
-          )
-        }
+        {}
 
         {
           hasContributions && (
