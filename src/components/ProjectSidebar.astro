@@ -132,7 +132,7 @@ const hasTeam = project.data.team && project.data.team.length > 0
               <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
                 {project.data.team!.map((member) => (
                   <li>
-                    member.name
+                    {member.name}
                     {member.role && (
                       <span class="text-xs"> - {member.role}</span>
                     )}
