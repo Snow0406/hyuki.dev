@@ -48,8 +48,31 @@ const projects = defineCollection({
       name: z.string(),
       description: z.string(),
       tags: z.array(z.string()),
-      image: image(),
-      link: z.string().url(),
+      image: image().optional(),
+      startDate: z.coerce.date().optional(),
+      endDate: z.coerce.date().optional(),
+      status: z
+        .enum(['Completed', 'In Progress', 'Planned', 'Paused'])
+        .optional(),
+      link: z
+        .array(
+          z.object({
+            icon: z.string().optional(),
+            name: z.string(),
+            url: z.string().url().optional(),
+          }),
+        )
+        .optional(),
+      draft: z.boolean().optional(),
+      contributions: z.array(z.string()).optional(),
+      team: z
+        .array(
+          z.object({
+            name: z.string(),
+            role: z.string().optional(),
+          }),
+        )
+        .optional(),
     }),
 })
 

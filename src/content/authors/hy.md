@@ -6,5 +6,5 @@ bio: '-.-'
 website: 'https://hyuki.dev'
 twitter: 'https://twitter.com/snowflake597'
 github: 'https://github.com/snow0406'
-mail: 'snowland.dev@gmail.com'
+mail: 'snow@hyuki.dev'
 ---

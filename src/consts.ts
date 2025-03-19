@@ -15,7 +15,7 @@ export type Link = {
 export const SITE: Site = {
   TITLE: 'hyuki.dev',
   DESCRIPTION: 'Game Developer and Incheon National University Student',
-  EMAIL: 'snowland.dev@gmail.com',
+  EMAIL: 'snow@hyuki.dev',
   NUM_POSTS_ON_HOMEPAGE: 2,
   POSTS_PER_PAGE: 4,
   SITEURL: 'https://hyuki.dev',
