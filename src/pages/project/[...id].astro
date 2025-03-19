@@ -39,8 +39,8 @@ const { variant, icon } = getStatusInfo(project.data.status)
   >
     <Breadcrumbs
       items={[
-        { href: '/project', label: 'Project', icon: 'lucide:archive' },
-        { label: project.data.name, icon: 'lucide:file-text' },
+        { href: '/project', label: 'Project', icon: 'lucide:code-2' },
+        { label: project.data.name, icon: 'lucide:component' },
       ]}
       class="col-start-2"
     />
@@ -95,7 +95,6 @@ const { variant, icon } = getStatusInfo(project.data.status)
             project.data.tags && project.data.tags.length > 0 ? (
               project.data.tags.map((tag) => (
                 <span class={badgeVariants({ variant: 'secondary' })}>
-                  <Icon name="lucide:hash" class="size-3 -translate-x-0.5" />
                   {tag}
                 </span>
               ))
