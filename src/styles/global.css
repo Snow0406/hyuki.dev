@@ -3,19 +3,34 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'CustomFont';
   src: url('/fonts/JetBrainsMono[wght].woff2') format('woff2-variations');
   font-weight: 100 800;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'CustomFont';
   src: url('/fonts/JetBrainsMono-Italic[wght].woff2') format('woff2-variations');
   font-weight: 100 800;
   font-style: italic;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('/fonts/Pretendard-Regular.woff2') format('woff2');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+AC00-D7A3;
 }
 
 @layer base {

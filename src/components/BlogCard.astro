@@ -29,10 +29,21 @@ const authors = await parseAuthors(entry.data.authors ?? [])
     class="flex flex-col gap-4 sm:flex-row"
   >
     {
-      entry.data.image && (
+      entry.data.image ? (
         <div class="max-w-[200px] sm:flex-shrink-0">
           <Image
             src={entry.data.image}
+            alt={entry.data.title}
+            width={1200}
+            height={630}
+            class="rounded-lg object-cover"
+            decoding="async"
+          />
+        </div>
+      ) : (
+        <div class="max-w-[200px] sm:flex-shrink-0">
+          <img
+            src={`/og/${entry.id}.png`}
             alt={entry.data.title}
             width={1200}
             height={630}

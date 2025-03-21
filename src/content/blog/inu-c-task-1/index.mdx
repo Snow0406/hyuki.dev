@@ -2,7 +2,7 @@
 title: 'Visual Studio 사용법과 C언어의 기본 요소'
 description: '인천대학교 C언어 수업 1주차 과제용'
 date: 2025-03-17
-tags: ['INU_Task', 'C']
+tags: ['INU_Task']
 image: 'assets/cLanguage_image.png'
 authors: ['hy']
 ---
@@ -184,8 +184,8 @@ int main(void) {
 }
 ```
 
-Visual Studio와 같은 개발 환경에서는 scanf 함수가 입력 데이터를 받을 때 버퍼 오버플로우와 같은 보안 취약점이 발생할 위험이 있기 때문에, 
-보안을 강화한 `scanf_s` 사용을 권장하거나, 
+Visual Studio와 같은 개발 환경에서는 scanf 함수가 입력 데이터를 받을 때 버퍼 오버플로우와 같은 보안 취약점이 발생할 위험이 있기 때문에,
+보안을 강화한 `scanf_s` 사용을 권장하거나,
 
-경고 메시지를 무시하기 위해 코드 상단에 `#define _CRT_SECURE_NO_WARNINGS`를 추가하는 방법을 사용합니다. 
+경고 메시지를 무시하기 위해 코드 상단에 `#define _CRT_SECURE_NO_WARNINGS`를 추가하는 방법을 사용합니다.
 이 매크로는 컴파일러에게 이전의 **안전하지 않은 함수 사용에 대한 경고를 출력하지 말라는 지시 역할**을 합니다.
