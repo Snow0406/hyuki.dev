@@ -33,14 +33,14 @@ function getSubtitle(title: string): string {
 }
 ---
 
-<details open class="not-prose my-8 rounded-xl border">
+<details open class="my-8 rounded-xl border">
   <summary
-    class="flex cursor-pointer items-center justify-between p-4 text-xl font-semibold [&[open]]:pb-4"
+    class="[&[open]]:pb- flex cursor-pointer items-center justify-between p-4 text-xl font-semibold"
   >
     {title}
     <Icon
       name="lucide:chevron-down"
-      class="size-5 transition-transform [details[open]_&]:rotate-180"
+      class="h-5 w-5 transition-transform [&:has(details[open])]:rotate-180"
     />
   </summary>
   <ScrollArea
@@ -48,31 +48,31 @@ function getSubtitle(title: string): string {
     className="flex max-h-96 flex-col overflow-y-auto"
     type="always"
   >
-    <div class="my-[-1.5rem] flex flex-col gap-4 p-10">
+    <div class="my-[-1rem] flex flex-col gap-4 p-10">
       {
         subposts.map((post) => (
           <a
             href={`/blog/${post.id}`}
-            class="bg-card group relative flex overflow-hidden rounded-xl border transition-all duration-300 hover:border-primary/50 hover:bg-accent/10"
+            class="group/card bg-card hover:border-primary/50 hover:bg-accent/10 relative flex overflow-hidden rounded-xl border no-underline transition-all duration-300"
           >
             <div class="w-1/3 flex-shrink-0 p-3">
-              <div class="aspect-video overflow-hidden rounded-lg">
+              <div class="max-w-[200px] sm:shrink-0">
                 {post.data.image ? (
                   <Image
                     src={post.data.image}
                     alt={post.data.title}
-                    width={400}
-                    height={225}
-                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    width={1200}
+                    height={630}
+                    class="rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
                     decoding="async"
                   />
                 ) : (
                   <img
                     src={`/og/${post.id}.png`}
                     alt={post.data.title}
-                    width={400}
-                    height={225}
-                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    width={1200}
+                    height={630}
+                    class="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
                     decoding="async"
                   />
                 )}
@@ -80,15 +80,15 @@ function getSubtitle(title: string): string {
             </div>
             <div class="flex flex-1 flex-col justify-between p-4">
               <div>
-                <h3 class="mb-2 text-xl font-semibold tracking-tight">
+                <h3 class="mb-[-1rem] text-xl font-semibold tracking-tight">
                   {getSubtitle(post.data.title)}
                 </h3>
-                <p class="line-clamp-2 text-sm text-muted-foreground">
+                <p class="text-muted-foreground line-clamp-2 text-sm">
                   {post.data.description}
                 </p>
               </div>
               <div class="flex justify-end">
-                <div class="translate-x-2 transform opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                <div class="translate-x-2 transform opacity-0 transition-all duration-300 group-hover/card:translate-x-0 group-hover/card:opacity-100">
                   <Icon name="lucide:arrow-right" class="h-4 w-4" />
                 </div>
               </div>

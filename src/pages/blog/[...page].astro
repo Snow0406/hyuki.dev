@@ -14,10 +14,9 @@ export async function getStaticPaths({
   paginate: PaginateFunction
 }) {
   const allPosts = (
-    await getCollection(
-      'blog',
-      ({ data }) => !data.draft && data.hidden !== true,
-    )
+    await getCollection('blog', ({ data }) => {
+      return !data.draft && data.hidden !== true
+    })
   ).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
 
   return paginate(allPosts, { pageSize: SITE.POSTS_PER_PAGE })
