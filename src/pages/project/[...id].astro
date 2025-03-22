@@ -35,7 +35,7 @@ const { variant, icon } = getStatusInfo(project.data.status)
   image={project.data.image?.src ?? '/static/twitter-card.png'}
 >
   <section
-    class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
+    class="grid grid-cols-[minmax(0px,1fr)_min(var(--breakpoint-md),100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
   >
     <Breadcrumbs
       items={[
@@ -67,7 +67,7 @@ const { variant, icon } = getStatusInfo(project.data.status)
 
           {
             project.data.status && (
-              <Badge variant={variant} showHash={false}>
+              <Badge variant={variant}>
                 <Icon name={icon} class="mr-1 size-3.5" />
                 {project.data.status}
               </Badge>
@@ -76,21 +76,21 @@ const { variant, icon } = getStatusInfo(project.data.status)
         </div>
 
         <div
-          class="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"
+          class="wrap text-muted-foreground flex items-center justify-center gap-2 text-sm"
         >
           <span>{project.data.description}</span>
         </div>
 
         {
           developmentPeriod && (
-            <div class="flex items-center justify-center text-sm text-muted-foreground">
+            <div class="text-muted-foreground flex items-center justify-center text-sm">
               <Icon name="lucide:calendar" class="mr-1 size-4" />
               <span>{developmentPeriod}</span>
             </div>
           )
         }
 
-        <div class="flex flex-wrap justify-center gap-2">
+        <div class="wrap flex justify-center gap-2">
           {
             project.data.tags && project.data.tags.length > 0 ? (
               project.data.tags.map((tag) => (
@@ -99,7 +99,7 @@ const { variant, icon } = getStatusInfo(project.data.status)
                 </span>
               ))
             ) : (
-              <span class="text-sm text-muted-foreground">
+              <span class="text-muted-foreground text-sm">
                 No tags available
               </span>
             )
@@ -110,9 +110,7 @@ const { variant, icon } = getStatusInfo(project.data.status)
 
     <ProjectSidebar project={project} />
 
-    <article
-      class="prose prose-neutral col-start-2 max-w-none dark:prose-invert"
-    >
+    <article class="prose col-start-2 max-w-none">
       <Content />
     </article>
   </section>

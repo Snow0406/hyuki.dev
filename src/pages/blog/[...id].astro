@@ -88,7 +88,7 @@ const readTime = readingTime(totalBody)
   image={post.data.image?.src ?? `/og/${post.id}.png`}
 >
   <section
-    class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
+    class="grid grid-cols-[minmax(0px,1fr)_min(var(--breakpoint-md),100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
   >
     <!-- 경로 표시 (서브 블로그일 경우 부모 포스트 링크 포함) -->
     <Breadcrumbs
@@ -143,11 +143,11 @@ const readTime = readingTime(totalBody)
       {
         !isSubpost && (
           <div class="flex flex-col gap-y-4 text-center">
-            <h1 class="text-4xl font-bold leading-tight sm:text-5xl">
+            <h1 class="text-4xl leading-tight font-bold sm:text-5xl">
               {post.data.title}
             </h1>
 
-            <div class="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">
+            <div class="text-muted-foreground wrap flex items-center justify-center gap-2 text-sm">
               {authors.length > 0 && (
                 <>
                   <div class="flex items-center gap-x-2">
@@ -175,28 +175,28 @@ const readTime = readingTime(totalBody)
                       </div>
                     ))}
                   </div>
-                  <Separator orientation="vertical" className="h-4" />
+                  <Separator orientation="vertical" className="h-4!" />
                 </>
               )}
               <div class="flex items-center gap-2">
                 <span>{formatDate(post.data.date)}</span>
-                <Separator orientation="vertical" className="h-4" />
+                <Separator orientation="vertical" className="h-4!" />
                 <span>{readTime}</span>
               </div>
             </div>
-            <div class="flex flex-wrap justify-center gap-2">
+            <div class="wrap flex justify-center gap-2">
               {post.data.tags && post.data.tags.length > 0 ? (
                 post.data.tags.map((tag) => (
                   <a
                     href={`/tags/${tag}`}
                     class={badgeVariants({ variant: 'secondary' })}
                   >
-                    <Icon name="lucide:hash" class="size-3 -translate-x-0.5" />
+                    <Icon name="lucide:hash" class="size-3" />
                     {tag}
                   </a>
                 ))
               ) : (
-                <span class="text-sm text-muted-foreground">
+                <span class="text-muted-foreground text-sm">
                   No tags available
                 </span>
               )}
@@ -211,9 +211,7 @@ const readTime = readingTime(totalBody)
     <!-- 일반 포스트일 경우 자동 생성된 목차 표시 -->
     {headings.length > 0 && <TableOfContents headings={headings} />}
 
-    <article
-      class="prose prose-sm prose-neutral prose-invert col-start-2 max-w-none [&>:first-child>*]:mt-0"
-    >
+    <article class="prose col-start-2 max-w-none">
       <Content />
     </article>
 
@@ -234,7 +232,7 @@ const readTime = readingTime(totalBody)
   <Button
     variant="outline"
     size="icon"
-    className="group fixed bottom-8 right-8 z-50 hidden"
+    className="group fixed right-8 bottom-8 z-50 hidden"
     id="scroll-to-top"
     title="Scroll to top"
     aria-label="Scroll to top"

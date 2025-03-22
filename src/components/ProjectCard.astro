@@ -21,12 +21,12 @@ const { variant, icon } = getStatusInfo(project.data.status)
 ---
 
 <div
-  class="not-prose rounded-xl border p-4 transition-colors duration-300 ease-in-out hover:bg-secondary/50"
+  class="hover:bg-secondary/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
 >
   <Link href={`/project/${project.id}`} class="flex flex-col gap-4 sm:flex-row">
     {
       project.data.image && (
-        <div class="max-w-[200px] sm:flex-shrink-0">
+        <div class="max-w-[200px] sm:shrink-0">
           <Image
             src={project.data.image}
             alt={project.data.name}
@@ -38,27 +38,27 @@ const { variant, icon } = getStatusInfo(project.data.status)
         </div>
       )
     }
-    <div class="flex-grow">
+    <div class="grow">
       <div class="flex items-center justify-between">
         <h3 class="mb-1 text-lg font-semibold">
           {project.data.name}
         </h3>
         {
           project.data.status && (
-            <Badge variant={variant} showHash={false}>
+            <Badge variant={variant}>
               <Icon name={icon} class="mr-1 size-3" />
               {project.data.status}
             </Badge>
           )
         }
       </div>
-      <p class="mb-3 text-sm text-muted-foreground">
+      <p class="text-muted-foreground mb-3 text-sm">
         {project.data.description}
       </p>
 
       {
         developmentPeriod && (
-          <div class="mb-3 flex items-center text-xs text-muted-foreground">
+          <div class="text-muted-foreground mb-3 flex items-center text-xs">
             <Icon name="lucide:calendar" class="mr-1 size-3.5" />
             <span>{developmentPeriod}</span>
           </div>
@@ -69,9 +69,7 @@ const { variant, icon } = getStatusInfo(project.data.status)
         project.data.tags && project.data.tags.length > 0 && (
           <div class="flex flex-wrap gap-2">
             {project.data.tags.map((tag: string) => (
-              <Badge variant="secondary" showHash={false}>
-                {tag}
-              </Badge>
+              <Badge variant="secondary">{tag}</Badge>
             ))}
           </div>
         )
