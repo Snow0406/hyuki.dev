@@ -3,6 +3,7 @@ import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import Link from '@/components/Link.astro'
 import PostNavigation from '@/components/PostNavigation.astro'
 import TableOfContents from '@/components/TableOfContents.astro'
+import TableOfContentsPrebuilt from '@/components/TableOfContentsPrebuilt.astro'
 import { badgeVariants } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -13,45 +14,72 @@ import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import { type CollectionEntry, getCollection, render } from 'astro:content'
 
+type Props = CollectionEntry<'blog'>
+type Post = CollectionEntry<'blog'>
+
 export async function getStaticPaths() {
-  const posts = (await getCollection('blog'))
-    .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  )
+
   return posts.map((post) => ({
     params: { id: post.id },
     props: post,
   }))
 }
-type Props = CollectionEntry<'blog'>
 
-const posts = (await getCollection('blog'))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+// 모든 블로그 포스트 가져오기 (draft 아닌 것만)
+const allPosts = await getCollection('blog', ({ data }) => !data.draft)
 
-function getPostIndex(id: string): number {
-  return posts.findIndex((post) => post.id === id)
+// 정렬된 포스트 목록
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+)
+
+// hidden 속성이 false인 포스트만 필터링 (블로그 목록 페이지에 표시될 포스트)
+const visiblePosts = posts.filter((post) => post.data.hidden !== true)
+
+// 이전/다음 포스트 가져오기 함수
+function getAdjacentPosts(currentId: string, postList: Post[]) {
+  const index = postList.findIndex((post) => post.id === currentId)
+  return {
+    prev: index > 0 ? postList[index - 1] : null,
+    next:
+      index >= 0 && index < postList.length - 1 ? postList[index + 1] : null,
+  }
 }
 
-function getPrevPost(id: string): Props | null {
-  const postIndex = getPostIndex(id)
-  return postIndex !== -1 && postIndex < posts.length - 1
-    ? posts[postIndex + 1]
-    : null
-}
-
-function getNextPost(id: string): Props | null {
-  const postIndex = getPostIndex(id)
-  return postIndex > 0 ? posts[postIndex - 1] : null
-}
-
-const currentPostId = Astro.params.id
-const nextPost = getNextPost(currentPostId)
-const prevPost = getPrevPost(currentPostId)
-
+// 현재 포스트 정보
 const post = Astro.props
-const { Content, headings } = await render(post)
+const currentPostId = Astro.params.id as string
+const isSubpost = !!post.data.parentSlug
 
+// 서브 블로그일 경우 같은 부모를 가진 포스트 중에서 이전/다음을 찾음
+const { prev: prevPost, next: nextPost } = isSubpost
+  ? getAdjacentPosts(
+      currentPostId,
+      posts
+        .filter((p) => p.data.parentTitle === post.data.parentTitle)
+        .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf()),
+    )
+  : getAdjacentPosts(currentPostId, visiblePosts)
+
+// 포스트 콘텐츠와 헤딩 정보 가져오기
+const { Content, headings } = await render(post)
 const authors = await parseAuthors(post.data.authors ?? [])
+
+// 코드 블록 제거 함수 (읽기 시간 계산에 사용)
+const stripCodeBlocks = (text: string) => text.replace(/```[\s\S]*?```/g, '')
+
+// 메인 포스트인 경우 서브 포스트까지 포함한 읽기 시간 계산
+// 이미 필터링된 allPosts에서 서브 포스트 찾기
+const subposts = isSubpost
+  ? []
+  : allPosts.filter((p) => p.data.parentTitle === post.data.title)
+const totalBody = isSubpost
+  ? post.body!
+  : [post.body!, ...subposts.map((p) => p.body!)].map(stripCodeBlocks).join('')
+const readTime = readingTime(totalBody)
 ---
 
 <Layout
@@ -62,15 +90,30 @@ const authors = await parseAuthors(post.data.authors ?? [])
   <section
     class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
   >
+    <!-- 경로 표시 (서브 블로그일 경우 부모 포스트 링크 포함) -->
     <Breadcrumbs
       items={[
         { href: '/blog', label: 'Blog', icon: 'lucide:archive' },
-        { label: post.data.title, icon: 'lucide:file-text' },
+        ...(isSubpost
+          ? [
+              {
+                href: post.data.parentSlug,
+                label: post.data.parentTitle ?? 'Parent Post',
+                icon: 'lucide:file-text',
+              },
+              {
+                label: post.data.title.split(': ')[1] ?? post.data.title,
+                icon: 'lucide:pilcrow',
+              },
+            ]
+          : [{ label: post.data.title, icon: 'lucide:file-text' }]),
       ]}
       class="col-start-2"
     />
+
+    <!-- 메인 포스트일 경우에만 이미지 표시 -->
     {
-      post.data.image ? (
+      !isSubpost && post.data.image ? (
         <div class="col-span-full mx-auto w-full max-w-[1000px]">
           <Image
             src={post.data.image}
@@ -81,95 +124,109 @@ const authors = await parseAuthors(post.data.authors ?? [])
           />
         </div>
       ) : (
-        <div class="col-span-full mx-auto w-full max-w-[1000px]">
-          <img
-            src={`/og/${post.id}.png`}
-            alt={post.data.title}
-            width={1200}
-            height={630}
-            class="rounded-xl object-cover"
-          />
-        </div>
+        !isSubpost && (
+          <div class="col-span-full mx-auto w-full max-w-[1000px]">
+            <img
+              src={`/og/${post.id}.png`}
+              alt={post.data.title}
+              width={1200}
+              height={630}
+              class="rounded-xl object-cover"
+            />
+          </div>
+        )
       )
     }
-    <section class="col-start-2 flex flex-col gap-y-6 text-center">
-      <div class="flex flex-col gap-y-4">
-        <h1 class="text-4xl font-bold leading-tight sm:text-5xl">
-          {post.data.title}
-        </h1>
 
-        <div
-          class="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"
-        >
-          {
-            authors.length > 0 && (
-              <>
-                <div class="flex items-center gap-x-2">
-                  {authors.map((author) => (
-                    <div class="flex items-center gap-x-1.5">
-                      <Image
-                        src={author.avatar}
-                        alt={author.name}
-                        width={24}
-                        height={24}
-                        class="rounded-full"
-                        decoding="async"
-                      />
-                      {author.isRegistered ? (
-                        <Link
-                          href={`/authors/${author.id}`}
-                          underline
-                          class="text-foreground"
-                        >
+    <section class="col-start-2 flex flex-col gap-y-6">
+      <!-- 메인 포스트일 경우에만 제목, 저자 등 메타데이터 표시 -->
+      {
+        !isSubpost && (
+          <div class="flex flex-col gap-y-4 text-center">
+            <h1 class="text-4xl font-bold leading-tight sm:text-5xl">
+              {post.data.title}
+            </h1>
+
+            <div class="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">
+              {authors.length > 0 && (
+                <>
+                  <div class="flex items-center gap-x-2">
+                    {authors.map((author) => (
+                      <div class="flex items-center gap-x-1.5">
+                        <Image
+                          src={author.avatar}
+                          alt={author.name}
+                          width={24}
+                          height={24}
+                          class="rounded-full"
+                          decoding="async"
+                        />
+                        {author.isRegistered ? (
+                          <Link
+                            href={`/authors/${author.id}`}
+                            underline
+                            class="text-foreground"
+                          >
+                            <span>{author.name}</span>
+                          </Link>
+                        ) : (
                           <span>{author.name}</span>
-                        </Link>
-                      ) : (
-                        <span>{author.name}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <Separator orientation="vertical" className="h-4" />
+                </>
+              )}
+              <div class="flex items-center gap-2">
+                <span>{formatDate(post.data.date)}</span>
                 <Separator orientation="vertical" className="h-4" />
-              </>
-            )
-          }
-          <div class="flex items-center gap-2">
-            <span>{formatDate(post.data.date)}</span>
-            <Separator orientation="vertical" className="h-4" />
-            <span>{readingTime(post.body!)}</span>
+                <span>{readTime}</span>
+              </div>
+            </div>
+            <div class="flex flex-wrap justify-center gap-2">
+              {post.data.tags && post.data.tags.length > 0 ? (
+                post.data.tags.map((tag) => (
+                  <a
+                    href={`/tags/${tag}`}
+                    class={badgeVariants({ variant: 'secondary' })}
+                  >
+                    <Icon name="lucide:hash" class="size-3 -translate-x-0.5" />
+                    {tag}
+                  </a>
+                ))
+              ) : (
+                <span class="text-sm text-muted-foreground">
+                  No tags available
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-        <div class="flex flex-wrap justify-center gap-2">
-          {
-            post.data.tags && post.data.tags.length > 0 ? (
-              post.data.tags.map((tag) => (
-                <a
-                  href={`/tags/${tag}`}
-                  class={badgeVariants({ variant: 'secondary' })}
-                >
-                  <Icon name="lucide:hash" class="size-3 -translate-x-0.5" />
-                  {tag}
-                </a>
-              ))
-            ) : (
-              <span class="text-sm text-muted-foreground">
-                No tags available
-              </span>
-            )
-          }
-        </div>
-      </div>
+        )
+      }
 
       <PostNavigation prevPost={prevPost} nextPost={nextPost} />
     </section>
 
+    <!-- 일반 포스트일 경우 자동 생성된 목차 표시 -->
     {headings.length > 0 && <TableOfContents headings={headings} />}
 
     <article
-      class="prose prose-neutral col-start-2 max-w-none dark:prose-invert"
+      class="prose prose-sm prose-neutral prose-invert col-start-2 max-w-none [&>:first-child>*]:mt-0"
     >
       <Content />
     </article>
+
+    <!-- 서브 블로그일 경우 미리 정의된 목차 표시 -->
+    {
+      isSubpost && post.data.tableOfContents && (
+        <TableOfContentsPrebuilt
+          headings={post.data.tableOfContents}
+          activeSlug={post.data.activeSlug}
+          title={post.data.tableOfContentsTitle}
+        />
+      )
+    }
 
     <PostNavigation prevPost={prevPost} nextPost={nextPost} />
   </section>

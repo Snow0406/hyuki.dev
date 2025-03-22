@@ -1,24 +1,42 @@
 ---
+import { cn } from '@/lib/utils'
 import Link from './Link.astro'
-import type { Heading } from './TableOfContents.astro'
+import type { Heading } from './TableOfContentsPrebuilt.astro'
 
-const { heading } = Astro.props
+interface Props {
+  heading: Heading
+  activeSlug?: string // 현재 활성화된 항목의 슬러그
+}
+
+const { heading, activeSlug } = Astro.props
+const isActive = heading.slug === activeSlug
 ---
 
 <li
-  class="list-inside list-disc px-4 text-sm text-foreground/60 xl:list-none xl:p-0"
+  class={cn(
+    'list-inside list-disc px-4 text-xs xl:list-none xl:p-0 xl:max-w-[280px]',
+    isActive ? 'text-foreground' : 'text-foreground/60',
+    activeSlug && heading.depth > 2
+      ? 'pl-6 xl:pl-0 xl:text-right'
+      : activeSlug && 'xl:text-right',
+  )}
 >
   <Link
-    href={'#' + heading.slug}
-    class="underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit py-1 xl:py-0"
+    href={activeSlug ? heading.slug : '#' + heading.slug}
+    class="py-1 underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit xl:py-0"
   >
     {heading.text}
   </Link>
   {
-    heading.subheadings.length > 0 && (
-      <ul class="translate-x-3 xl:ml-4 xl:mt-2 xl:flex xl:translate-x-0 xl:flex-col xl:gap-2">
+    heading.subheadings && heading.subheadings.length > 0 && (
+      <ul
+        class={cn(
+          'translate-x-3 xl:ml-4 xl:mt-2 xl:flex xl:translate-x-0 xl:flex-col xl:gap-2',
+          activeSlug && 'xl:ml-0 xl:mr-4',
+        )}
+      >
         {heading.subheadings.map((subheading: Heading) => (
-          <Astro.self heading={subheading} />
+          <Astro.self heading={subheading} activeSlug={activeSlug} />
         ))}
       </ul>
     )

@@ -22,6 +22,32 @@ const blog = defineCollection({
       tags: z.array(z.string()).optional(),
       authors: z.array(z.string()).optional(),
       draft: z.boolean().optional(),
+
+      // SubBlog
+      parentTitle: z.string().optional(),
+      parentSlug: z.string().optional(),
+      hidden: z.boolean().optional(),
+      tableOfContentsTitle: z.string().optional(),
+      tableOfContents: z
+        .array(
+          z.object({
+            depth: z.number(),
+            slug: z.string(),
+            text: z.string(),
+            subheadings: z.lazy(() =>
+              z.array(
+                z.object({
+                  depth: z.number(),
+                  slug: z.string(),
+                  text: z.string(),
+                  subheadings: z.array(z.any()),
+                }),
+              ),
+            ),
+          }),
+        )
+        .optional(),
+      activeSlug: z.string().optional(),
     }),
 })
 
@@ -54,6 +80,9 @@ const projects = defineCollection({
       status: z
         .enum(['Completed', 'In Progress', 'Planned', 'Paused'])
         .optional(),
+      draft: z.boolean().optional(),
+
+      // ProjectSideBar
       link: z
         .array(
           z.object({
@@ -63,7 +92,6 @@ const projects = defineCollection({
           }),
         )
         .optional(),
-      draft: z.boolean().optional(),
       contributions: z.array(z.string()).optional(),
       team: z
         .array(

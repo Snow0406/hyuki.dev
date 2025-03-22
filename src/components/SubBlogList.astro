@@ -1,0 +1,101 @@
+---
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import { getCollection } from 'astro:content'
+
+// 부모 포스트 ID를 props로 받음
+interface Props {
+  parentId: string
+  title?: string // 목록 제목
+}
+
+const { parentId, title = 'Series Contents' } = Astro.props
+
+// 부모 ID로부터 전체 부모 포스트 정보 가져오기
+const parentPost = (await getCollection('blog')).find(
+  (post) => post.id === parentId,
+)
+if (!parentPost) {
+  throw new Error(`Parent post with ID ${parentId} not found`)
+}
+
+// 부모 포스트와 동일한 parentTitle을 가진 서브 블로그 포스트들을 가져옴
+const allPosts = await getCollection('blog', ({ data }) => !data.draft)
+const subposts = allPosts
+  .filter((post) => post.data.parentTitle === parentPost.data.title)
+  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf())
+
+// 제목에서 서브타이틀만 추출하는 함수 (예: "릴리움 개발일지: 1. 캐릭터 디자인" -> "1. 캐릭터 디자인")
+function getSubtitle(title: string): string {
+  const parts = title.split(': ')
+  return parts.length > 1 ? parts[1] : title
+}
+---
+
+<details open class="not-prose my-8 rounded-xl border">
+  <summary
+    class="flex cursor-pointer items-center justify-between p-4 text-xl font-semibold [&[open]]:pb-4"
+  >
+    {title}
+    <Icon
+      name="lucide:chevron-down"
+      class="size-5 transition-transform [details[open]_&]:rotate-180"
+    />
+  </summary>
+  <ScrollArea
+    client:load
+    className="flex max-h-96 flex-col overflow-y-auto"
+    type="always"
+  >
+    <div class="my-[-1.5rem] flex flex-col gap-4 p-10">
+      {
+        subposts.map((post) => (
+          <a
+            href={`/blog/${post.id}`}
+            class="bg-card group relative flex overflow-hidden rounded-xl border transition-all duration-300 hover:border-primary/50 hover:bg-accent/10"
+          >
+            <div class="w-1/3 flex-shrink-0 p-3">
+              <div class="aspect-video overflow-hidden rounded-lg">
+                {post.data.image ? (
+                  <Image
+                    src={post.data.image}
+                    alt={post.data.title}
+                    width={400}
+                    height={225}
+                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    decoding="async"
+                  />
+                ) : (
+                  <img
+                    src={`/og/${post.id}.png`}
+                    alt={post.data.title}
+                    width={400}
+                    height={225}
+                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    decoding="async"
+                  />
+                )}
+              </div>
+            </div>
+            <div class="flex flex-1 flex-col justify-between p-4">
+              <div>
+                <h3 class="mb-2 text-xl font-semibold tracking-tight">
+                  {getSubtitle(post.data.title)}
+                </h3>
+                <p class="line-clamp-2 text-sm text-muted-foreground">
+                  {post.data.description}
+                </p>
+              </div>
+              <div class="flex justify-end">
+                <div class="translate-x-2 transform opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                  <Icon name="lucide:arrow-right" class="h-4 w-4" />
+                </div>
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </ScrollArea>
+</details>
