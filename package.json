@@ -9,7 +9,8 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -33,8 +34,8 @@
     "@types/react-dom": "19.0.0",
     "astro": "^5.5.4",
     "astro-expressive-code": "^0.40.2",
-    "astro-icon": "^1.1.5",
     "astro-og-canvas": "^0.7.0",
+    "astro-icon": "^1.1.5",
     "bootstrap-icons": "^1.11.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

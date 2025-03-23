@@ -14,12 +14,13 @@ export async function getStaticPaths({
   paginate: PaginateFunction
 }) {
   const allPosts = (
-    await getCollection('blog', ({ data }) => {
-      return !data.draft && data.hidden !== true
-    })
+    await getCollection(
+      'blog',
+      ({ data }) => !data.draft && !data.hidden,
+    )
   ).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
 
-  return paginate(allPosts, { pageSize: SITE.POSTS_PER_PAGE })
+  return paginate(allPosts, { pageSize: SITE.postsPerPage })
 }
 
 const { page } = Astro.props
@@ -49,7 +50,7 @@ const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
       {
         years.map((year) => (
           <section class="flex flex-col gap-y-4">
-            <div class="font-semibold">{year}</div>
+            <div class="font-medium">{year}</div>
             <ul class="flex flex-col gap-4">
               {postsByYear[year].map((post) => (
                 <li>

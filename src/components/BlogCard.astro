@@ -37,8 +37,7 @@ const authors = await parseAuthors(entry.data.authors ?? [])
             alt={entry.data.title}
             width={1200}
             height={630}
-            class="rounded-lg object-cover"
-            decoding="async"
+            class="rounded-xl object-cover"
           />
         </div>
       ) : (
@@ -48,14 +47,13 @@ const authors = await parseAuthors(entry.data.authors ?? [])
             alt={entry.data.title}
             width={1200}
             height={630}
-            class="rounded-lg object-cover"
-            decoding="async"
+            class="rounded-xl object-cover"
           />
         </div>
       )
     }
     <div class="grow">
-      <h3 class="mb-1 text-lg font-semibold">
+      <h3 class="mb-1 text-lg font-medium">
         {entry.data.title}
       </h3>
       <p class="text-muted-foreground mb-2 text-sm">

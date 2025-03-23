@@ -88,9 +88,8 @@ const readTime = readingTime(totalBody)
   image={post.data.image?.src ?? `/og/${post.id}.png`}
 >
   <section
-    class="grid grid-cols-[minmax(0px,1fr)_min(var(--breakpoint-md),100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
+    class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-5 *:px-4"
   >
-    <!-- 경로 표시 (서브 블로그일 경우 부모 포스트 링크 포함) -->
     <Breadcrumbs
       items={[
         { href: '/blog', label: 'Blog', icon: 'lucide:archive' },
@@ -110,44 +109,38 @@ const readTime = readingTime(totalBody)
       ]}
       class="col-start-2"
     />
-
-    <!-- 메인 포스트일 경우에만 이미지 표시 -->
     {
       !isSubpost && post.data.image ? (
-        <div class="col-span-full mx-auto w-full max-w-[1000px]">
-          <Image
-            src={post.data.image}
+        <Image
+          src={post.data.image}
+          alt={post.data.title}
+          width={1200}
+          height={630}
+          class="col-span-full mx-auto w-full max-w-[1000px] rounded-xl object-cover"
+        />
+      ) : (
+        !isSubpost &&
+        (
+          <img
+            src={`/og/${post.id}.png`}
             alt={post.data.title}
             width={1200}
             height={630}
-            class="rounded-xl object-cover"
+            class="col-span-full mx-auto w-full max-w-[1000px] rounded-xl object-cover"
           />
-        </div>
-      ) : (
-        !isSubpost && (
-          <div class="col-span-full mx-auto w-full max-w-[1000px]">
-            <img
-              src={`/og/${post.id}.png`}
-              alt={post.data.title}
-              width={1200}
-              height={630}
-              class="rounded-xl object-cover"
-            />
-          </div>
-        )
+        )``
       )
     }
 
-    <section class="col-start-2 flex flex-col gap-y-6">
-      <!-- 메인 포스트일 경우에만 제목, 저자 등 메타데이터 표시 -->
+    <section class="col-start-2 flex flex-col gap-y-6 text-center">
       {
         !isSubpost && (
-          <div class="flex flex-col gap-y-4 text-center">
-            <h1 class="text-4xl leading-tight font-bold sm:text-5xl">
+          <div class="flex flex-col gap-y-4">
+            <h1 class="text-4xl leading-tight font-medium text-pretty sm:text-5xl">
               {post.data.title}
             </h1>
 
-            <div class="text-muted-foreground wrap flex items-center justify-center gap-2 text-sm">
+            <div class="text-muted-foreground flex flex-wrap items-center justify-center gap-2 text-sm">
               {authors.length > 0 && (
                 <>
                   <div class="flex items-center gap-x-2">
@@ -159,7 +152,6 @@ const readTime = readingTime(totalBody)
                           width={24}
                           height={24}
                           class="rounded-full"
-                          decoding="async"
                         />
                         {author.isRegistered ? (
                           <Link
@@ -184,7 +176,7 @@ const readTime = readingTime(totalBody)
                 <span>{readTime}</span>
               </div>
             </div>
-            <div class="wrap flex justify-center gap-2">
+            <div class="flex flex-wrap justify-center gap-2">
               {post.data.tags && post.data.tags.length > 0 ? (
                 post.data.tags.map((tag) => (
                   <a
@@ -208,14 +200,12 @@ const readTime = readingTime(totalBody)
       <PostNavigation prevPost={prevPost} nextPost={nextPost} />
     </section>
 
-    <!-- 일반 포스트일 경우 자동 생성된 목차 표시 -->
     {headings.length > 0 && <TableOfContents headings={headings} />}
 
     <article class="prose col-start-2 max-w-none">
       <Content />
     </article>
 
-    <!-- 서브 블로그일 경우 미리 정의된 목차 표시 -->
     {
       isSubpost && post.data.tableOfContents && (
         <TableOfContentsPrebuilt
