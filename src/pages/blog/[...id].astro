@@ -69,7 +69,8 @@ const { Content, headings } = await render(post)
 const authors = await parseAuthors(post.data.authors ?? [])
 
 // 코드 블록 제거 함수 (읽기 시간 계산에 사용)
-const stripCodeBlocks = (text: string) => text.replace(/```[\s\S]*?```/g, '')
+const stripCodeBlocks = (text: string | undefined) =>
+  text ? text.replace(/```[\s\S]*?```/g, '') : ''
 
 // 메인 포스트인 경우 서브 포스트까지 포함한 읽기 시간 계산
 // 이미 필터링된 allPosts에서 서브 포스트 찾기
@@ -77,8 +78,10 @@ const subposts = isSubpost
   ? []
   : allPosts.filter((p) => p.data.parentTitle === post.data.title)
 const totalBody = isSubpost
-  ? post.body!
-  : [post.body!, ...subposts.map((p) => p.body!)].map(stripCodeBlocks).join('')
+  ? post.body || ''
+  : [post.body || '', ...subposts.map((p) => p.body || '')]
+      .map(stripCodeBlocks)
+      .join('')
 const readTime = readingTime(totalBody)
 ---
 
