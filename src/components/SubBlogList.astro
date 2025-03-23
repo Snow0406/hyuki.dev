@@ -43,28 +43,28 @@ const subPosts = (await getCollection('blog', ({ data }) => !data.draft))
         subPosts.map((post) => (
           <a
             href={`/blog/${post.id}`}
-            class="hover:bg-muted/50 mr-5 block rounded-lg border no-underline transition-colors"
+            class="hover:bg-muted/50 group/card relative mr-5 block rounded-lg border no-underline transition-colors"
           >
             <div class="flex flex-row gap-4">
               {showImage &&
                 (post.data.image ? (
-                  <div class="mt-[-1rem] ml-4 h-30 w-30 flex-shrink-0">
+                  <div class="mt-[-1rem] ml-4 h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
                     <Image
                       src={post.data.image}
                       alt={post.data.title}
                       width={400}
                       height={200}
-                      class="rounded-lg object-cover"
+                      class="rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
                     />
                   </div>
                 ) : (
-                  <div class="mt-[-1rem] mb-[-1rem] h-24 w-24 flex-shrink-0 pl-5">
+                  <div class="mt-[-1rem] mb-[-1rem] h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg pl-5">
                     <img
                       src={`/og/${post.id}.png`}
                       alt={post.data.title}
                       width={400}
                       height={200}
-                      class="h-full w-full rounded-lg object-cover"
+                      class="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
                     />
                   </div>
                 ))}
@@ -78,6 +78,9 @@ const subPosts = (await getCollection('blog', ({ data }) => !data.draft))
                   {post.data.description}
                 </p>
               </div>
+            </div>
+            <div class="absolute right-4 bottom-4 translate-x-2 transform opacity-0 transition-all duration-300 group-hover/card:translate-x-0 group-hover/card:opacity-100">
+              <Icon name="lucide:arrow-right" class="h-4 w-4" />
             </div>
           </a>
         ))
