@@ -35,7 +35,7 @@ export async function getStaticPaths({
     return dateB - dateA
   })
 
-  return paginate(sortedProjects, { pageSize: SITE.POSTS_PER_PAGE })
+  return paginate(sortedProjects, { pageSize: SITE.postsPerPage })
 }
 
 const { page } = Astro.props
