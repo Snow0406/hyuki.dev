@@ -80,7 +80,7 @@ C++ 파일을 선택하고 **이름의 확장명은 .c**로 바꿔주세요 !
 - 단일줄 코멘트 : `//`
 - 여러줄 코멘트 : `/* */`
 
-```c
+```c showLineNumbers
 int a = 4; // a는 4입니다.
 
 /* 이건
@@ -93,7 +93,7 @@ int a = 4; // a는 4입니다.
 main 함수는 **프로그램의 시작을 담당**합니다.
 모든 C 프로그램은 실행의 시작점인 main() 함수를 포함해야 합니다.
 
-```c
+```c showLineNumbers
 int main() {
 
 }
@@ -121,7 +121,7 @@ int main() {
 변수는 **데이터를 저장하는 공간**으로, C언어에서는 사용 전에 반드시 타입을 선언해야 합니다.
 정수형 변수는 `int`, 실수형 변수는 `float` 또는 `double`형을 사용하며, 변수는 선언과 동시에 초기화할 수 있습니다.
 
-```c
+```c showLineNumbers
 /*
     변수명 규칙
     1. 변수명은 오직 영어, 숫자, _로만 구성되어 있어야 한다.
@@ -146,7 +146,7 @@ int main() {
 두 함수는 `stdio.h` 헤더파일에 선언되어 있으므로 사용하기 위해서는
 코드 상단에 `#inculde <stdio.h>` 적어야합니다.
 
-```c
+```c showLineNumbers
 #define _CRT_SECURE_NO_WARNINGS
 #inculde <stdio.h>
 

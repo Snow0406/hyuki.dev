@@ -1,0 +1,90 @@
+---
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import { getCollection } from 'astro:content'
+import { fade } from 'astro:transitions'
+
+export interface Props {
+  parentId: string
+  title: string
+  showImage?: boolean
+}
+
+const { parentId, title, showImage = fade } = Astro.props
+
+// 해당 부모 ID를 가진 서브 블로그 포스트 가져오기
+const subPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .filter(
+    (post) =>
+      post.id.startsWith(`${parentId}/`) && post.id !== `${parentId}/index`,
+  )
+  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf())
+---
+
+<details open class="group mt-5 rounded-xl border p-4">
+  <summary
+    class="flex cursor-pointer items-center justify-between pb-3 text-xl font-medium"
+  >
+    {title}
+    <Icon
+      name="lucide:chevron-down"
+      class="size-5 transition-transform group-open:rotate-180"
+    />
+  </summary>
+
+  <ScrollArea
+    client:load
+    className="flex max-h-96 flex-col overflow-y-auto"
+    type="always"
+  >
+    <ul class="flex flex-col gap-4">
+      {
+        subPosts.map((post) => (
+          <a
+            href={`/blog/${post.id}`}
+            class="hover:bg-muted/50 group/card relative mr-5 block rounded-lg border no-underline transition-colors"
+          >
+            <div class="flex flex-row gap-4">
+              {showImage &&
+                (post.data.image ? (
+                  <div class="mt-[-1rem] ml-4 h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
+                    <Image
+                      src={post.data.image}
+                      alt={post.data.title}
+                      width={400}
+                      height={200}
+                      class="rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
+                    />
+                  </div>
+                ) : (
+                  <div class="mt-[-1rem] mb-[-1rem] h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg pl-5">
+                    <img
+                      src={`/og/${post.id}.png`}
+                      alt={post.data.title}
+                      width={400}
+                      height={200}
+                      class="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
+                    />
+                  </div>
+                ))}
+              <div class="mt-[-0.3rem] min-w-0 grow overflow-hidden pl-3">
+                <h3 class="mb-1 overflow-hidden text-lg font-medium text-ellipsis">
+                  {post.data.title.includes(': ')
+                    ? post.data.title.split(': ')[1]
+                    : post.data.title}
+                </h3>
+                <p class="text-muted-foreground mt-[-0.1rem] overflow-hidden text-sm text-ellipsis">
+                  {post.data.description}
+                </p>
+              </div>
+            </div>
+            <div class="absolute right-4 bottom-4 translate-x-2 transform opacity-0 transition-all duration-300 group-hover/card:translate-x-0 group-hover/card:opacity-100">
+              <Icon name="lucide:arrow-right" class="h-4 w-4" />
+            </div>
+          </a>
+        ))
+      }
+    </ul>
+  </ScrollArea>
+</details>

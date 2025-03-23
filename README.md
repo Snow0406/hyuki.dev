@@ -59,5 +59,5 @@ Made with ♥ by [hy](https://hyuki.dev) & [enscribe](https://enscribe.dev)!
 
 [cc-by-nc-nd]: http://creativecommons.org/licenses/by-nc-nd/4.0/
 [cc-by-nc-nd-shield]: https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg
-[Code License]: https://img.shields.io/badge/content%20license-CC%20BY--NC--ND%204.0-5d?style=for-the-badge&logo=creativecommons&logoColor=fff&color=%237A73D1
-[Content License]: https://img.shields.io/badge/code%20license-proprietary-5d?style=for-the-badge&logo=github&logoColor=fff&color=%237A73D1
+[Code License]: https://img.shields.io/badge/code%20license-proprietary-5d?style=for-the-badge&logo=github&logoColor=fff&color=%237A73D1
+[Content License]: https://img.shields.io/badge/content%20license-CC%20BY--NC--ND%204.0-5d?style=for-the-badge&logo=creativecommons&logoColor=fff&color=%237A73D1

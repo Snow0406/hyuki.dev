@@ -61,13 +61,13 @@ const { variant, icon } = getStatusInfo(project.data.status)
     <section class="col-start-2 flex flex-col gap-y-6 text-center">
       <div class="flex flex-col gap-y-4">
         <div class="flex flex-col items-center gap-2">
-          <h1 class="text-4xl font-bold leading-tight sm:text-5xl">
+          <h1 class="text-4xl leading-tight font-bold sm:text-5xl">
             {project.data.name}
           </h1>
 
           {
             project.data.status && (
-              <Badge variant={variant} showHash={false}>
+              <Badge variant={variant}>
                 <Icon name={icon} class="mr-1 size-3.5" />
                 {project.data.status}
               </Badge>
@@ -76,14 +76,14 @@ const { variant, icon } = getStatusInfo(project.data.status)
         </div>
 
         <div
-          class="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground"
+          class="text-muted-foreground flex flex-wrap items-center justify-center gap-2 text-sm"
         >
           <span>{project.data.description}</span>
         </div>
 
         {
           developmentPeriod && (
-            <div class="flex items-center justify-center text-sm text-muted-foreground">
+            <div class="text-muted-foreground flex items-center justify-center text-sm">
               <Icon name="lucide:calendar" class="mr-1 size-4" />
               <span>{developmentPeriod}</span>
             </div>
@@ -99,7 +99,7 @@ const { variant, icon } = getStatusInfo(project.data.status)
                 </span>
               ))
             ) : (
-              <span class="text-sm text-muted-foreground">
+              <span class="text-muted-foreground text-sm">
                 No tags available
               </span>
             )
@@ -111,7 +111,7 @@ const { variant, icon } = getStatusInfo(project.data.status)
     <ProjectSidebar project={project} />
 
     <article
-      class="prose prose-neutral col-start-2 max-w-none dark:prose-invert"
+      class="prose prose-neutral dark:prose-invert col-start-2 max-w-none"
     >
       <Content />
     </article>
@@ -120,7 +120,7 @@ const { variant, icon } = getStatusInfo(project.data.status)
   <Button
     variant="outline"
     size="icon"
-    className="group fixed bottom-8 right-8 z-50 hidden"
+    className="group fixed right-8 bottom-8 z-50 hidden"
     id="scroll-to-top"
     title="Scroll to top"
     aria-label="Scroll to top"

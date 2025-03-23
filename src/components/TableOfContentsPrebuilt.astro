@@ -1,0 +1,84 @@
+---
+import { ScrollArea } from '@/components/ui/scroll-area'
+import TableOfContentsHeading from './TableOfContentsHeading.astro'
+
+// 목차 항목 인터페이스 정의
+export interface Heading {
+  depth: number
+  slug: string
+  text: string
+  subheadings: Heading[]
+}
+
+interface Props {
+  headings: Heading[] // 미리 정의된 목차 항목들
+  title?: string // 목차 제목
+  activeSlug?: string // 현재 활성화된 항목의 슬러그
+}
+
+const { headings, title = 'Table of Contents', activeSlug } = Astro.props
+---
+
+<!-- 데스크톱에서는 오른쪽 사이드바로 표시 -->
+<nav
+  class="sticky top-[3.5rem] col-start-3 hidden h-[calc(100vh-3.5rem)] text-xs leading-4 xl:block"
+>
+  <div class="flex justify-start">
+    <ScrollArea client:load className="max-h-[calc(100vh-6rem)]" type="always">
+      <ul
+        class="flex flex-col justify-end gap-y-2 overflow-y-auto px-8"
+        id="toc-container"
+      >
+        <li>
+          <h2 class="mb-2 text-right text-lg font-semibold">{title}</h2>
+        </li>
+        {
+          headings.map((heading) => (
+            <TableOfContentsHeading heading={heading} activeSlug={activeSlug} />
+          ))
+        }
+      </ul>
+    </ScrollArea>
+  </div>
+</nav>
+
+<!-- 모바일에서는 접이식 메뉴로 표시 -->
+<details
+  open
+  class="group col-start-2 mx-4 block rounded-xl border p-4 xl:hidden"
+>
+  <summary
+    class="flex cursor-pointer items-center justify-between text-xl font-semibold group-open:pb-4"
+  >
+    {title}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="size-5 transition-transform group-open:rotate-180"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m6 9 6 6 6-6"></path>
+    </svg>
+  </summary>
+  <ScrollArea
+    client:load
+    className="flex max-h-64 flex-col overflow-y-auto pt-2"
+    type="always"
+  >
+    <nav>
+      <ul>
+        {
+          headings.map((heading) => (
+            <TableOfContentsHeading heading={heading} activeSlug={activeSlug} />
+          ))
+        }
+      </ul>
+    </nav>
+  </ScrollArea>
+</details>
