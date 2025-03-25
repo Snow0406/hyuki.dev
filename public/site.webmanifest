@@ -1,19 +1,19 @@
 {
-  "name": "erudite",
-  "short_name": "erudite",
+  "name": "hyuki.dev",
+  "short_name": "hyuki.dev",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/android-chrome-512x512.png",
+      "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
-  "theme_color": "#121212",
-  "background_color": "#121212",
+  "theme_color": "#ebf0ff",
+  "background_color": "#1b1b2f",
   "display": "standalone"
 }
