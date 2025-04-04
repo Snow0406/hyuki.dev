@@ -30,11 +30,11 @@ const DiscordSkeleton = () => (
       <Skeleton className="bg-secondary/50" />
       <div className="row-span-3 flex flex-col gap-3 p-3 xl:gap-2 xl:p-2">
         <div className="flex justify-between gap-x-1">
-          <Skeleton className="-mt-[4.5rem] aspect-square size-24 rounded-full xl:-mt-[3.5rem] xl:size-20" />
-          <Skeleton className="h-6 w-[104px] rounded-xl xl:h-5 xl:w-[90px]" />
+          <Skeleton className="-mt-[3rem] aspect-square size-20 rounded-full" />
+          <Skeleton className="h-6 w-[118px] rounded-xl xl:h-5 xl:w-[100px]" />
         </div>
-        <Skeleton className="h-14 w-full rounded-xl xl:h-12" />
-        <Skeleton className="flex grow rounded-xl" />
+        <Skeleton className="flex h-[62px] flex-col gap-y-1 rounded-xl p-3 xl:h-[54px] xl:gap-y-0.5 xl:p-2" />
+        <Skeleton className="flex grow rounded-xl p-2 xl:p-1.5" />
       </div>
     </div>
   </div>
@@ -167,14 +167,14 @@ const DiscordPresence = () => {
                 src="/static/avatar.webp"
                 alt="Avatar"
                 fallback="e"
-                className="-mt-[4.5rem] aspect-square size-24 rounded-full xl:-mt-[3.5rem] xl:size-20"
+                className="-mt-[3rem] aspect-square size-20 rounded-full"
               />
               <StatusIndicator status={status} />
               <div className="pointer-events-none absolute -inset-4">
                 <img
                   src="/static/discord_avatar_decoration.gif"
                   alt="Avatar Decoration"
-                  className="absolute -top-15 left-2 size-28 xl:-top-12 xl:left-1.5 xl:size-24"
+                  className="absolute -top-11 left-1 size-28"
                 />
               </div>
             </div>
