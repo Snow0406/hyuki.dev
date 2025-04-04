@@ -1,59 +1,86 @@
 ---
-import BlogCard from '@/components/BlogCard.astro'
-import Container from '@/components/Container.astro'
+import DiscordPresence from '@/components/bento/DiscordPresence'
 import Link from '@/components/Link.astro'
-import { buttonVariants } from '@/components/ui/button'
 import { SITE } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
+import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 
-const blog = (await getCollection('blog'))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, SITE.featuredPostCount)
+const latestPost = await getCollection('blog').then((posts) =>
+  posts
+    .sort(
+      (a, b) =>
+        new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+    )
+    .filter((post) => !post.data.hidden && !post.data.draft)
+    .slice(0, SITE.featuredPostCount),
+)
 ---
 
 <Layout title="Home" description={SITE.description}>
-  <Container class="flex flex-col gap-y-6">
-    <section>
-      <div class="rounded-lg border">
-        <div class="flex flex-col space-y-1.5 p-6">
-          <h3 class="text-3xl leading-none font-semibold">Hey, I'm Hy !</h3>
-        </div>
-        <div class="p-6 pt-0">
-          <p class="text-muted-foreground mb-2 text-sm">
-            I'm a game developer and student at Incheon National University from
-            Korea.
-          </p>
-          <p class="text-muted-foreground text-sm">
-            I'm currently interested in web, Unity development, and subculture
-            games !
-          </p>
-        </div>
+  <section
+    class="*:bg-secondary/25 mx-auto grid max-w-[375px] grid-cols-2 gap-4 px-4 [grid-template-areas:'a_a'_'a_a'_'b_b'_'e_e'_'f_f'] *:rounded-3xl *:border *:bg-cover *:bg-center *:bg-no-repeat sm:max-w-screen-sm sm:[grid-template-areas:'a_a'_'b_f'_'e_e'] xl:max-w-screen-md xl:grid-cols-3 xl:[grid-template-areas:'a_a_b'_'f_d_d'_'e_e_e']"
+  >
+    <div
+      class="first rounded-3xl border bg-cover bg-center bg-no-repeat [grid-area:a] sm:aspect-[2.7/1] xl:aspect-auto"
+    >
+      <div class="flex flex-col space-y-1.5 p-6">
+        <h3 class="text-3xl leading-none font-semibold">Hey, I'm Hy !</h3>
       </div>
-    </section>
-    <section class="flex flex-col gap-y-4">
-      <h2 class="text-2xl font-semibold">Latest posts</h2>
-      <ul class="flex flex-col gap-y-4">
-        {
-          blog.map((post) => (
-            <li>
-              <BlogCard entry={post} />
-            </li>
-          ))
-        }
-      </ul>
-      <div class="flex justify-center">
-        <Link
-          href="/blog"
-          class={buttonVariants({ variant: 'ghost' }) + ' group'}
-        >
-          See all posts <span
-            class="ml-1.5 transition-transform group-hover:translate-x-1"
-            >&rarr;</span
-          >
-        </Link>
+      <div class="text-muted-foreground p-6 pt-0 text-sm">
+        <p class="mb-2">
+          I'm a developer and student at Incheon National University from Korea,
+          active online as hy and snow.
+        </p>
+        <p class="mb-2">
+          I'm currently interested in Unity optimization and web backend
+          development!
+        </p>
+        <p class="mb-2">I adore subculture games and strawberry lattes ✨</p>
       </div>
-    </section>
-  </Container>
+    </div>
+
+    <div
+      class="relative hidden items-start overflow-hidden p-4 [grid-area:d] xl:flex xl:aspect-auto"
+    >
+      {
+        latestPost && latestPost.length > 0 && (
+          <>
+            <img
+              src={latestPost[0].data.image?.src ?? '#'}
+              alt={latestPost[0].data.title}
+              width={477}
+              height={251}
+              class="border-border w-[85%] rounded-2xl border"
+            />
+            <Link
+              href={`/blog/${latestPost[0].id}`}
+              aria-label={`Read blog post: ${latestPost[0].data.title}`}
+              title={`Read blog post: ${latestPost[0].data.title}`}
+            >
+              <div class="bg-secondary/50 text-primary hover:ring-primary absolute right-0 bottom-0 m-3 flex w-fit items-end rounded-full border p-3 transition-all duration-300 hover:ring-1">
+                <Icon name="lucide:move-up-right" size={16} />
+              </div>
+            </Link>
+          </>
+        )
+      }
+    </div>
+
+    <div
+      class="relative flex aspect-square items-center justify-center overflow-hidden [grid-area:e] sm:aspect-[2.1/1]"
+    >
+      Wakatime Calendar
+    </div>
+
+    <div class="relative overflow-hidden [grid-area:b] sm:aspect-square">
+      <DiscordPresence client:load />
+    </div>
+
+    <div
+      class="relative flex aspect-square items-center justify-center [grid-area:f]"
+    >
+      Wakatime Graph
+    </div>
+  </section>
 </Layout>

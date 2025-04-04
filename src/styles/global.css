@@ -106,7 +106,7 @@
   --accent-foreground: var(--foreground);
   --additive: var(--primary);
   --additive-foreground: var(--foreground);
-  --destructive: var(--destructive);
+  --destructive: oklch(0.65 0.25 30);
   --destructive-foreground: var(--foreground);
   --success: oklch(0.55 0.1 210);
   --success-foreground: oklch(0.98 0.005 240);
