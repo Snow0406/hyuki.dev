@@ -118,78 +118,6 @@ const WakatimeGraph = () => {
       })
       .catch((err) => {
         console.error('Wakatime 데이터 불러오기 실패:', err)
-        // 오류 발생 시 샘플 데이터를 대신 사용 (두 번째 이미지에 맞는 샘플 데이터)
-        const fallbackData = [
-          {
-            name: 'C#',
-            percent: 42.37,
-            color: '#178600',
-            hours: 29,
-            minutes: 29,
-            text: '29 hrs 29 mins',
-            total_seconds: 106155.4,
-          },
-          {
-            name: 'Astro',
-            percent: 23.9,
-            color: '#ff5a03',
-            hours: 16,
-            minutes: 38,
-            text: '16 hrs 38 mins',
-            total_seconds: 59883.5,
-          },
-          {
-            name: 'MDX',
-            percent: 8.65,
-            color: '#fcb32c',
-            hours: 6,
-            minutes: 1,
-            text: '6 hrs 1 min',
-            total_seconds: 21674.5,
-          },
-          {
-            name: 'TypeScript',
-            percent: 5.87,
-            color: '#3178c6',
-            hours: 4,
-            minutes: 5,
-            text: '4 hrs 5 mins',
-            total_seconds: 14700.4,
-          },
-          {
-            name: 'Markdown',
-            percent: 5.44,
-            color: '#083fa1',
-            hours: 3,
-            minutes: 47,
-            text: '3 hrs 47 mins',
-            total_seconds: 13641.3,
-          },
-          {
-            name: 'C',
-            percent: 4.51,
-            color: '#555555',
-            hours: 3,
-            minutes: 8,
-            text: '3 hrs 8 mins',
-            total_seconds: 11309.9,
-          },
-          {
-            name: 'CSS',
-            percent: 3.59,
-            color: '#563d7c',
-            hours: 2,
-            minutes: 29,
-            text: '2 hrs 29 mins',
-            total_seconds: 8994.2,
-          },
-        ].map((lang, index) => ({
-          ...lang,
-          fill: colors[index % colors.length],
-          value: lang.hours,
-        }))
-        setLanguages(fallbackData)
-        setIsLoading(false)
       })
   }, [])
 
@@ -197,7 +125,7 @@ const WakatimeGraph = () => {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center p-0">
         <div
-          className={`flex w-full flex-col px-8 py-10 ${isXl ? 'space-y-[13px] px-8' : 'space-y-[15px]'}`}
+          className={`flex w-full flex-col px-8 py-10 ${isXl ? 'space-y-[12.5px] px-8' : 'space-y-[15px]'}`}
         >
           {[...Array(7)].map((_, index) => (
             <div key={index} className="flex items-center">

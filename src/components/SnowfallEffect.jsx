@@ -29,47 +29,42 @@ const SnowfallEffect = () => {
     observerRef.current = new MutationObserver(checkDarkMode)
     observerRef.current.observe(document.documentElement, { attributes: true })
 
-    const createSnowflake = () => {
+    const createSnowflake = (isInitial = false) => {
       const id = Math.random().toString(36).substring(2, 9)
       const size = Math.random() * 5 + 2 // 2px ~ 7px
       const left = Math.random() * 100 // 0% ~ 100%
       const baseOpacity = Math.random() * 0.25 + 0.05 // 0.05 ~ 0.3
       const duration = Math.random() * 15 + 15 // 15s ~ 30s
-      const delay = Math.random() * 10 // 0s ~ 10s
+      const delay = isInitial ? 0 : Math.random() * 10 // 초기 눈송이는 지연 없음, 이후 0s ~ 10s
       const isStrawberry = Math.random() > 0.8 // 20% 확률로 strawberry 색상
 
       return { id, size, left, baseOpacity, duration, delay, isStrawberry }
     }
 
-    // 디바이스 성능에 따라 초기 눈송이 개수 조정
-    let initialSnowflakesCount = Math.floor(Math.random() * 6) + 12
+    let initialSnowflakesCount = Math.floor(Math.random() * 6) + 15
     if (isMobile)
-      initialSnowflakesCount = Math.max(8, initialSnowflakesCount - 4)
+      initialSnowflakesCount = Math.max(10, initialSnowflakesCount - 4)
     if (isLowPerfDevice)
-      initialSnowflakesCount = Math.max(6, initialSnowflakesCount - 6)
+      initialSnowflakesCount = Math.max(8, initialSnowflakesCount - 6)
 
     const initialSnowflakes = Array.from(
       { length: initialSnowflakesCount },
-      createSnowflake,
+      () => createSnowflake(true),
     )
     setSnowflakes(initialSnowflakes)
 
-    // 주기적으로 새 눈송이 추가 (성능에 따라 간격 조정)
     const interval = setInterval(
       () => {
-        // 화면 밖으로 나가면 눈송이를 추가하지 않음
         if (document.hidden) return
 
         const newSnowflakesCount = Math.floor(Math.random() * 2) + 1
-        const newSnowflakes = Array.from(
-          { length: newSnowflakesCount },
-          createSnowflake,
+        const newSnowflakes = Array.from({ length: newSnowflakesCount }, () =>
+          createSnowflake(false),
         )
 
-        // 최대 눈송이 수를 디바이스 성능에 맞게 조정
-        let maxSnowflakes = 25
-        if (isMobile) maxSnowflakes = 15
-        if (isLowPerfDevice) maxSnowflakes = 10
+        let maxSnowflakes = 30
+        if (isMobile) maxSnowflakes = 18
+        if (isLowPerfDevice) maxSnowflakes = 12
 
         setSnowflakes((prev) => {
           const updatedSnowflakes = [...prev, ...newSnowflakes]
@@ -105,7 +100,7 @@ const SnowfallEffect = () => {
     // 화면 크기에 따라 눈송이 밀도 조절
     const handleResize = () => {
       const width = window.innerWidth
-      const maxSnowflakes = width < 640 ? 15 : width < 1024 ? 20 : 25
+      const maxSnowflakes = width < 640 ? 18 : width < 1024 ? 25 : 30
 
       setSnowflakes((prev) => {
         if (prev.length > maxSnowflakes) {
