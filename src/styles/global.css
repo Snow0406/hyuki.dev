@@ -189,140 +189,17 @@
     filter: drop-shadow(0 0 5px var(--strawberry-hover));
   }
 
-  .frost-border {
-    position: relative;
-    overflow: hidden;
-    background-clip: padding-box;
-    border: 2px solid transparent !important;
-    transition: box-shadow 0.3s ease-in-out;
-  }
-
-  .frost-border::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: -1;
-    margin: -2px;
-    border-radius: inherit;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.8) 0%,
-      rgba(240, 248, 255, 0.5) 25%,
-      rgba(230, 240, 255, 0.3) 50%,
-      rgba(200, 225, 255, 0.5) 75%,
-      rgba(255, 255, 255, 0.8) 100%
-    );
-  }
-
-  .dark .frost-border::before {
-    background: linear-gradient(
-      135deg,
-      rgba(130, 200, 255, 0.8) 0%,
-      rgba(100, 180, 255, 0.4) 25%,
-      rgba(70, 150, 240, 0.2) 50%,
-      rgba(100, 180, 255, 0.4) 75%,
-      rgba(150, 220, 255, 0.8) 100%
-    );
-  }
-
-  .frost-border:hover::before {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(240, 248, 255, 0.7) 25%,
-      rgba(230, 240, 255, 0.5) 50%,
-      rgba(200, 225, 255, 0.7) 75%,
-      rgba(255, 255, 255, 0.9) 100%
-    );
-  }
-
-  .dark .frost-border:hover::before {
-    background: linear-gradient(
-      135deg,
-      rgba(130, 200, 255, 0.9) 0%,
-      rgba(100, 180, 255, 0.6) 25%,
-      rgba(70, 150, 240, 0.4) 50%,
-      rgba(100, 180, 255, 0.6) 75%,
-      rgba(150, 220, 255, 0.9) 100%
-    );
-  }
-
-  .frost-glow {
+  .snow-border {
+    border: 2px solid rgba(180, 220, 255, 0.5) !important;
     box-shadow:
-      0 0 15px 2px rgba(200, 230, 255, 0.2),
-      0 0 20px 8px rgba(200, 235, 255, 0.1) inset;
+      0 0 15px 3px rgba(100, 180, 255, 0.25),
+      0 0 25px 5px rgba(130, 200, 255, 0.15) inset;
   }
 
-  .dark .frost-glow {
+  .dark .snow-border {
+    border: 2px solid rgba(180, 220, 255, 0.3) !important;
     box-shadow:
-      0 0 15px 2px rgba(100, 180, 255, 0.3),
-      0 0 20px 8px rgba(50, 150, 250, 0.2) inset;
-  }
-
-  .frost-border:hover.frost-glow {
-    box-shadow:
-      0 0 20px 4px rgba(200, 230, 255, 0.3),
-      0 0 25px 10px rgba(200, 235, 255, 0.15) inset;
-  }
-
-  .dark .frost-border:hover.frost-glow {
-    box-shadow:
-      0 0 20px 4px rgba(100, 180, 255, 0.4),
-      0 0 25px 10px rgba(50, 150, 250, 0.25) inset;
-  }
-
-  @keyframes snowfall {
-    0% {
-      transform: translateY(-10px) rotate(0deg);
-      opacity: 0;
-    }
-    10% {
-      opacity: var(--opacity);
-    }
-    90% {
-      opacity: var(--opacity);
-    }
-    100% {
-      transform: translateY(calc(100vh + 10px)) rotate(360deg);
-      opacity: 0;
-    }
-  }
-
-  .snowflake {
-    --opacity: 0;
-    will-change: transform;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-  }
-
-  @media (max-width: 768px) {
-    .snowflake-container {
-      opacity: 0.7;
-    }
-
-    .snowflake {
-      filter: blur(0.5px) !important;
-    }
-
-    @keyframes snowfall {
-      0% {
-        transform: translateY(-5px) rotate(0deg);
-        opacity: 0;
-      }
-      10% {
-        opacity: var(--opacity);
-      }
-      90% {
-        opacity: var(--opacity);
-      }
-      100% {
-        transform: translateY(calc(100vh + 5px)) rotate(180deg);
-        opacity: 0;
-      }
-    }
+      0 0 12px 2px rgba(120, 200, 255, 0.15),
+      0 0 20px 4px rgba(150, 220, 255, 0.08) inset;
   }
 }

@@ -24,8 +24,7 @@ const latestPost = await getCollection('blog').then((posts) =>
     class="*:bg-secondary/25 mx-auto grid max-w-[375px] grid-cols-2 gap-4 px-4 [grid-template-areas:'a_a'_'a_a'_'b_b'_'f_f'_'e_e'] *:rounded-3xl *:bg-cover *:bg-center *:bg-no-repeat sm:max-w-screen-sm sm:[grid-template-areas:'a_a'_'b_f'_'e_e'] xl:max-w-screen-md xl:grid-cols-3 xl:[grid-template-areas:'a_a_b'_'f_d_d'_'e_e_e']"
   >
     <div
-      class="first group relative overflow-hidden rounded-3xl border bg-cover bg-center bg-no-repeat [grid-area:a] sm:aspect-[2.7/1] xl:aspect-auto"
-      style="border: 2px solid rgba(180, 220, 255, 0.3) !important; box-shadow: 0 0 12px 2px rgba(120, 200, 255, 0.15), 0 0 20px 4px rgba(150, 220, 255, 0.08) inset;"
+      class="first group snow-border relative overflow-hidden rounded-3xl border bg-cover bg-center bg-no-repeat [grid-area:a] sm:aspect-[2.7/1] xl:aspect-auto"
     >
       <div class="snowflake-container pointer-events-none absolute inset-0">
         <Icon
@@ -53,6 +52,11 @@ const latestPost = await getCollection('blog').then((posts) =>
           class="snowflake-icon absolute top-32 right-16 opacity-15 transition-all duration-650 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-55"
           size={14}
         />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute right-40 bottom-6 opacity-30 transition-all duration-500 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-45 group-hover:opacity-50"
+          size={15}
+        />
       </div>
       <div class="relative flex flex-col space-y-1.5 p-6">
         <h3 class="text-3xl leading-none font-semibold">Hey, I'm Hy !</h3>
@@ -66,22 +70,12 @@ const latestPost = await getCollection('blog').then((posts) =>
           I'm currently interested in Unity optimization and web backend
           development!
         </p>
-        <p class="mb-2">
-          I adore subculture games and strawberry lattes <span
-            class="relative inline-block"
-            >✨<Icon
-              name="lucide:snowflake"
-              class="snowflake-strawberry absolute -top-3 right-0 opacity-30 transition-all duration-500 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-45 group-hover:opacity-50"
-              size={15}
-            /></span
-          >
-        </p>
+        <p class="mb-2">I adore subculture games and strawberry lattes ✨</p>
       </div>
     </div>
 
     <div
-      class="group relative hidden items-start overflow-hidden rounded-3xl border p-4 [grid-area:d] xl:flex xl:aspect-auto"
-      style="border: 2px solid rgba(180, 220, 255, 0.3) !important; box-shadow: 0 0 12px 2px rgba(120, 200, 255, 0.15), 0 0 20px 4px rgba(150, 220, 255, 0.08) inset;"
+      class="group snow-border relative hidden items-start overflow-hidden rounded-3xl border p-4 [grid-area:d] xl:flex xl:aspect-auto"
     >
       <div class="snowflake-container pointer-events-none absolute inset-0">
         <Icon
@@ -93,6 +87,26 @@ const latestPost = await getCollection('blog').then((posts) =>
           name="lucide:snowflake"
           class="snowflake-icon absolute right-10 bottom-12 opacity-10 transition-all duration-600 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-90 group-hover:opacity-60"
           size={14}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-10 left-8 opacity-18 transition-all duration-750 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-65"
+          size={15}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute bottom-4 left-14 opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-30deg] group-hover:opacity-55"
+          size={12}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-[40%] right-[20%] opacity-12 transition-all duration-850 ease-in-out group-hover:translate-y-3 group-hover:rotate-[120deg] group-hover:opacity-50"
+          size={13}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-[30%] left-[15%] opacity-14 transition-all duration-650 ease-in-out group-hover:translate-y-[-1px] group-hover:rotate-[45deg] group-hover:opacity-60"
+          size={11}
         />
       </div>
       {
@@ -120,8 +134,7 @@ const latestPost = await getCollection('blog').then((posts) =>
     </div>
 
     <div
-      class="group relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl border [grid-area:e] sm:aspect-[2.1/1]"
-      style="border: 2px solid rgba(180, 220, 255, 0.3) !important; box-shadow: 0 0 12px 2px rgba(120, 200, 255, 0.15), 0 0 20px 4px rgba(150, 220, 255, 0.08) inset;"
+      class="group snow-border relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl border [grid-area:e] sm:aspect-[2.1/1]"
     >
       <div class="snowflake-container pointer-events-none absolute inset-0">
         <Icon
@@ -134,13 +147,37 @@ const latestPost = await getCollection('blog').then((posts) =>
           class="snowflake-icon absolute right-[20%] bottom-5 opacity-10 transition-all duration-600 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-45 group-hover:opacity-50"
           size={16}
         />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-3 right-[15%] opacity-20 transition-all duration-750 ease-in-out group-hover:translate-y-2 group-hover:rotate-[30deg] group-hover:opacity-65"
+          size={14}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute bottom-10 left-[25%] opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-90deg] group-hover:opacity-55"
+          size={18}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-[40%] left-[10%] opacity-18 transition-all duration-650 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-60"
+          size={12}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-[30%] right-[10%] opacity-12 transition-all duration-700 ease-in-out group-hover:translate-y-[-1px] group-hover:rotate-[120deg] group-hover:opacity-45"
+          size={13}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute right-[25%] bottom-[30%] opacity-18 transition-all duration-600 ease-in-out group-hover:translate-y-3 group-hover:rotate-[-30deg] group-hover:opacity-55"
+          size={11}
+        />
       </div>
-      <WakatimeCalendar />
+      <WakatimeCalendar client:load />
     </div>
 
     <div
-      class="group relative overflow-hidden rounded-3xl border [grid-area:b] sm:aspect-square"
-      style="border: 2px solid rgba(180, 220, 255, 0.3) !important; box-shadow: 0 0 12px 2px rgba(120, 200, 255, 0.15), 0 0 20px 4px rgba(150, 220, 255, 0.08) inset;"
+      class="group snow-border relative overflow-hidden rounded-3xl border [grid-area:b] sm:aspect-square"
     >
       <div class="snowflake-container pointer-events-none absolute inset-0">
         <Icon
@@ -168,8 +205,7 @@ const latestPost = await getCollection('blog').then((posts) =>
     </div>
 
     <div
-      class="group relative aspect-square rounded-3xl border [grid-area:f]"
-      style="border: 2px solid rgba(180, 220, 255, 0.3) !important; box-shadow: 0 0 12px 2px rgba(120, 200, 255, 0.15), 0 0 20px 4px rgba(150, 220, 255, 0.08) inset;"
+      class="group snow-border relative aspect-square rounded-3xl border [grid-area:f]"
     >
       <div class="snowflake-container pointer-events-none absolute inset-0">
         <Icon
@@ -179,12 +215,12 @@ const latestPost = await getCollection('blog').then((posts) =>
         />
         <Icon
           name="lucide:snowflake"
-          class="snowflake-icon absolute right-3 bottom-3 opacity-15 transition-all duration-600 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-45deg] group-hover:opacity-60"
+          class="snowflake-strawberry absolute right-3 bottom-3 opacity-15 transition-all duration-600 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-45deg] group-hover:opacity-60"
           size={14}
         />
         <Icon
           name="lucide:snowflake"
-          class="snowflake-icon absolute right-14 bottom-14 opacity-10 transition-all duration-800 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-[60deg] group-hover:opacity-50"
+          class="snowflake-strawberry absolute right-14 bottom-14 opacity-10 transition-all duration-800 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-[60deg] group-hover:opacity-50"
           size={12}
         />
         <Icon
