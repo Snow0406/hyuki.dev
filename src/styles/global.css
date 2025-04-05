@@ -37,6 +37,9 @@
 
   --color-border: var(--border);
   --color-ring: var(--ring);
+
+  --color-snowflake: var(--snowflake);
+  --color-snowflake-hover: var(--snowflake-hover);
 }
 
 @font-face {
@@ -91,6 +94,18 @@
   --success-foreground: oklch(0.2 0.03 195);
   --border: oklch(0.85 0.03 240);
   --ring: oklch(0.75 0.07 240);
+  --snowflake: oklch(0.65 0.07 220);
+  --snowflake-hover: oklch(0.55 0.15 220);
+  --strawberry: oklch(0.75 0.15 0);
+  --strawberry-hover: oklch(0.65 0.25 10);
+
+  --chart-1: oklch(0.85 0.1 240);
+  --chart-2: oklch(0.75 0.12 245);
+  --chart-3: oklch(0.65 0.14 250);
+  --chart-4: oklch(0.55 0.16 255);
+  --chart-5: oklch(0.45 0.15 250);
+  --chart-6: oklch(0.35 0.13 245);
+  --chart-7: oklch(0.25 0.1 240);
 }
 
 .dark {
@@ -106,12 +121,24 @@
   --accent-foreground: var(--foreground);
   --additive: var(--primary);
   --additive-foreground: var(--foreground);
-  --destructive: var(--destructive);
+  --destructive: oklch(0.65 0.25 30);
   --destructive-foreground: var(--foreground);
   --success: oklch(0.55 0.1 210);
   --success-foreground: oklch(0.98 0.005 240);
   --border: var(--accent);
   --ring: var(--muted);
+  --snowflake: oklch(0.7 0.1 210);
+  --snowflake-hover: oklch(0.8 0.15 200);
+  --strawberry: oklch(0.75 0.12 10);
+  --strawberry-hover: oklch(0.82 0.18 15);
+
+  --chart-1: oklch(0.85 0.1 240);
+  --chart-2: oklch(0.75 0.12 245);
+  --chart-3: oklch(0.65 0.14 250);
+  --chart-4: oklch(0.55 0.16 255);
+  --chart-5: oklch(0.45 0.15 250);
+  --chart-6: oklch(0.35 0.13 245);
+  --chart-7: oklch(0.25 0.1 240);
 }
 
 @layer base {
@@ -138,5 +165,41 @@
   .disable-transitions,
   .disable-transitions * {
     @apply transition-none!;
+  }
+
+  .snowflake-icon {
+    color: var(--color-snowflake);
+    filter: drop-shadow(0 0 2px var(--color-snowflake));
+    will-change: transform, opacity;
+  }
+
+  .group:hover .snowflake-icon {
+    color: var(--color-snowflake-hover);
+    filter: drop-shadow(0 0 5px var(--color-snowflake-hover));
+  }
+
+  .snowflake-strawberry {
+    color: var(--strawberry);
+    filter: drop-shadow(0 0 2px var(--strawberry));
+    will-change: transform, opacity;
+  }
+
+  .group:hover .snowflake-strawberry {
+    color: var(--strawberry-hover);
+    filter: drop-shadow(0 0 5px var(--strawberry-hover));
+  }
+
+  .snow-border {
+    border: 2px solid rgba(180, 220, 255, 0.5) !important;
+    box-shadow:
+      0 0 15px 3px rgba(100, 180, 255, 0.25),
+      0 0 25px 5px rgba(130, 200, 255, 0.15) inset;
+  }
+
+  .dark .snow-border {
+    border: 2px solid rgba(180, 220, 255, 0.3) !important;
+    box-shadow:
+      0 0 12px 2px rgba(120, 200, 255, 0.15),
+      0 0 20px 4px rgba(150, 220, 255, 0.08) inset;
   }
 }

@@ -89,6 +89,7 @@ const readTime = readingTime(totalBody)
   title={post.data.title}
   description={post.data.description}
   image={post.data.image?.src ?? `/og/${post.id}.png`}
+  disableSnowfall={true}
 >
   <section
     class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-5 *:px-4"
@@ -119,7 +120,7 @@ const readTime = readingTime(totalBody)
           alt={post.data.title}
           width={1200}
           height={630}
-          class="col-span-full mx-auto w-full max-w-[1000px] rounded-xl object-cover"
+          class="col-span-full mx-auto w-full max-w-[1000px] rounded-4xl object-cover"
         />
       ) : (
         !isSubpost &&
@@ -129,7 +130,7 @@ const readTime = readingTime(totalBody)
             alt={post.data.title}
             width={1200}
             height={630}
-            class="col-span-full mx-auto w-full max-w-[1000px] rounded-xl object-cover"
+            class="col-span-full mx-auto w-full max-w-[1000px] rounded-4xl object-cover"
           />
         )``
       )

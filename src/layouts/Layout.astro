@@ -2,15 +2,17 @@
 import Footer from '@/components/Footer.astro'
 import Head from '@/components/Head.astro'
 import Header from '@/components/Header.astro'
+import SnowfallEffect from '@/components/SnowfallEffect'
 import { SITE } from '@/consts'
 
 type Props = {
   title: string
   description: string
   image?: string
+  disableSnowfall?: boolean
 }
 
-const { title, description, image } = Astro.props
+const { title, description, image, disableSnowfall = false } = Astro.props
 ---
 
 <!doctype html>
@@ -26,6 +28,7 @@ const { title, description, image } = Astro.props
     <div
       class="box-border flex h-fit min-h-screen flex-col gap-y-6 font-sans antialiased"
     >
+      {!disableSnowfall && <SnowfallEffect client:only="react" />}
       <Header />
       <main class="grow">
         <slot />

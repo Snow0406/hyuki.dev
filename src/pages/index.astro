@@ -1,59 +1,235 @@
 ---
-import BlogCard from '@/components/BlogCard.astro'
-import Container from '@/components/Container.astro'
+import DiscordPresence from '@/components/bento/DiscordPresence'
+import WakatimeCalendar from '@/components/bento/WakatimeCalendar'
+import WakatimeGraph from '@/components/bento/WakatimeGraph'
 import Link from '@/components/Link.astro'
-import { buttonVariants } from '@/components/ui/button'
 import { SITE } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
+import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 
-const blog = (await getCollection('blog'))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, SITE.featuredPostCount)
+const latestPost = await getCollection('blog').then((posts) =>
+  posts
+    .sort(
+      (a, b) =>
+        new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+    )
+    .filter((post) => !post.data.hidden && !post.data.draft)
+    .at(0),
+)
 ---
 
 <Layout title="Home" description={SITE.description}>
-  <Container class="flex flex-col gap-y-6">
-    <section>
-      <div class="rounded-lg border">
-        <div class="flex flex-col space-y-1.5 p-6">
-          <h3 class="text-3xl leading-none font-semibold">Hey, I'm Hy !</h3>
-        </div>
-        <div class="p-6 pt-0">
-          <p class="text-muted-foreground mb-2 text-sm">
-            I'm a game developer and student at Incheon National University from
-            Korea.
-          </p>
-          <p class="text-muted-foreground text-sm">
-            I'm currently interested in web, Unity development, and subculture
-            games !
-          </p>
-        </div>
+  <section
+    class="*:bg-secondary/25 mx-auto grid max-w-[375px] grid-cols-2 gap-4 px-4 [grid-template-areas:'a_a'_'a_a'_'b_b'_'f_f'_'e_e'] *:rounded-3xl *:bg-cover *:bg-center *:bg-no-repeat sm:max-w-screen-sm sm:[grid-template-areas:'a_a'_'b_f'_'e_e'] xl:max-w-screen-md xl:grid-cols-3 xl:[grid-template-areas:'a_a_b'_'f_d_d'_'e_e_e']"
+  >
+    <div
+      class="first group snow-border relative overflow-hidden rounded-3xl border bg-cover bg-center bg-no-repeat [grid-area:a] sm:aspect-[2.7/1] xl:aspect-auto"
+    >
+      <div class="snowflake-container pointer-events-none absolute inset-0">
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-12 left-10 opacity-20 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-45 group-hover:opacity-70"
+          size={22}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-8 right-30 opacity-20 transition-all duration-600 ease-in-out group-hover:translate-y-3 group-hover:rotate-90 group-hover:opacity-50"
+          size={19}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute bottom-14 left-20 opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-5px] group-hover:rotate-180 group-hover:opacity-50"
+          size={18}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute bottom-28 left-40 opacity-15 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-[-45deg] group-hover:opacity-40"
+          size={15}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-32 right-16 opacity-15 transition-all duration-650 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-55"
+          size={14}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute right-40 bottom-6 opacity-30 transition-all duration-500 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-45 group-hover:opacity-50"
+          size={15}
+        />
       </div>
-    </section>
-    <section class="flex flex-col gap-y-4">
-      <h2 class="text-2xl font-semibold">Latest posts</h2>
-      <ul class="flex flex-col gap-y-4">
-        {
-          blog.map((post) => (
-            <li>
-              <BlogCard entry={post} />
-            </li>
-          ))
-        }
-      </ul>
-      <div class="flex justify-center">
-        <Link
-          href="/blog"
-          class={buttonVariants({ variant: 'ghost' }) + ' group'}
-        >
-          See all posts <span
-            class="ml-1.5 transition-transform group-hover:translate-x-1"
-            >&rarr;</span
-          >
-        </Link>
+      <div class="relative flex flex-col space-y-1.5 p-6">
+        <h3 class="text-3xl leading-none font-semibold">Hey, I'm Hy !</h3>
       </div>
-    </section>
-  </Container>
+      <div class="text-muted-foreground relative p-6 pt-0 text-sm">
+        <p class="mb-2">
+          I'm a developer and student at Incheon National University from Korea,
+          active online as hy and snow.
+        </p>
+        <p class="mb-2">
+          I'm currently interested in Unity optimization and web backend
+          development!
+        </p>
+        <p class="mb-2">I adore subculture games and strawberry lattes ✨</p>
+      </div>
+    </div>
+
+    <div
+      class="group snow-border relative hidden items-start overflow-hidden rounded-3xl border p-4 [grid-area:d] xl:flex xl:aspect-auto"
+    >
+      <div class="snowflake-container pointer-events-none absolute inset-0">
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-2 right-5 opacity-20 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-45 group-hover:opacity-70"
+          size={16}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute right-10 bottom-12 opacity-10 transition-all duration-600 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-90 group-hover:opacity-60"
+          size={14}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-10 left-8 opacity-18 transition-all duration-750 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-65"
+          size={15}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute bottom-4 left-14 opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-30deg] group-hover:opacity-55"
+          size={12}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-[40%] right-[20%] opacity-12 transition-all duration-850 ease-in-out group-hover:translate-y-3 group-hover:rotate-[120deg] group-hover:opacity-50"
+          size={13}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-[30%] left-[15%] opacity-14 transition-all duration-650 ease-in-out group-hover:translate-y-[-1px] group-hover:rotate-[45deg] group-hover:opacity-60"
+          size={11}
+        />
+      </div>
+      {
+        latestPost && (
+          <>
+            <img
+              src={latestPost.data.image?.src ?? '#'}
+              alt={latestPost.data.title}
+              width={477}
+              height={251}
+              class="border-border w-[85%] rounded-2xl border"
+            />
+            <Link
+              href={`/blog/${latestPost.id}`}
+              aria-label={`Read blog post: ${latestPost.data.title}`}
+              title={`Read blog post: ${latestPost.data.title}`}
+            >
+              <div class="bg-secondary/50 text-primary hover:ring-primary absolute right-0 bottom-0 m-3 flex w-fit items-end rounded-full border p-3 transition-all duration-300 hover:ring-1">
+                <Icon name="lucide:move-up-right" size={16} />
+              </div>
+            </Link>
+          </>
+        )
+      }
+    </div>
+
+    <div
+      class="group snow-border relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl border [grid-area:e] sm:aspect-[2.1/1]"
+    >
+      <div class="snowflake-container pointer-events-none absolute inset-0">
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-5 left-[15%] opacity-15 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-90 group-hover:opacity-60"
+          size={20}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute right-[20%] bottom-5 opacity-10 transition-all duration-600 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-45 group-hover:opacity-50"
+          size={16}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-3 right-[15%] opacity-20 transition-all duration-750 ease-in-out group-hover:translate-y-2 group-hover:rotate-[30deg] group-hover:opacity-65"
+          size={14}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute bottom-10 left-[25%] opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-90deg] group-hover:opacity-55"
+          size={18}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-[40%] left-[10%] opacity-18 transition-all duration-650 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-60"
+          size={12}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-[30%] right-[10%] opacity-12 transition-all duration-700 ease-in-out group-hover:translate-y-[-1px] group-hover:rotate-[120deg] group-hover:opacity-45"
+          size={13}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute right-[25%] bottom-[30%] opacity-18 transition-all duration-600 ease-in-out group-hover:translate-y-3 group-hover:rotate-[-30deg] group-hover:opacity-55"
+          size={11}
+        />
+      </div>
+      <WakatimeCalendar client:load />
+    </div>
+
+    <div
+      class="group snow-border relative overflow-hidden rounded-3xl border [grid-area:b] sm:aspect-square"
+    >
+      <div class="snowflake-container pointer-events-none absolute inset-0">
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-2 right-4 opacity-20 transition-all duration-600 ease-in-out group-hover:translate-y-1 group-hover:rotate-45 group-hover:opacity-70"
+          size={15}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-8 right-12 opacity-20 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-[60deg] group-hover:opacity-65"
+          size={12}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-4 left-10 opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-45deg] group-hover:opacity-55"
+          size={17}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute top-2 left-3 opacity-18 transition-all duration-650 ease-in-out group-hover:translate-y-1 group-hover:rotate-[30deg] group-hover:opacity-60"
+          size={13}
+        />
+      </div>
+      <DiscordPresence client:load />
+    </div>
+
+    <div
+      class="group snow-border relative aspect-square rounded-3xl border [grid-area:f]"
+    >
+      <div class="snowflake-container pointer-events-none absolute inset-0">
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-3 left-3 opacity-20 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-[135deg] group-hover:opacity-70"
+          size={16}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute right-3 bottom-3 opacity-15 transition-all duration-600 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-45deg] group-hover:opacity-60"
+          size={14}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-strawberry absolute right-14 bottom-14 opacity-10 transition-all duration-800 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-[60deg] group-hover:opacity-50"
+          size={12}
+        />
+        <Icon
+          name="lucide:snowflake"
+          class="snowflake-icon absolute top-12 right-5 opacity-10 transition-all duration-750 ease-in-out group-hover:translate-y-2 group-hover:rotate-[30deg] group-hover:opacity-40"
+          size={10}
+        />
+      </div>
+      <WakatimeGraph client:load />
+    </div>
+  </section>
 </Layout>
