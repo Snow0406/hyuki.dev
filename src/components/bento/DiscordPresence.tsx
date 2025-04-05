@@ -88,17 +88,83 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
     return () => clearInterval(intervalId)
   }, [activity])
 
+  /**
+   * Discord 활동 이미지 URL을 처리하는 유틸리티 함수
+   *
+   * @param imageKey - 이미지 키 ('large_image' 또는 'small_image')
+   * @returns 처리된 이미지 URL
+   */
+  const getActivityImageUrl = (imageKey: 'large_image' | 'small_image') => {
+    const imageValue = activity.assets?.[imageKey]
+    if (!imageValue) return ''
+
+    console.log(`${imageKey}:`, imageValue)
+
+    // 외부 이미지(mp:external) 처리
+    if (imageValue.startsWith('mp:external/')) {
+      return processExternalImageUrl(imageValue)
+    }
+    // Discord 미디어 프록시 이미지 처리
+    else if (imageValue.startsWith('mp:')) {
+      return `https://media.discordapp.net/${imageValue.replace('mp:', '')}`
+    }
+    // 기본 Discord 앱 에셋 처리
+    else {
+      return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${imageValue}`
+    }
+  }
+
+  /**
+   * Discord 외부 이미지 URL 처리 함수
+   *
+   * @param imageValue - 원본 이미지 값(mp:external/로 시작하는 문자열)
+   * @returns 처리된 이미지 URL
+   */
+  const processExternalImageUrl = (imageValue: string) => {
+    const fullPath = imageValue.replace('mp:external/', '')
+
+    // 첫 번째 '/' 위치 찾기 (ID 부분 이후)
+    const firstSlashIndex = fullPath.indexOf('/')
+
+    if (firstSlashIndex !== -1) {
+      // ID 이후의 경로 추출
+      const urlPath = fullPath.substring(firstSlashIndex + 1)
+
+      try {
+        // 'https/cdn...' 형식을 'https://cdn...' 형식으로 변환
+        if (urlPath.startsWith('https/')) {
+          // URL 디코딩하여 %40 등의 문자를 복원
+          const decodedPath = decodeURIComponent(urlPath.substring(6))
+          const finalUrl = 'https://' + decodedPath
+          console.log('Processed image URL:', finalUrl)
+          return finalUrl
+        } else if (urlPath.startsWith('http/')) {
+          // URL 디코딩하여 %40 등의 문자를 복원
+          const decodedPath = decodeURIComponent(urlPath.substring(5))
+          const finalUrl = 'http://' + decodedPath
+          console.log('Processed image URL:', finalUrl)
+          return finalUrl
+        }
+      } catch (e) {
+        console.error('Error decoding URL:', e)
+      }
+    }
+
+    console.error('Could not process external URL:', fullPath)
+    return ''
+  }
+
   return (
     <div className="flex w-full items-center gap-x-3 xl:gap-x-2">
       <div
         className="relative aspect-square h-full w-auto flex-shrink-0 rounded-md bg-contain"
         style={{
-          backgroundImage: `url('https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets?.large_image}.png')`,
+          backgroundImage: `url('${getActivityImageUrl('large_image')}')`,
         }}
       >
         {activity.assets?.small_image && (
           <img
-            src={`https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.small_image}.png`}
+            src={getActivityImageUrl('small_image')}
             alt="Now Playing"
             width={20}
             height={20}
