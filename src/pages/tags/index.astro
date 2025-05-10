@@ -2,6 +2,7 @@
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import Container from '@/components/Container.astro'
 import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
 import { badgeVariants } from '@/components/ui/badge'
 import Layout from '@/layouts/Layout.astro'
 import { Icon } from 'astro-icon/components'
@@ -22,7 +23,8 @@ const tags = [...tagCounts.keys()].sort((a, b) => {
 })
 ---
 
-<Layout title="Tags" description="A list of all tags used in blog posts">
+<Layout>
+  <PageHead slot="head" title="Tags" />
   <Container class="flex flex-col gap-y-6">
     <Breadcrumbs items={[{ label: 'Tags', icon: 'lucide:tags' }]} />
 
@@ -31,7 +33,7 @@ const tags = [...tagCounts.keys()].sort((a, b) => {
         {
           tags.map((tag) => (
             <Link
-              href={`/tags/${tag}`}
+              href={`/tags/${encodeURIComponent(tag)}`}
               class={badgeVariants({ variant: 'secondary' })}
             >
               <Icon name="lucide:hash" class="size-3" />

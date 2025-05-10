@@ -1,7 +1,7 @@
 ---
 import Link from '@/components/Link.astro'
 import { Badge } from '@/components/ui/badge'
-import { getDevelopmentPeriod, getStatusInfo } from '@/lib/utils'
+import { formatDate, getStatusInfo } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
@@ -11,11 +11,6 @@ type Props = {
 }
 
 const { project } = Astro.props
-
-const developmentPeriod = getDevelopmentPeriod(
-  project.data.startDate,
-  project.data.endDate,
-)
 
 const { variant, icon } = getStatusInfo(project.data.status)
 ---
@@ -55,11 +50,18 @@ const { variant, icon } = getStatusInfo(project.data.status)
         {project.data.description}
       </p>
       {
-        developmentPeriod && (
-          <div class="text-muted-foreground mb-3 flex items-center text-xs">
-            <Icon name="lucide:calendar" class="mr-1 size-3.5" />
-            <span>{developmentPeriod}</span>
-          </div>
+        project.data.startDate && (
+          <p class="text-muted-foreground/70 mb-2 flex items-center gap-x-1.5 text-xs">
+            <span class="flex items-center gap-x-1.5">
+              <Icon name="lucide:calendar" class="size-3" />
+              <span>
+                {formatDate(project.data.startDate)}
+                {project.data.endDate
+                  ? ` → ${formatDate(project.data.endDate)}`
+                  : ' → Present'}
+              </span>
+            </span>
+          </p>
         )
       }
       {

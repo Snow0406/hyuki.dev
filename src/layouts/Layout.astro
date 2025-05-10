@@ -1,4 +1,7 @@
 ---
+import '../styles/global.css'
+import '../styles/typography.css'
+
 import Footer from '@/components/Footer.astro'
 import Head from '@/components/Head.astro'
 import Header from '@/components/Header.astro'
@@ -6,24 +9,17 @@ import SnowfallEffect from '@/components/SnowfallEffect'
 import { SITE } from '@/consts'
 
 type Props = {
-  title: string
-  description: string
-  image?: string
   disableSnowfall?: boolean
 }
 
-const { title, description, image, disableSnowfall = false } = Astro.props
+const { disableSnowfall = false } = Astro.props
 ---
 
 <!doctype html>
-<html lang="ko">
-  <head>
-    <Head
-      title={`${title} | ${SITE.title}`}
-      description={description}
-      image={image}
-    />
-  </head>
+<html lang={SITE.locale}>
+  <Head>
+    <slot name="head" />
+  </Head>
   <body>
     <div
       class="box-border flex h-fit min-h-screen flex-col gap-y-6 font-sans antialiased"

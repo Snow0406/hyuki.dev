@@ -2,6 +2,7 @@ import type { IconMap, SocialLink, Site } from '@/types'
 
 export const SITE: Site = {
   title: 'hyuki.dev',
+  locale: 'ko_KR',
   description: 'Game Developer and Incheon National University Student',
   href: 'https://hyuki.dev',
   featuredPostCount: 1,

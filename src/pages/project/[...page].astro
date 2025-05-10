@@ -1,6 +1,7 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import Container from '@/components/Container.astro'
+import PageHead from '@/components/PageHead.astro'
 import ProjectCard from '@/components/ProjectCard.astro'
 import PaginationComponent from '@/components/ui/pagination'
 import { SITE } from '@/consts'
@@ -59,7 +60,8 @@ const statuses = Object.keys(projectsByStatus).sort(
 )
 ---
 
-<Layout title="Project" description="Project">
+<Layout>
+  <PageHead slot="head" title="Project" />
   <Container class="flex grow flex-col gap-y-6">
     <Breadcrumbs
       items={[

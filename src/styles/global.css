@@ -162,7 +162,6 @@
     }
   }
 
-  .disable-transitions,
   .disable-transitions * {
     @apply transition-none!;
   }

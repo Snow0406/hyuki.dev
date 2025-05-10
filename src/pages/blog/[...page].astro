@@ -2,6 +2,7 @@
 import BlogCard from '@/components/BlogCard.astro'
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import Container from '@/components/Container.astro'
+import PageHead from '@/components/PageHead.astro'
 import PaginationComponent from '@/components/ui/pagination'
 import { SITE } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
@@ -34,7 +35,8 @@ const postsByYear = page.data.reduce(
 const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
 ---
 
-<Layout title="Blog" description="Blog">
+<Layout>
+  <PageHead slot="head" title="Blog" />
   <Container class="flex grow flex-col gap-y-6">
     <Breadcrumbs
       items={[

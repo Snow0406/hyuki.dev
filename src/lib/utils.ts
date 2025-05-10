@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(date: Date | undefined): string {
-  if (!date) return 'In Progress'
+  if (!date) return '-1'
   return date
     .toLocaleDateString('ko-KR', {
       year: 'numeric',
@@ -15,20 +15,6 @@ export function formatDate(date: Date | undefined): string {
     })
     .replace(/\. /g, '.')
     .replace(/\.$/, '')
-}
-
-export function getDevelopmentPeriod(
-  startDate: Date | undefined,
-  endDate: Date | undefined,
-): string {
-  const startDateFormatted = startDate ? formatDate(startDate) : ''
-  const endDateFormatted = endDate ? formatDate(endDate) : ''
-
-  return startDateFormatted
-    ? endDateFormatted
-      ? `${startDateFormatted} - ${endDateFormatted}`
-      : `${startDateFormatted} - In Progress`
-    : ''
 }
 
 export function getStatusInfo(status: string | undefined): {

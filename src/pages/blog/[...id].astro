@@ -1,6 +1,7 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import Link from '@/components/Link.astro'
+import PostHead from '@/components/PostHead.astro'
 import PostNavigation from '@/components/PostNavigation.astro'
 import TableOfContents from '@/components/TableOfContents.astro'
 import TableOfContentsPrebuilt from '@/components/TableOfContentsPrebuilt.astro'
@@ -14,8 +15,7 @@ import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import { type CollectionEntry, getCollection, render } from 'astro:content'
 
-type Props = CollectionEntry<'blog'>
-type Post = CollectionEntry<'blog'>
+interface Props extends CollectionEntry<'blog'> {}
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
@@ -28,19 +28,16 @@ export async function getStaticPaths() {
   }))
 }
 
-// 모든 블로그 포스트 가져오기 (draft 아닌 것만)
 const allPosts = await getCollection('blog', ({ data }) => !data.draft)
 
-// 정렬된 포스트 목록
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 )
 
-// hidden 속성이 false인 포스트만 필터링 (블로그 목록 페이지에 표시될 포스트)
 const visiblePosts = posts.filter((post) => post.data.hidden !== true)
 
 // 이전/다음 포스트 가져오기 함수
-function getAdjacentPosts(currentId: string, postList: Post[]) {
+function getAdjacentPosts(currentId: string, postList: Props[]) {
   const index = postList.findIndex((post) => post.id === currentId)
   return {
     prev: index > 0 ? postList[index - 1] : null,
@@ -54,7 +51,6 @@ const post = Astro.props
 const currentPostId = Astro.params.id as string
 const isSubpost = !!post.data.parentSlug
 
-// 서브 블로그일 경우 같은 부모를 가진 포스트 중에서 이전/다음을 찾음
 const { prev: prevPost, next: nextPost } = isSubpost
   ? getAdjacentPosts(
       currentPostId,
@@ -64,11 +60,9 @@ const { prev: prevPost, next: nextPost } = isSubpost
     )
   : getAdjacentPosts(currentPostId, visiblePosts)
 
-// 포스트 콘텐츠와 헤딩 정보 가져오기
 const { Content, headings } = await render(post)
 const authors = await parseAuthors(post.data.authors ?? [])
 
-// 코드 블록 제거 함수 (읽기 시간 계산에 사용)
 const stripCodeBlocks = (text: string | undefined) =>
   text ? text.replace(/```[\s\S]*?```/g, '') : ''
 
@@ -85,12 +79,8 @@ const totalBody = isSubpost
 const readTime = readingTime(totalBody)
 ---
 
-<Layout
-  title={post.data.title}
-  description={post.data.description}
-  image={post.data.image?.src ?? `/og/${post.id}.png`}
-  disableSnowfall={true}
->
+<Layout>
+  <PostHead slot="head" post={post} />
   <section
     class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-5 *:px-4"
   >

@@ -2,6 +2,7 @@
 import BlogCard from '@/components/BlogCard.astro'
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import Container from '@/components/Container.astro'
+import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
 import { Icon } from 'astro-icon/components'
 import { type CollectionEntry, getCollection } from 'astro:content'
@@ -23,7 +24,7 @@ export async function getStaticPaths() {
   )
 
   return uniqueTags.map((tag) => ({
-    params: { id: tag },
+    params: { id: encodeURIComponent(tag) },
     props: {
       tag,
       posts: posts.filter((post) => post.data.tags?.includes(tag)),
@@ -32,10 +33,12 @@ export async function getStaticPaths() {
 }
 ---
 
-<Layout
-  title={`Posts tagged with "${tag}"`}
-  description={`A collection of posts tagged with ${tag}.`}
->
+<Layout>
+  <PageHead
+    slot="head"
+    title={`Posts tagged with "${tag}"`}
+    description={`A collection of posts tagged with ${tag}.`}
+  />
   <Container class="flex flex-col gap-y-6">
     <Breadcrumbs
       items={[
