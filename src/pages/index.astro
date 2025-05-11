@@ -3,23 +3,16 @@ import DiscordPresence from '@/components/bento/DiscordPresence'
 import WakatimeCalendar from '@/components/bento/WakatimeCalendar'
 import WakatimeGraph from '@/components/bento/WakatimeGraph'
 import Link from '@/components/Link.astro'
-import { SITE } from '@/consts'
+import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
+import { getRecentPost } from '@/lib/data-utils'
 import { Icon } from 'astro-icon/components'
-import { getCollection } from 'astro:content'
 
-const latestPost = await getCollection('blog').then((posts) =>
-  posts
-    .sort(
-      (a, b) =>
-        new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
-    )
-    .filter((post) => !post.data.hidden && !post.data.draft)
-    .at(0),
-)
+const latestPost = await getRecentPost()
 ---
 
-<Layout title="Home" description={SITE.description}>
+<Layout>
+  <PageHead slot="head" title="Home" />
   <section
     class="*:bg-secondary/25 mx-auto grid max-w-[375px] grid-cols-2 gap-4 px-4 [grid-template-areas:'a_a'_'a_a'_'b_b'_'f_f'_'e_e'] *:rounded-3xl *:bg-cover *:bg-center *:bg-no-repeat sm:max-w-screen-sm sm:[grid-template-areas:'a_a'_'b_f'_'e_e'] xl:max-w-screen-md xl:grid-cols-3 xl:[grid-template-areas:'a_a_b'_'f_d_d'_'e_e_e']"
   >

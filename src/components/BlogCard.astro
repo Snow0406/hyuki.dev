@@ -2,20 +2,18 @@
 import AvatarComponent from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { parseAuthors } from '@/lib/server-utils'
+import { parseAuthors } from '@/lib/data-utils'
 import { formatDate, readingTime } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
 import Link from './Link.astro'
 
-type Props = {
+interface Props {
   entry: CollectionEntry<'blog'>
 }
 
-const { entry } = Astro.props as {
-  entry: CollectionEntry<'blog'>
-}
+const { entry } = Astro.props
 
 const formattedDate = formatDate(entry.data.date)
 const readTime = readingTime(entry.body!)
@@ -52,13 +50,11 @@ const authors = await parseAuthors(entry.data.authors ?? [])
         </div>
       )
     }
+
     <div class="grow">
-      <h3 class="mb-1 text-lg font-semibold">
-        {entry.data.title}
-      </h3>
-      <p class="text-muted-foreground mb-2 text-sm">
-        {entry.data.description}
-      </p>
+      <h3 class="mb-1 text-lg font-semibold">{entry.data.title}</h3>
+      <p class="text-muted-foreground mb-2 text-sm">{entry.data.description}</p>
+
       <div
         class="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-2 text-xs"
       >
@@ -85,6 +81,7 @@ const authors = await parseAuthors(entry.data.authors ?? [])
         <Separator orientation="vertical" className="h-4!" />
         <span>{readTime}</span>
       </div>
+
       {
         entry.data.tags && (
           <div class="flex flex-wrap gap-2">

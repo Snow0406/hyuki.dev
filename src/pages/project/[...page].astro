@@ -1,65 +1,39 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import Container from '@/components/Container.astro'
+import PageHead from '@/components/PageHead.astro'
 import ProjectCard from '@/components/ProjectCard.astro'
 import PaginationComponent from '@/components/ui/pagination'
 import { SITE } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
+import {
+  getAllProjects,
+  groupProjectsByStatus,
+  PROJECT_STATUS,
+} from '@/lib/data-utils'
 import type { PaginateFunction } from 'astro'
-import { type CollectionEntry, getCollection } from 'astro:content'
-
-const STATUS_ORDER = ['In Progress', 'Completed', 'Planned', 'Paused']
 
 export async function getStaticPaths({
   paginate,
 }: {
   paginate: PaginateFunction
 }) {
-  const allProjects = await getCollection('projects')
-
-  // 상태별 1차 정렬 후 개발 시작 날짜별 2차 정렬
-  const sortedProjects = [...allProjects].sort((a, b) => {
-    const statusA = a.data.status || 'Other'
-    const statusB = b.data.status || 'Other'
-
-    // 상태가 다른 경우 상태 우선순위로 정렬
-    const statusComparison =
-      STATUS_ORDER.indexOf(statusA) - STATUS_ORDER.indexOf(statusB)
-    if (statusComparison !== 0) return statusComparison
-
-    // 상태가 같은 경우 시작 날짜별로 정렬 (최신순)
-    const dateA = a.data.startDate ? new Date(a.data.startDate).getTime() : 0
-    const dateB = b.data.startDate ? new Date(b.data.startDate).getTime() : 0
-
-    // 시작 날짜가 최신인 프로젝트가 먼저 오도록 내림차순 정렬
-    return dateB - dateA
-  })
-
-  return paginate(sortedProjects, { pageSize: SITE.postsPerPage })
+  const allProjects = await getAllProjects()
+  return paginate(allProjects, { pageSize: SITE.postsPerPage })
 }
 
 const { page } = Astro.props
 
 // 프로젝트를 상태별로 그룹화 (이미 정렬된 상태에서 그룹화만 수행)
-const projectsByStatus = page.data.reduce(
-  (acc: Record<string, CollectionEntry<'projects'>[]>, project) => {
-    const status = project.data.status || 'Other'
-    if (!acc[status]) {
-      acc[status] = []
-    }
-    acc[status].push(project)
-    return acc
-  },
-  {},
-)
+const projectsByStatus = groupProjectsByStatus(page.data)
 
-// 상태별로 정렬된 상태 키 배열
 const statuses = Object.keys(projectsByStatus).sort(
-  (a, b) => STATUS_ORDER.indexOf(a) - STATUS_ORDER.indexOf(b),
+  (a, b) => PROJECT_STATUS.indexOf(a) - PROJECT_STATUS.indexOf(b),
 )
 ---
 
-<Layout title="Project" description="Project">
+<Layout>
+  <PageHead slot="head" title="Project" />
   <Container class="flex grow flex-col gap-y-6">
     <Breadcrumbs
       items={[

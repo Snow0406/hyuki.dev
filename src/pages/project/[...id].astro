@@ -1,39 +1,31 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import PostHead from '@/components/PostHead.astro'
 import ProjectSidebar from '@/components/ProjectSidebar.astro'
 import { Badge, badgeVariants } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Layout from '@/layouts/Layout.astro'
-import { getDevelopmentPeriod, getStatusInfo } from '@/lib/utils'
+import { getAllProjects } from '@/lib/data-utils'
+import { formatDate, getStatusInfo } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
-import { type CollectionEntry, getCollection, render } from 'astro:content'
+import { render } from 'astro:content'
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects')
+  const projects = await getAllProjects()
   return projects.map((project) => ({
     params: { id: project.id },
     props: project,
   }))
 }
-type Props = CollectionEntry<'projects'>
 
 const project = Astro.props
 const { Content } = await render(project)
-
-const developmentPeriod = getDevelopmentPeriod(
-  project.data.startDate,
-  project.data.endDate,
-)
-
 const { variant, icon } = getStatusInfo(project.data.status)
 ---
 
-<Layout
-  title={project.data.name}
-  description={project.data.description}
-  image={project.data.image?.src ?? '/static/twitter-card.png'}
->
+<Layout>
+  <PostHead slot="head" post={project} />
   <section
     class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
   >
@@ -82,10 +74,15 @@ const { variant, icon } = getStatusInfo(project.data.status)
         </div>
 
         {
-          developmentPeriod && (
+          project.data.startDate && (
             <div class="text-muted-foreground flex items-center justify-center text-sm">
               <Icon name="lucide:calendar" class="mr-1 size-4" />
-              <span>{developmentPeriod}</span>
+              <span>
+                {formatDate(project.data.startDate)}
+                {project.data.endDate
+                  ? ` → ${formatDate(project.data.endDate)}`
+                  : ' → Present'}
+              </span>
             </div>
           )
         }
