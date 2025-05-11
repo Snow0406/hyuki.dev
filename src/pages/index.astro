@@ -5,18 +5,10 @@ import WakatimeGraph from '@/components/bento/WakatimeGraph'
 import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
+import { getRecentPost } from '@/lib/data-utils'
 import { Icon } from 'astro-icon/components'
-import { getCollection } from 'astro:content'
 
-const latestPost = await getCollection('blog').then((posts) =>
-  posts
-    .sort(
-      (a, b) =>
-        new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
-    )
-    .filter((post) => !post.data.hidden && !post.data.draft)
-    .at(0),
-)
+const latestPost = await getRecentPost()
 ---
 
 <Layout>

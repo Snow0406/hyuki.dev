@@ -5,23 +5,22 @@ import ProjectSidebar from '@/components/ProjectSidebar.astro'
 import { Badge, badgeVariants } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Layout from '@/layouts/Layout.astro'
+import { getAllProjects } from '@/lib/data-utils'
 import { formatDate, getStatusInfo } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
-import { type CollectionEntry, getCollection, render } from 'astro:content'
+import { render } from 'astro:content'
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects')
+  const projects = await getAllProjects()
   return projects.map((project) => ({
     params: { id: project.id },
     props: project,
   }))
 }
-type Props = CollectionEntry<'projects'>
 
 const project = Astro.props
 const { Content } = await render(project)
-
 const { variant, icon } = getStatusInfo(project.data.status)
 ---
 

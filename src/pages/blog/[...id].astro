@@ -9,18 +9,14 @@ import { badgeVariants } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import Layout from '@/layouts/Layout.astro'
-import { parseAuthors } from '@/lib/server-utils'
+import { getAdjacentPosts, getAllPosts, parseAuthors } from '@/lib/data-utils'
 import { formatDate, readingTime } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
-import { type CollectionEntry, getCollection, render } from 'astro:content'
-
-interface Props extends CollectionEntry<'blog'> {}
+import { render } from 'astro:content'
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
-    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-  )
+  const posts = await getAllPosts()
 
   return posts.map((post) => ({
     params: { id: post.id },
@@ -28,55 +24,18 @@ export async function getStaticPaths() {
   }))
 }
 
-const allPosts = await getCollection('blog', ({ data }) => !data.draft)
-
-const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
-)
-
-const visiblePosts = posts.filter((post) => post.data.hidden !== true)
-
-// 이전/다음 포스트 가져오기 함수
-function getAdjacentPosts(currentId: string, postList: Props[]) {
-  const index = postList.findIndex((post) => post.id === currentId)
-  return {
-    prev: index > 0 ? postList[index - 1] : null,
-    next:
-      index >= 0 && index < postList.length - 1 ? postList[index + 1] : null,
-  }
-}
-
 // 현재 포스트 정보
 const post = Astro.props
 const currentPostId = Astro.params.id as string
 const isSubpost = !!post.data.parentSlug
-
-const { prev: prevPost, next: nextPost } = isSubpost
-  ? getAdjacentPosts(
-      currentPostId,
-      posts
-        .filter((p) => p.data.parentTitle === post.data.parentTitle)
-        .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf()),
-    )
-  : getAdjacentPosts(currentPostId, visiblePosts)
-
 const { Content, headings } = await render(post)
+
+const { next, prev } = await getAdjacentPosts(
+  currentPostId,
+  post.data.parentTitle || undefined,
+)
+
 const authors = await parseAuthors(post.data.authors ?? [])
-
-const stripCodeBlocks = (text: string | undefined) =>
-  text ? text.replace(/```[\s\S]*?```/g, '') : ''
-
-// 메인 포스트인 경우 서브 포스트까지 포함한 읽기 시간 계산
-// 이미 필터링된 allPosts에서 서브 포스트 찾기
-const subposts = isSubpost
-  ? []
-  : allPosts.filter((p) => p.data.parentTitle === post.data.title)
-const totalBody = isSubpost
-  ? post.body || ''
-  : [post.body || '', ...subposts.map((p) => p.body || '')]
-      .map(stripCodeBlocks)
-      .join('')
-const readTime = readingTime(totalBody)
 ---
 
 <Layout>
@@ -167,7 +126,7 @@ const readTime = readingTime(totalBody)
               <div class="flex items-center gap-2">
                 <span>{formatDate(post.data.date)}</span>
                 <Separator orientation="vertical" className="h-4!" />
-                <span>{readTime}</span>
+                <span>{readingTime(post.body!)}</span>
               </div>
             </div>
             <div class="flex flex-wrap justify-center gap-2">
@@ -191,7 +150,7 @@ const readTime = readingTime(totalBody)
         )
       }
 
-      <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+      <PostNavigation prevPost={prev} nextPost={next} />
     </section>
 
     {headings.length > 0 && <TableOfContents headings={headings} />}
@@ -210,7 +169,7 @@ const readTime = readingTime(totalBody)
       )
     }
 
-    <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+    <PostNavigation prevPost={prev} nextPost={next} />
   </section>
 
   <Button
