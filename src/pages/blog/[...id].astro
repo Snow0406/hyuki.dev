@@ -16,7 +16,7 @@ import { Image } from 'astro:assets'
 import { render } from 'astro:content'
 
 export async function getStaticPaths() {
-  const posts = await getAllPosts()
+  const posts = await getAllPosts(true)
 
   return posts.map((post) => ({
     params: { id: post.id },
