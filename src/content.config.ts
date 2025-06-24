@@ -8,36 +8,11 @@ const blog = defineCollection({
       title: z.string(),
       description: z.string(),
       date: z.coerce.date(),
+      order: z.number().optional(),
       image: image().optional(),
       tags: z.array(z.string()).optional(),
       authors: z.array(z.string()).optional(),
       draft: z.boolean().optional(),
-
-      // SubBlog
-      parentTitle: z.string().optional(),
-      parentSlug: z.string().optional(),
-      hidden: z.boolean().optional(),
-      tableOfContentsTitle: z.string().optional(),
-      tableOfContents: z
-        .array(
-          z.object({
-            depth: z.number(),
-            slug: z.string(),
-            text: z.string(),
-            subheadings: z.lazy(() =>
-              z.array(
-                z.object({
-                  depth: z.number(),
-                  slug: z.string(),
-                  text: z.string(),
-                  subheadings: z.array(z.any()),
-                }),
-              ),
-            ),
-          }),
-        )
-        .optional(),
-      activeSlug: z.string().optional(),
     }),
 })
 

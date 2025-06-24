@@ -1,6 +1,5 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Container from '@/components/Container.astro'
 import PageHead from '@/components/PageHead.astro'
 import ProjectCard from '@/components/ProjectCard.astro'
 import PaginationComponent from '@/components/ui/pagination'
@@ -32,38 +31,36 @@ const statuses = Object.keys(projectsByStatus).sort(
 )
 ---
 
-<Layout>
+<Layout class="max-w-3xl">
   <PageHead slot="head" title="Project" />
-  <Container class="flex grow flex-col gap-y-6">
-    <Breadcrumbs
-      items={[
-        { label: 'Project', href: '/project', icon: 'lucide:code-2' },
-        { label: `Page ${page.currentPage}`, icon: 'lucide:layout' },
-      ]}
-    />
+  <Breadcrumbs
+    items={[
+      { label: 'Project', href: '/project', icon: 'lucide:code-2' },
+      { label: `Page ${page.currentPage}`, icon: 'lucide:layout' },
+    ]}
+  />
 
-    <div class="flex min-h-[calc(100vh-18rem)] flex-col gap-y-8">
-      {
-        statuses.map((status) => (
-          <section class="flex flex-col gap-y-4">
-            <div class="font-semibold">{status}</div>
-            <ul class="not-prose flex flex-col gap-4">
-              {projectsByStatus[status].map((project) => (
-                <li>
-                  <ProjectCard project={project} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      }
-    </div>
+  <div class="flex min-h-[calc(100vh-18rem)] flex-col gap-y-8">
+    {
+      statuses.map((status) => (
+        <section class="flex flex-col gap-y-4">
+          <div class="font-semibold">{status}</div>
+          <ul class="not-prose flex flex-col gap-4">
+            {projectsByStatus[status].map((project) => (
+              <li>
+                <ProjectCard project={project} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
 
-    <PaginationComponent
-      currentPage={page.currentPage}
-      totalPages={page.lastPage}
-      baseUrl="/project/"
-      client:load
-    />
-  </Container>
+  <PaginationComponent
+    currentPage={page.currentPage}
+    totalPages={page.lastPage}
+    baseUrl="/project/"
+    client:load
+  />
 </Layout>

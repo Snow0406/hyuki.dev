@@ -1,9 +1,9 @@
 ---
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { getPostReadingTime, getSubpostsForParent } from '@/lib/data-utils'
+import { formatDate } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
-import { getCollection } from 'astro:content'
-import { fade } from 'astro:transitions'
 
 export interface Props {
   parentId: string
@@ -11,15 +11,18 @@ export interface Props {
   showImage?: boolean
 }
 
-const { parentId, title, showImage = fade } = Astro.props
+const { parentId, title, showImage = true } = Astro.props
 
-// 해당 부모 ID를 가진 서브 블로그 포스트 가져오기
-const subPosts = (await getCollection('blog', ({ data }) => !data.draft))
-  .filter(
-    (post) =>
-      post.id.startsWith(`${parentId}/`) && post.id !== `${parentId}/index`,
-  )
-  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf())
+// data-utils의 getSubpostsForParent 함수 사용
+const subPosts = await getSubpostsForParent(parentId)
+
+// 각 서브포스트의 읽기 시간 계산
+const subPostsWithReadingTime = await Promise.all(
+  subPosts.map(async (post) => ({
+    ...post,
+    readingTime: await getPostReadingTime(post.id),
+  })),
+)
 ---
 
 <details open class="group mt-5 rounded-xl border p-4">
@@ -37,49 +40,56 @@ const subPosts = (await getCollection('blog', ({ data }) => !data.draft))
     client:load
     className="flex max-h-96 flex-col overflow-y-auto"
     type="always"
+    data-subblog-list-scroll
   >
     <ul class="flex flex-col gap-4">
       {
-        subPosts.map((post) => (
+        subPostsWithReadingTime.map((post) => (
           <a
             href={`/blog/${post.id}`}
             class="hover:bg-muted/50 group/card relative mr-5 block rounded-lg border no-underline transition-colors"
           >
-            <div class="flex flex-row gap-4">
-              {showImage &&
+            <div class="flex flex-row items-center gap-4 p-4">
+              {!showImage &&
                 (post.data.image ? (
-                  <div class="mt-[-1rem] ml-4 h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
+                  <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
                     <Image
                       src={post.data.image}
                       alt={post.data.title}
-                      width={400}
-                      height={200}
-                      class="rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
+                      width={96}
+                      height={96}
+                      class="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
                     />
                   </div>
                 ) : (
-                  <div class="mt-[-1rem] mb-[-1rem] h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg pl-5">
+                  <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
                     <img
                       src={`/og/${post.id}.png`}
                       alt={post.data.title}
-                      width={400}
-                      height={200}
+                      width={96}
+                      height={96}
                       class="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
                     />
                   </div>
                 ))}
-              <div class="mt-[-0.3rem] min-w-0 grow overflow-hidden pl-3">
-                <h3 class="mb-1 overflow-hidden text-lg font-medium text-ellipsis">
-                  {post.data.title.includes(': ')
-                    ? post.data.title.split(': ')[1]
-                    : post.data.title}
+              <div class="min-w-0 grow overflow-hidden">
+                <h3 class="mt-[-1px] mb-2 line-clamp-2 text-lg font-medium">
+                  {post.data.title}
                 </h3>
-                <p class="text-muted-foreground mt-[-0.1rem] overflow-hidden text-sm text-ellipsis">
+                <p class="text-muted-foreground mb-2 line-clamp-2 text-sm">
                   {post.data.description}
                 </p>
+                <div class="text-muted-foreground flex items-center gap-2 text-xs">
+                  <Icon name="lucide:clock" class="h-3 w-3" />
+                  <span>{post.readingTime}</span>
+                  <span>•</span>
+                  <time datetime={post.data.date.toISOString()}>
+                    {formatDate(post.data.date)}
+                  </time>
+                </div>
               </div>
             </div>
-            <div class="absolute right-4 bottom-4 translate-x-2 transform opacity-0 transition-all duration-300 group-hover/card:translate-x-0 group-hover/card:opacity-100">
+            <div class="absolute top-1/2 right-4 translate-x-2 -translate-y-1/2 transform opacity-0 transition-all duration-300 group-hover/card:translate-x-0 group-hover/card:opacity-100">
               <Icon name="lucide:arrow-right" class="h-4 w-4" />
             </div>
           </a>
@@ -88,3 +98,78 @@ const subPosts = (await getCollection('blog', ({ data }) => !data.draft))
     </ul>
   </ScrollArea>
 </details>
+
+<script>
+  class SubBlogListState {
+    scrollArea: HTMLElement | null = null
+    sidebarScrollArea: HTMLElement | null = null
+
+    reset() {
+      this.scrollArea = null
+      this.sidebarScrollArea = null
+    }
+  }
+
+  const state = new SubBlogListState()
+
+  class SubBlogListScrollMask {
+    static update() {
+      if (!state.scrollArea || !state.sidebarScrollArea) return
+
+      const { scrollTop, scrollHeight, clientHeight } = state.scrollArea
+      const threshold = 5
+      const isAtTop = scrollTop <= threshold
+      const isAtBottom = scrollTop >= scrollHeight - clientHeight - threshold
+
+      state.sidebarScrollArea.classList.toggle('mask-t-from-90%', !isAtTop)
+      state.sidebarScrollArea.classList.toggle('mask-b-from-90%', !isAtBottom)
+    }
+  }
+
+  class SubBlogListController {
+    static init() {
+      state.reset()
+
+      const details = document.querySelector('details[class*="group"]')
+      if (details) {
+        state.scrollArea = details.querySelector(
+          '[data-radix-scroll-area-viewport]',
+        )
+        state.sidebarScrollArea = details.querySelector(
+          '[data-subblog-list-scroll]',
+        )
+
+        if (state.scrollArea) {
+          state.scrollArea.addEventListener(
+            'scroll',
+            SubBlogListScrollMask.update,
+            { passive: true },
+          )
+        }
+
+        setTimeout(SubBlogListScrollMask.update, 100)
+      }
+    }
+
+    static cleanup() {
+      if (state.scrollArea) {
+        state.scrollArea.removeEventListener(
+          'scroll',
+          SubBlogListScrollMask.update,
+        )
+      }
+      state.reset()
+    }
+  }
+
+  document.addEventListener('astro:page-load', () =>
+    SubBlogListController.init(),
+  )
+  document.addEventListener('astro:after-swap', () => {
+    SubBlogListController.cleanup()
+    SubBlogListController.init()
+  })
+  document.addEventListener('astro:before-swap', () =>
+    SubBlogListController.cleanup(),
+  )
+</script>

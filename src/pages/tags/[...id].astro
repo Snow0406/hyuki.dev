@@ -1,11 +1,9 @@
 ---
 import BlogCard from '@/components/BlogCard.astro'
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Container from '@/components/Container.astro'
 import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
 import { getAllTags, getPostsByTag } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
 
 export async function getStaticPaths() {
   const tagMap = await getAllTags()
@@ -28,35 +26,27 @@ export async function getStaticPaths() {
 const { tag, posts } = Astro.props
 ---
 
-<Layout>
+<Layout class="max-w-3xl">
   <PageHead
     slot="head"
     title={`Posts tagged with "${tag}"`}
     description={`A collection of posts tagged with ${tag}.`}
+    noindex
   />
-  <Container class="flex flex-col gap-y-6">
-    <Breadcrumbs
-      items={[
-        { href: '/tags', label: 'Tags', icon: 'lucide:tags' },
-        { label: tag, icon: 'lucide:tag' },
-      ]}
-    />
-    <div class="flex flex-wrap items-center gap-2">
-      <h1 class="text-3xl font-medium">Posts tagged with</h1>
-      <span
-        class="bg-secondary flex items-center gap-x-1 rounded-full px-4 py-2 text-2xl font-medium"
-      >
-        <Icon name="lucide:hash" class="size-6 -translate-x-0.5" />{tag}
-      </span>
-    </div>
-    <ul class="flex flex-col gap-y-4">
-      {
-        posts.map((post) => (
-          <li>
-            <BlogCard entry={post} />
-          </li>
-        ))
-      }
-    </ul>
-  </Container>
+  <Breadcrumbs
+    items={[
+      { href: '/tags', label: 'Tags', icon: 'lucide:tags' },
+      { label: tag, icon: 'lucide:tag' },
+    ]}
+  />
+
+  <ul class="flex flex-col gap-y-4">
+    {
+      posts.map((post) => (
+        <li>
+          <BlogCard entry={post} />
+        </li>
+      ))
+    }
+  </ul>
 </Layout>

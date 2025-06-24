@@ -2,9 +2,10 @@ import type { IconMap, SocialLink, Site } from '@/types'
 
 export const SITE: Site = {
   title: 'hyuki.dev',
+  description: "hy's Personal Blog",
+  href: 'https://astro-erudite.vercel.app',
+  author: 'hy',
   locale: 'ko_KR',
-  description: 'Game Developer and Incheon National University Student',
-  href: 'https://hyuki.dev',
   featuredPostCount: 1,
   postsPerPage: 3,
 }

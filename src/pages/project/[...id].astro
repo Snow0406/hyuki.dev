@@ -24,18 +24,19 @@ const { Content } = await render(project)
 const { variant, icon } = getStatusInfo(project.data.status)
 ---
 
-<Layout>
+<Layout disableSnowfall>
   <PostHead slot="head" post={project} />
   <section
     class="grid grid-cols-[minmax(0px,1fr)_min(768px,100%)_minmax(0px,1fr)] gap-y-6 *:px-4"
   >
-    <Breadcrumbs
-      items={[
-        { href: '/project', label: 'Project', icon: 'lucide:code-2' },
-        { label: project.data.name, icon: 'lucide:component' },
-      ]}
-      class="col-start-2"
-    />
+    <div class="col-start-2">
+      <Breadcrumbs
+        items={[
+          { href: '/project', label: 'Project', icon: 'lucide:code-2' },
+          { label: project.data.name, icon: 'lucide:component' },
+        ]}
+      />
+    </div>
     {
       project.data.image && (
         <div class="col-span-full mx-auto w-full max-w-[1000px]">

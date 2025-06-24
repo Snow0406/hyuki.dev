@@ -71,8 +71,10 @@ const languageIcons: { [key: string]: IconType } = {
   assembly: SiOpenai,
 }
 
-const getLanguageIcon = (name: string) => {
-  const lowercaseName = name.toLowerCase()
+const getLanguageIcon = (name: string | any) => {
+  // name이 문자열인지 확인
+  const nameStr = typeof name === 'string' ? name : String(name || '')
+  const lowercaseName = nameStr.toLowerCase()
   const Icon = languageIcons[lowercaseName]
 
   if (Icon) {
@@ -82,7 +84,7 @@ const getLanguageIcon = (name: string) => {
   // 아이콘이 없는 경우 첫 글자를 보여줌
   return (
     <span className="text-foreground text-xs font-medium">
-      {name.slice(0, 1)}
+      {nameStr.slice(0, 1)}
     </span>
   )
 }
@@ -224,7 +226,7 @@ const WakatimeGraph = () => {
           <LabelList
             dataKey="value"
             position="right"
-            formatter={(value: number) => `${value}h`}
+            formatter={(value: any) => `${value}h`}
             fill="var(--foreground)"
             fontSize={12}
             fontWeight={500}

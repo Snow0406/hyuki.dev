@@ -5,10 +5,10 @@ import WakatimeGraph from '@/components/bento/WakatimeGraph'
 import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
-import { getRecentPost } from '@/lib/data-utils'
+import { getRecentPosts } from '@/lib/data-utils'
 import { Icon } from 'astro-icon/components'
 
-const latestPost = await getRecentPost()
+const latestPost = await getRecentPosts(1)
 ---
 
 <Layout>
@@ -106,16 +106,16 @@ const latestPost = await getRecentPost()
         latestPost && (
           <>
             <img
-              src={latestPost.data.image?.src ?? '#'}
-              alt={latestPost.data.title}
+              src={latestPost[0].data.image?.src ?? '#'}
+              alt={latestPost[0].data.title}
               width={477}
               height={251}
               class="border-border w-[85%] rounded-2xl border"
             />
             <Link
-              href={`/blog/${latestPost.id}`}
-              aria-label={`Read blog post: ${latestPost.data.title}`}
-              title={`Read blog post: ${latestPost.data.title}`}
+              href={`/blog/${latestPost[0].id}`}
+              aria-label={`Read blog post: ${latestPost[0].data.title}`}
+              title={`Read blog post: ${latestPost[0].data.title}`}
             >
               <div class="bg-secondary/50 text-primary hover:ring-primary absolute right-0 bottom-0 m-3 flex w-fit items-end rounded-full border p-3 transition-all duration-300 hover:ring-1">
                 <Icon name="lucide:move-up-right" size={16} />

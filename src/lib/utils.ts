@@ -38,23 +38,25 @@ export function getStatusInfo(status: string | undefined): {
   )
 }
 
-export function readingTime(html: string) {
+export function calculateWordCountFromHtml(
+  html: string | null | undefined,
+): number {
+  if (!html) return 0
   const textOnly = html.replace(/<[^>]+>/g, '')
-  const wordCount = textOnly.split(/\s+/).length
-  const readingTimeMinutes = (wordCount / 200 + 1).toFixed()
+  return textOnly.split(/\s+/).filter(Boolean).length
+}
+
+export function readingTime(wordCount: number): string {
+  const readingTimeMinutes = Math.max(1, Math.round(wordCount / 200))
   return `${readingTimeMinutes} min read`
 }
 
-export function getElapsedTime(unixTimestamp: number): string {
-  const createdAt = new Date(unixTimestamp)
-  const now = new Date()
-  let difference = now.getTime() - createdAt.getTime()
-  const hours = Math.floor(difference / (1000 * 60 * 60))
-  difference -= hours * (1000 * 60 * 60)
-  const minutes = Math.floor(difference / (1000 * 60))
-  difference -= minutes * (1000 * 60)
-  const seconds = Math.floor(difference / 1000)
-  return `${hours.toString().padStart(2, '0')}:${minutes
-    .toString()
-    .padStart(2, '0')}:${seconds.toString().padStart(2, '0')} elapsed`
+export function getHeadingMargin(depth: number): string {
+  const margins: Record<number, string> = {
+    3: 'ml-4',
+    4: 'ml-8',
+    5: 'ml-12',
+    6: 'ml-16',
+  }
+  return margins[depth] || ''
 }

@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useLanyard } from 'react-use-lanyard'
 import { Skeleton } from '@/components/ui/skeleton'
-import { cn, getElapsedTime } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import AvatarComponent from '@/components/ui/avatar'
 
 // 타입 정의
@@ -98,8 +98,6 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
     const imageValue = activity.assets?.[imageKey]
     if (!imageValue) return ''
 
-    console.log(`${imageKey}:`, imageValue)
-
     // 외부 이미지(mp:external) 처리
     if (imageValue.startsWith('mp:external/')) {
       return processExternalImageUrl(imageValue)
@@ -112,6 +110,20 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
     else {
       return `https://cdn.discordapp.com/app-assets/${activity.application_id}/${imageValue}`
     }
+  }
+
+  const getElapsedTime = (unixTimestamp: number): string => {
+    const createdAt = new Date(unixTimestamp)
+    const now = new Date()
+    let difference = now.getTime() - createdAt.getTime()
+    const hours = Math.floor(difference / (1000 * 60 * 60))
+    difference -= hours * (1000 * 60 * 60)
+    const minutes = Math.floor(difference / (1000 * 60))
+    difference -= minutes * (1000 * 60)
+    const seconds = Math.floor(difference / 1000)
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')} elapsed`
   }
 
   /**
@@ -207,7 +219,7 @@ const DiscordPresence = () => {
   const mainActivity = useMemo(() => {
     if (!lanyard?.data?.activities) return null
     return lanyard.data.activities.find(
-      (activity) => activity.type === 0 && activity.assets,
+      (activity: Activity) => activity.type === 0 && activity.assets,
     )
   }, [lanyard?.data?.activities])
 

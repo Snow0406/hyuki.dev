@@ -1,6 +1,5 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Container from '@/components/Container.astro'
 import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
 import { badgeVariants } from '@/components/ui/badge'
@@ -11,26 +10,24 @@ import { Icon } from 'astro-icon/components'
 const sortedTags = await getSortedTags()
 ---
 
-<Layout>
+<Layout class="max-w-3xl">
   <PageHead slot="head" title="Tags" />
-  <Container class="flex flex-col gap-y-6">
-    <Breadcrumbs items={[{ label: 'Tags', icon: 'lucide:tags' }]} />
+  <Breadcrumbs items={[{ label: 'Tags', icon: 'lucide:tags' }]} />
 
-    <div class="flex flex-col gap-4">
-      <div class="flex flex-wrap gap-2">
-        {
-          sortedTags.map(({ tag, count }) => (
-            <Link
-              href={`/tags/${encodeURIComponent(tag)}`}
-              class={badgeVariants({ variant: 'secondary' })}
-            >
-              <Icon name="lucide:hash" class="size-3" />
-              {tag}
-              <span class="text-muted-foreground ml-1.5">({count})</span>
-            </Link>
-          ))
-        }
-      </div>
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-wrap gap-2">
+      {
+        sortedTags.map(({ tag, count }) => (
+          <Link
+            href={`/tags/${encodeURIComponent(tag)}`}
+            class={badgeVariants({ variant: 'secondary' })}
+          >
+            <Icon name="lucide:hash" class="size-3" />
+            {tag}
+            <span class="text-muted-foreground ml-1.5">({count})</span>
+          </Link>
+        ))
+      }
     </div>
-  </Container>
+  </div>
 </Layout>

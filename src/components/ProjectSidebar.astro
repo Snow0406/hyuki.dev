@@ -33,30 +33,31 @@ const hasTeam = project.data.team && project.data.team.length > 0
     client:load
     className="flex max-h-80 flex-col overflow-y-auto"
     type="always"
+    data-project-sidebar-mobile-scroll
   >
     <div class="space-y-4 pt-2">
       {
         hasLinks && (
           <div>
-            <h3 class="text-sm font-medium text-foreground">Links</h3>
+            <h3 class="text-foreground text-sm font-medium">Links</h3>
             <ul class="mt-2 space-y-1">
               {project.data.link!.map((linkItem) => (
                 <li class="flex items-center gap-1">
                   <Icon
                     name={linkItem.icon || 'lucide:link'}
-                    class="size-3.5 text-muted-foreground"
+                    class="text-muted-foreground size-3.5"
                   />
                   {linkItem.url ? (
                     <Link
                       href={linkItem.url}
                       external
                       underline
-                      class="text-sm text-muted-foreground hover:text-foreground hover:decoration-foreground"
+                      class="text-muted-foreground hover:text-foreground hover:decoration-foreground text-sm"
                     >
                       {linkItem.name}
                     </Link>
                   ) : (
-                    <span class="text-sm text-muted-foreground">
+                    <span class="text-muted-foreground text-sm">
                       {linkItem.name}
                     </span>
                   )}
@@ -70,10 +71,10 @@ const hasTeam = project.data.team && project.data.team.length > 0
       {
         hasContributions && (
           <div>
-            <h3 class="text-sm font-medium text-foreground">
+            <h3 class="text-foreground text-sm font-medium">
               My Contributions
             </h3>
-            <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
+            <ul class="text-muted-foreground mt-2 list-outside list-disc pl-5 text-sm">
               {project.data.contributions!.map((contribution) => (
                 <li>{contribution}</li>
               ))}
@@ -85,8 +86,8 @@ const hasTeam = project.data.team && project.data.team.length > 0
       {
         hasTeam && (
           <div>
-            <h3 class="text-sm font-medium text-foreground">Team</h3>
-            <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
+            <h3 class="text-foreground text-sm font-medium">Team</h3>
+            <ul class="text-muted-foreground mt-2 list-outside list-disc pl-5 text-sm">
               {project.data.team!.map((member) => (
                 <li>
                   {member.name}
@@ -105,18 +106,54 @@ const hasTeam = project.data.team && project.data.team.length > 0
   class="sticky top-[5.5rem] col-start-1 hidden h-[calc(100vh-5.5rem)] text-xs leading-4 xl:block"
 >
   <div class="flex justify-end">
-    <ScrollArea client:load className="max-h-[calc(100vh-8rem)]" type="always">
+    <ScrollArea
+      client:load
+      className="max-h-[calc(100vh-8rem)]"
+      type="always"
+      data-project-sidebar-desktop-scroll
+    >
       <div class="flex flex-col gap-y-4 overflow-y-auto px-8">
         <h2 class="mb-2 text-lg font-semibold">Project Info</h2>
-        {}
+
+        {
+          hasLinks && (
+            <div>
+              <h3 class="text-foreground text-sm font-medium">Links</h3>
+              <ul class="mt-2 space-y-1">
+                {project.data.link!.map((linkItem) => (
+                  <li class="flex items-center gap-1">
+                    <Icon
+                      name={linkItem.icon || 'lucide:link'}
+                      class="text-muted-foreground size-3.5"
+                    />
+                    {linkItem.url ? (
+                      <Link
+                        href={linkItem.url}
+                        external
+                        underline
+                        class="text-muted-foreground hover:text-foreground hover:decoration-foreground text-sm"
+                      >
+                        {linkItem.name}
+                      </Link>
+                    ) : (
+                      <span class="text-muted-foreground text-sm">
+                        {linkItem.name}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
 
         {
           hasContributions && (
             <div>
-              <h3 class="text-sm font-medium text-foreground">
+              <h3 class="text-foreground text-sm font-medium">
                 My Contributions
               </h3>
-              <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
+              <ul class="text-muted-foreground mt-2 list-outside list-disc pl-5 text-sm">
                 {project.data.contributions!.map((contribution) => (
                   <li>{contribution}</li>
                 ))}
@@ -128,8 +165,8 @@ const hasTeam = project.data.team && project.data.team.length > 0
         {
           hasTeam && (
             <div>
-              <h3 class="text-sm font-medium text-foreground">Team</h3>
-              <ul class="mt-2 list-outside list-disc pl-5 text-sm text-muted-foreground">
+              <h3 class="text-foreground text-sm font-medium">Team</h3>
+              <ul class="text-muted-foreground mt-2 list-outside list-disc pl-5 text-sm">
                 {project.data.team!.map((member) => (
                   <li>
                     {member.name}
@@ -146,3 +183,138 @@ const hasTeam = project.data.team && project.data.team.length > 0
     </ScrollArea>
   </div>
 </nav>
+
+<script>
+  class ProjectSidebarState {
+    mobileScrollArea: HTMLElement | null = null
+    desktopScrollArea: HTMLElement | null = null
+    mobileSidebarScrollArea: HTMLElement | null = null
+    desktopSidebarScrollArea: HTMLElement | null = null
+
+    reset() {
+      this.mobileScrollArea = null
+      this.desktopScrollArea = null
+      this.mobileSidebarScrollArea = null
+      this.desktopSidebarScrollArea = null
+    }
+  }
+
+  const state = new ProjectSidebarState()
+
+  class ProjectSidebarScrollMask {
+    static updateMobile() {
+      if (!state.mobileScrollArea || !state.mobileSidebarScrollArea) return
+
+      const { scrollTop, scrollHeight, clientHeight } = state.mobileScrollArea
+      const threshold = 5
+      const isAtTop = scrollTop <= threshold
+      const isAtBottom = scrollTop >= scrollHeight - clientHeight - threshold
+
+      state.mobileSidebarScrollArea.classList.toggle(
+        'mask-t-from-90%',
+        !isAtTop,
+      )
+      state.mobileSidebarScrollArea.classList.toggle(
+        'mask-b-from-90%',
+        !isAtBottom,
+      )
+    }
+
+    static updateDesktop() {
+      if (!state.desktopScrollArea || !state.desktopSidebarScrollArea) return
+
+      const { scrollTop, scrollHeight, clientHeight } = state.desktopScrollArea
+      const threshold = 5
+      const isAtTop = scrollTop <= threshold
+      const isAtBottom = scrollTop >= scrollHeight - clientHeight - threshold
+
+      state.desktopSidebarScrollArea.classList.toggle(
+        'mask-t-from-90%',
+        !isAtTop,
+      )
+      state.desktopSidebarScrollArea.classList.toggle(
+        'mask-b-from-90%',
+        !isAtBottom,
+      )
+    }
+  }
+
+  class ProjectSidebarController {
+    static init() {
+      state.reset()
+
+      // 모바일 사이드바 초기화
+      const mobileDetails = document.querySelector(
+        'details[class*="col-start-2"]',
+      )
+      if (mobileDetails) {
+        state.mobileScrollArea = mobileDetails.querySelector(
+          '[data-radix-scroll-area-viewport]',
+        )
+        state.mobileSidebarScrollArea = mobileDetails.querySelector(
+          '[data-project-sidebar-mobile-scroll]',
+        )
+
+        if (state.mobileScrollArea) {
+          state.mobileScrollArea.addEventListener(
+            'scroll',
+            ProjectSidebarScrollMask.updateMobile,
+            { passive: true },
+          )
+        }
+      }
+
+      // 데스크탑 사이드바 초기화
+      const desktopNav = document.querySelector('nav[class*="col-start-1"]')
+      if (desktopNav) {
+        state.desktopScrollArea = desktopNav.querySelector(
+          '[data-radix-scroll-area-viewport]',
+        )
+        state.desktopSidebarScrollArea = desktopNav.querySelector(
+          '[data-project-sidebar-desktop-scroll]',
+        )
+
+        if (state.desktopScrollArea) {
+          state.desktopScrollArea.addEventListener(
+            'scroll',
+            ProjectSidebarScrollMask.updateDesktop,
+            { passive: true },
+          )
+        }
+      }
+
+      // 초기 마스크 업데이트
+      setTimeout(() => {
+        ProjectSidebarScrollMask.updateMobile()
+        ProjectSidebarScrollMask.updateDesktop()
+      }, 100)
+    }
+
+    static cleanup() {
+      if (state.mobileScrollArea) {
+        state.mobileScrollArea.removeEventListener(
+          'scroll',
+          ProjectSidebarScrollMask.updateMobile,
+        )
+      }
+      if (state.desktopScrollArea) {
+        state.desktopScrollArea.removeEventListener(
+          'scroll',
+          ProjectSidebarScrollMask.updateDesktop,
+        )
+      }
+      state.reset()
+    }
+  }
+
+  document.addEventListener('astro:page-load', () =>
+    ProjectSidebarController.init(),
+  )
+  document.addEventListener('astro:after-swap', () => {
+    ProjectSidebarController.cleanup()
+    ProjectSidebarController.init()
+  })
+  document.addEventListener('astro:before-swap', () =>
+    ProjectSidebarController.cleanup(),
+  )
+</script>

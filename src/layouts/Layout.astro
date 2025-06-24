@@ -1,33 +1,42 @@
 ---
-import '../styles/global.css'
-import '../styles/typography.css'
+import '@/styles/global.css'
+import '@/styles/typography.css'
 
 import Footer from '@/components/Footer.astro'
 import Head from '@/components/Head.astro'
 import Header from '@/components/Header.astro'
-import SnowfallEffect from '@/components/SnowfallEffect'
 import { SITE } from '@/consts'
+import { cn } from '@/lib/utils'
+
+import SnowfallEffect from '@/components/SnowfallEffect'
 
 type Props = {
+  class?: string
   disableSnowfall?: boolean
 }
 
-const { disableSnowfall = false } = Astro.props
+const { class: className, disableSnowfall = false } = Astro.props
 ---
 
 <!doctype html>
-<html lang={SITE.locale}>
+<html class="bg-background text-foreground" lang={SITE.locale}>
   <Head>
     <slot name="head" />
   </Head>
   <body>
-    <div
-      class="box-border flex h-fit min-h-screen flex-col gap-y-6 font-sans antialiased"
-    >
+    <div class="flex h-fit min-h-screen flex-col gap-y-6 font-sans">
       {!disableSnowfall && <SnowfallEffect client:only="react" />}
-      <Header />
+      <div
+        class="bg-background/50 sticky top-0 z-50 divide-y backdrop-blur-sm xl:divide-none"
+      >
+        <Header />
+        <slot name="subposts-navigation" />
+        <slot name="table-of-contents" />
+      </div>
       <main class="grow">
-        <slot />
+        <div class={cn('mx-auto flex grow flex-col gap-y-6 px-4', className)}>
+          <slot />
+        </div>
       </main>
       <Footer />
     </div>

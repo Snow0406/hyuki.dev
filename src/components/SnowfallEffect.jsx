@@ -3,12 +3,9 @@ import React, { useEffect, useState, useMemo, useRef } from 'react'
 const SnowfallEffect = () => {
   const [snowflakes, setSnowflakes] = useState([])
   const [isDark, setIsDark] = useState(false)
-  const [isVisible, setIsVisible] = useState(true)
   const containerRef = useRef(null)
   const animationFrameRef = useRef(null)
-  const timerRef = useRef(null)
   const observerRef = useRef(null)
-  const intersectionObserverRef = useRef(null)
   const initializedRef = useRef(false)
 
   useEffect(() => {
@@ -20,18 +17,22 @@ const SnowfallEffect = () => {
     const isMobile = window.innerWidth < 768
     const isLowPerfDevice = window.navigator.hardwareConcurrency <= 4
 
-    // 다크모드 감지
+    // 다크모드 감지 (ThemeToggle과 동일한 방식 사용)
     const checkDarkMode = () => {
-      setIsDark(document.documentElement.classList.contains('dark'))
+      const theme = document.documentElement.getAttribute('data-theme')
+      setIsDark(theme === 'dark')
     }
 
     checkDarkMode()
     observerRef.current = new MutationObserver(checkDarkMode)
-    observerRef.current.observe(document.documentElement, { attributes: true })
+    observerRef.current.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    })
 
     const createSnowflake = (isInitial = false) => {
       const id = Math.random().toString(36).substring(2, 9)
-      const size = Math.random() * 5 + 2 // 2px ~ 7px
+      const size = Math.random() * 4 + 3 // 3px ~ 7px
       const left = Math.random() * 100 // 0% ~ 100%
       const baseOpacity = Math.random() * 0.25 + 0.05 // 0.05 ~ 0.3
       const duration = Math.random() * 15 + 15 // 15s ~ 30s
