@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Cell, LabelList } from 'recharts'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -92,7 +92,7 @@ const getLanguageIcon = (name: string | any) => {
 const WakatimeGraph = () => {
   const [languages, setLanguages] = useState<Language[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error] = useState<string | null>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   // xl 크기 미디어 쿼리 감지
@@ -152,7 +152,7 @@ const WakatimeGraph = () => {
   if (error) return <div className="text-destructive p-4">오류: {error}</div>
 
   // 커스텀 Bar 호버 이벤트 핸들러
-  const handleBarMouseEnter = (data: any, index: number) => {
+  const handleBarMouseEnter = (_data: any, index: number) => {
     setHoveredIndex(index)
   }
 
