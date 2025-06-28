@@ -47,7 +47,40 @@ const projects = defineCollection({
         .optional(),
       draft: z.boolean().optional(),
 
-      // ProjectSideBar
+      sections: z
+        .array(
+          z.discriminatedUnion('type', [
+            z.object({
+              title: z.string(),
+              type: z.literal('links'),
+              items: z.array(
+                z.object({
+                  icon: z.string().optional(),
+                  name: z.string(),
+                  url: z.string().url().optional(),
+                }),
+              ),
+            }),
+            z.object({
+              title: z.string(),
+              type: z.literal('list'),
+              items: z.array(z.string()),
+            }),
+            z.object({
+              title: z.string(),
+              type: z.literal('team'),
+              items: z.array(
+                z.object({
+                  name: z.string(),
+                  role: z.string().optional(),
+                }),
+              ),
+            }),
+          ]),
+        )
+        .optional(),
+
+      // 기존 호환성을 위해 유지 (deprecated)
       link: z
         .array(
           z.object({

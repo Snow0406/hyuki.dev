@@ -2,28 +2,31 @@
 import BlogCard from '@/components/BlogCard.astro'
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PageHead from '@/components/PageHead.astro'
+import ProjectCard from '@/components/ProjectCard.astro'
 import Layout from '@/layouts/Layout.astro'
-import { getAllTags, getPostsByTag } from '@/lib/data-utils'
+import { getAllCombinedTags, getContentByTag } from '@/lib/data-utils'
 
 export async function getStaticPaths() {
-  const tagMap = await getAllTags()
+  const tagMap = await getAllCombinedTags()
   const uniqueTags = Array.from(tagMap.keys())
 
   return Promise.all(
     uniqueTags.map(async (tag) => {
-      const posts = await getPostsByTag(tag)
+      const { posts, projects } = await getContentByTag(tag)
       return {
         params: { id: tag },
         props: {
           tag,
           posts,
+          projects,
         },
       }
     }),
   )
 }
 
-const { tag, posts } = Astro.props
+const { tag, posts, projects } = Astro.props
+const totalCount = posts.length + projects.length
 ---
 
 <Layout class="max-w-3xl">
@@ -45,6 +48,13 @@ const { tag, posts } = Astro.props
       posts.map((post) => (
         <li>
           <BlogCard entry={post} />
+        </li>
+      ))
+    }
+    {
+      projects.map((project) => (
+        <li>
+          <ProjectCard project={project} />
         </li>
       ))
     }

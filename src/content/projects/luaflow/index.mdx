@@ -1,0 +1,317 @@
+---
+name: 'LuaFlow'
+description: 'Unity Cutscene System + Lua Script'
+tags: ['Unity', 'C#', 'Lua', 'Open Source']
+image: 'luaflow.webp'
+startDate: '2025-04-04'
+endDate: '2025-04-08'
+status: 'Completed'
+sections:
+  - title: 'Links'
+    type: 'links'
+    items:
+      - icon: 'lucide:github'
+        name: 'GitHub Repository'
+        url: 'https://github.com/Snow0406/LuaFlow'
+      - icon: 'lucide:book'
+        name: 'Documentation'
+        url: 'https://github.com/Snow0406/LuaFlow#readme'
+      - icon: 'lucide:package'
+        name: 'Unity Package Manager'
+        url: 'https://github.com/Snow0406/LuaFlow.git?path=Assets/LuaFlow'
+  - title: 'Key Features'
+    type: 'list'
+    items:
+      - 'Lua 스크립트 기반 Unity 컷신 시스템'
+      - 'UniTask와 Lua-CSharp 통합'
+      - 'Interface 기반 확장 가능한 아키텍처'
+      - 'Service Locator 패턴으로 매니저 관리'
+      - 'Scene Adaptive 아키텍처 지원'
+      - 'Custom Events & Actions 시스템'
+  - title: 'Credits'
+    type: 'team'
+    items:
+      - name: 'hy'
+        role: 'Developer'
+---
+
+import Callout from '@/components/Callout.astro'
+
+## 프로젝트 개요
+
+LuaFlow는 **Lua 스크립트 기반의 Unity 컷신 시스템**입니다. [UniTask](https://github.com/Cysharp/UniTask)와 [Lua-CSharp](https://github.com/nuskey8/Lua-CSharp)를 기반으로 구축되었으며, 
+JSON 기반 컷신 관리의 불편함을 해결하기 위해 Lua 스크립팅을 도입한 혁신적인 시스템입니다.
+
+<Callout variant="note">
+  이 시스템은 **Lilium 프로젝트**의 일부에서 파생되었으며, MIT 라이센스로 오픈소스화되었습니다 !
+  
+  **최신 릴리즈**: v1.4.0 (2025년 6월 25일) | **라이센스**: MIT
+</Callout>
+
+## 개발 동기
+
+Unity Inspector에서 JSON 기반으로 컷신을 관리하는 것이 너무 번거롭고 복잡해서, 대안을 찾던 중 Lua 스크립팅을 발견했습니다. 
+컷신 관리에 Lua를 사용하는 것이 간지가 날것 같아서 이 시스템을 만들게 되었습니다!
+
+## Lilium 프로젝트의 실제 컷신 예시
+
+LuaFlow를 사용한 Lilium 프로젝트의 실제 컷신 코드입니다:
+
+```lua title="Chap1-01 -> Chap1-02 Cutscene"
+--- Chap1-01 -> Chap1-02 Cutscene
+
+-- 필요한 게임 오브젝트들의 참조를 가져옴
+local player = get("Player")
+local camera1 = get("CameraMove_1")
+local camera2 = get("CameraMove_2")
+
+function playCutscene()
+    -- camera1을 0.5 속도로 따라가기, 도착까지 대기
+    camera1:camera():follow(0.5, true)
+
+    -- 화면 페이드 아웃
+    camera1:cinematic():fadeOut()
+    camera2:camera():follow(0.03, true)
+
+    -- 플레이어 움직임 정지 함수 실행
+    player:action():exec("PlayerMoveStop")
+
+    -- 챕터 전환 이벤트 호출
+    player:event():exec("MovePlayerToNextChapter")
+
+    -- 플레이어 방향을 오른쪽으로 플립
+    player:animation():flip(true)
+    player:camera():follow(1, true)
+
+    -- 플레이어 낙하 애니메이션 재생
+    player:animation():play("FallDown")
+
+    -- 화면 페이드 인
+    player:cinematic():fadeIn()
+
+    -- 3초 대기
+    wait(3.0)
+
+    -- 플레이어 일어나는 애니메이션 재생 및 완료까지 대기
+    player:animation():play("GetUp", true)
+    player:animation():play("Idle")
+
+    -- 플레이어 제어 함수 재활성화
+    player:action():exec("PlayerMoveStart")
+end
+```
+
+## 핵심 아키텍처
+
+### Interface 기반 설계
+
+LuaFlow는 Interface 기반 설계를 통해 높은 유연성과 확장성을 제공합니다.
+
+```csharp title="Assets/LuaFlow/Runtime/Interface/ICameraManager.cs"
+// Interface/ICameraManager.cs
+public interface ICameraManager
+{
+    Vector3 PositionOffset { get; set; }
+    Transform transform { get; }
+    void ChangeCameraTarget(Transform target, float followSpeed = 0.1f);
+}
+```
+
+```csharp title="Assets/Scripts/CameraManager.cs"
+public class CameraManager : MonoBehaviour, ICameraManager
+{
+    public static CameraManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            LuaFlowServiceLocator.Register<ICameraManager>(this);
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // ICameraManager 인터페이스 구현
+    // ...
+}
+```
+
+### Service Locator 패턴
+
+`LuaFlowServiceLocator`는 다양한 매니저 인스턴스에 접근하기 위한 중앙 레지스트리를 제공합니다.
+
+```csharp title="매니저 등록"
+// 매니저 클래스의 Awake 메소드에서
+LuaFlowServiceLocator.Register<ICameraManager>(this);
+
+// 매니저가 파괴될 때 등록 해제
+private void OnDestroy()
+{
+    LuaFlowServiceLocator.Unregister<ICameraManager>();
+}
+```
+
+```csharp title="매니저 사용"
+// 어디서든 등록된 매니저 인스턴스에 접근
+ICameraManager cameraManager = LuaFlowServiceLocator.Get<ICameraManager>();
+cameraManager.ChangeCameraTarget(targetTransform, 0.5f);
+```
+
+## 주요 시스템
+
+### Game Entity 관리
+
+`GameEntityManager`는 다양한 씬에서 게임 오브젝트를 중앙에서 등록, 접근, 관리할 수 있는 방법을 제공합니다.
+
+```csharp title="C#에서 사용"
+// 게임 오브젝트 등록 (일반적으로 Awake나 Start에서)
+GameEntityManager.RegisterGameObject("Player", playerGameObject);
+
+// 등록된 게임 오브젝트 가져오기
+GameObject player = GameEntityManager.Instance.GetGameObject("Player");
+
+// 더 이상 필요하지 않을 때 게임 오브젝트 등록 해제
+GameEntityManager.UnregisterGameObject("Player");
+```
+
+```lua title="Lua에서 사용"
+-- Lua에서 등록된 게임 오브젝트 가져오기
+local player = get("Player")
+```
+
+### Custom Events 시스템
+
+`LuaCustomEventManager`는 C# 스크립트와 Lua 스크립트 간의 이벤트 시스템을 제공합니다.
+
+```csharp title="C#에서 이벤트 구독"
+// 매개변수 없는 이벤트 구독
+LuaCustomEventManager.Subscribe("PlayerDied", () => {
+    Debug.Log("Player died event received!");
+});
+
+// 매개변수가 있는 이벤트 구독
+LuaCustomEventManager.Subscribe<int>("ScoreChanged", (score) => {
+    Debug.Log($"Score changed to: {score}");
+});
+```
+
+```lua title="Lua에서 이벤트 발행"
+-- 매개변수 없는 이벤트 발행
+myObject:event():exec("PlayerDied")
+
+-- 매개변수가 있는 이벤트 발행
+myObject:event():execP("ScoreChanged", 100)
+```
+
+### Custom Actions 시스템
+
+`LuaCustomActionManager`는 Lua 스크립트에서 호출할 수 있는 C# 함수를 등록하는 시스템을 제공합니다.
+
+```csharp title="C#에서 함수 등록"
+// 매개변수 없는 간단한 함수 등록
+LuaCustomActionManager.RegisterFunction("ShowGameOver", () => {
+    gameOverPanel.SetActive(true);
+});
+
+// 매개변수가 있는 함수 등록
+LuaCustomActionManager.RegisterFunction<int>("UpdateHealth", (health) => {
+    playerHealth.SetHealth(health);
+});
+
+// 비동기 함수 등록 (UniTask 사용)
+LuaCustomActionManager.RegisterAsyncFunction("FadeToBlack", async () => {
+    await fadeScreen.FadeToBlackAsync(2.0f);
+});
+```
+
+```lua title="Lua에서 함수 실행"
+-- 매개변수 없는 등록된 함수 실행
+myObject:action():exec("ShowGameOver")
+
+-- 매개변수가 있는 등록된 함수 실행
+myObject:action():exec("UpdateHealth", 50)
+
+-- 비동기 함수 실행 (두 번째 매개변수가 true면 완료까지 대기)
+myObject:action():execAsync("FadeToBlack", true)
+```
+
+## 설치 및 사용법
+
+### Unity Package Manager를 통한 설치
+
+1. Package Manager 창을 엽니다 (Window > Package Manager)
+2. 좌측 상단의 "+" 버튼을 클릭합니다
+3. "Add package from git URL..."을 선택합니다
+4. `https://github.com/Snow0406/LuaFlow.git?path=Assets/LuaFlow`를 입력합니다
+5. "Add" 버튼을 클릭합니다
+
+<Callout variant="note">
+  패키지 종속성(Lua-CSharp 및 UniTask)은 package.json에 정의되어 있어 자동으로 설치됩니다.
+</Callout>
+
+### 컷신 생성하기
+
+1. `Assets/Cutscene/Chap{X}/` 디렉토리에 새 Lua 스크립트를 생성합니다
+2. 다음 템플릿을 사용하여 시작합니다:
+
+```lua title="컷신 템플릿"
+--- Test Cutscene
+
+-- GameEntityManager에 등록된 게임 오브젝트들의 참조 가져오기
+local tg1 = get("Target1")
+local tg2 = get("Target2")
+
+-- 메인 컷신 함수
+function playCutscene()
+    log("Test Cutscene Start")
+
+    -- 2초 대기
+    wait(2.0)
+
+    -- 카메라가 Target1을 부드럽게 따라가도록 전환
+    tg1:camera():follow(0.03, true)
+
+    -- 카메라가 Target2를 따라가도록 전환
+    tg2:camera():follow(0.03, true)
+
+    log("Test Cutscene End")
+end
+```
+
+### 컷신 트리거하기
+
+`CutsceneTrigger` 컴포넌트를 사용하여 컷신을 트리거할 수 있습니다:
+
+1. 씬에 빈 GameObject를 생성합니다
+2. CircleCollider2D 컴포넌트를 추가합니다
+3. `CutsceneTrigger` 스크립트를 추가합니다
+4. Chapter와 Cutscene Name 필드를 설정합니다
+5. 플레이어가 트리거 영역에 들어가면 컷신이 재생됩니다
+
+## 시스템 확장하기
+
+### 커스텀 커맨드 추가
+
+새로운 커맨드 클래스를 생성하여 LuaFlow를 확장할 수 있습니다:
+
+```csharp title="커스텀 커맨드 예시"
+[LuaObject]
+public partial class LuaDialogueCommand : BaseLuaCommand
+{
+    public LuaDialogueCommand(GameObject targetObject) : base(targetObject)
+    {
+    }
+
+    [LuaMember("say")]
+    public void Say(string text)
+    {
+        // 구현 내용
+    }
+}
+```
+

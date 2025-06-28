@@ -138,6 +138,51 @@ export async function getPostsByTag(
   return posts.filter((post) => post.data.tags?.includes(tag))
 }
 
+export async function getProjectsByTag(
+  tag: string,
+): Promise<CollectionEntry<'projects'>[]> {
+  const projects = await getAllProjects()
+  return projects.filter((project) => project.data.tags?.includes(tag))
+}
+
+export async function getContentByTag(tag: string): Promise<{
+  posts: CollectionEntry<'blog'>[]
+  projects: CollectionEntry<'projects'>[]
+}> {
+  const [posts, projects] = await Promise.all([
+    getPostsByTag(tag),
+    getProjectsByTag(tag),
+  ])
+  return { posts, projects }
+}
+
+export async function getAllProjectTags(): Promise<Map<string, number>> {
+  const projects = await getAllProjects()
+  return projects.reduce((acc, project) => {
+    project.data.tags?.forEach((tag) => {
+      acc.set(tag, (acc.get(tag) || 0) + 1)
+    })
+    return acc
+  }, new Map<string, number>())
+}
+
+export async function getAllCombinedTags(): Promise<Map<string, number>> {
+  const [postTags, projectTags] = await Promise.all([
+    getAllTags(),
+    getAllProjectTags(),
+  ])
+
+  const combinedTags = new Map<string, number>()
+  postTags.forEach((count, tag) => {
+    combinedTags.set(tag, (combinedTags.get(tag) || 0) + count)
+  })
+  projectTags.forEach((count, tag) => {
+    combinedTags.set(tag, (combinedTags.get(tag) || 0) + count)
+  })
+
+  return combinedTags
+}
+
 export async function getRecentPosts(
   count: number,
 ): Promise<CollectionEntry<'blog'>[]> {
@@ -148,7 +193,7 @@ export async function getRecentPosts(
 export async function getSortedTags(): Promise<
   { tag: string; count: number }[]
 > {
-  const tagCounts = await getAllTags()
+  const tagCounts = await getAllCombinedTags()
   return Array.from(tagCounts.entries())
     .map(([tag, count]) => ({ tag, count }))
     .sort((a, b) => {
