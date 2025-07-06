@@ -50,28 +50,17 @@ const subPostsWithReadingTime = await Promise.all(
             class="hover:bg-muted/50 group/card relative mr-5 block rounded-lg border no-underline transition-colors"
           >
             <div class="flex flex-row items-center gap-4 p-4">
-              {!showImage &&
-                (post.data.image ? (
-                  <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
-                    <Image
-                      src={post.data.image}
-                      alt={post.data.title}
-                      width={96}
-                      height={96}
-                      class="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
-                    />
-                  </div>
-                ) : (
-                  <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
-                    <img
-                      src={`/og/${post.id}.png`}
-                      alt={post.data.title}
-                      width={96}
-                      height={96}
-                      class="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
-                    />
-                  </div>
-                ))}
+              {!showImage && post.data.image && (
+                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
+                  <Image
+                    src={post.data.image}
+                    alt={post.data.title}
+                    width={96}
+                    height={96}
+                    class="h-full w-full rounded-lg object-cover transition-transform duration-300 group-hover/card:scale-105"
+                  />
+                </div>
+              )}
               <div class="min-w-0 grow overflow-hidden">
                 <h3 class="mt-[-1px] mb-2 line-clamp-2 text-lg font-medium">
                   {post.data.title}
