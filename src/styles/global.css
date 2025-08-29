@@ -186,4 +186,14 @@
       0 0 12px 2px rgba(120, 200, 255, 0.15),
       0 0 20px 4px rgba(150, 220, 255, 0.08) inset;
   }
+
+  /* 테마 전환 시 transition 완전 비활성화 */
+  .disable-transitions *,
+  .disable-transitions *:before,
+  .disable-transitions *:after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }

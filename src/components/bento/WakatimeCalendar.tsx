@@ -64,7 +64,8 @@ const WakatimeCalendar: FunctionComponent<Props> = ({ ...props }) => {
   // 다크 모드 감지
   useEffect(() => {
     // 초기 테마 상태 감지
-    const isDark = document.documentElement.classList.contains('dark')
+    const isDark =
+      document.documentElement.getAttribute('data-theme') === 'dark'
     setIsDarkMode(isDark)
 
     // MutationObserver를 사용하여 테마 변경 감지
@@ -72,9 +73,10 @@ const WakatimeCalendar: FunctionComponent<Props> = ({ ...props }) => {
       mutations.forEach((mutation) => {
         if (
           mutation.type === 'attributes' &&
-          mutation.attributeName === 'class'
+          mutation.attributeName === 'data-theme'
         ) {
-          const isDark = document.documentElement.classList.contains('dark')
+          const isDark =
+            document.documentElement.getAttribute('data-theme') === 'dark'
           setIsDarkMode(isDark)
         }
       })
@@ -82,7 +84,7 @@ const WakatimeCalendar: FunctionComponent<Props> = ({ ...props }) => {
 
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ['data-theme'],
     })
 
     return () => observer.disconnect()

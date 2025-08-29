@@ -24,12 +24,12 @@ import Favicons from './Favicons.astro'
 
   <meta
     name="theme-color"
-    content="#121212"
+    content="#26263B"
     media="(prefers-color-scheme: dark)"
   />
   <meta
     name="theme-color"
-    content="#121212"
+    content="#F8F8FB"
     media="(prefers-color-scheme: light)"
   />
 
@@ -44,6 +44,27 @@ import Favicons from './Favicons.astro'
 
   <Favicons />
   <ClientRouter />
+
+  <!-- FOUC 방지를 위한 즉시 테마 적용 -->
+  <script is:inline>
+    ;(function () {
+      const theme = (() => {
+        const stored = localStorage?.getItem('theme') ?? ''
+        if (['dark', 'light'].includes(stored)) return stored
+        return window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+      })()
+
+      const el = document.documentElement
+      el.classList.add('disable-transitions')
+      el.setAttribute('data-theme', theme)
+      el.classList.add(theme === 'dark' ? 'scheme-dark' : 'scheme-light')
+
+      // transition을 빠르게 재활성화
+      requestAnimationFrame(() => el.classList.remove('disable-transitions'))
+    })()
+  </script>
 
   <slot />
 </head>

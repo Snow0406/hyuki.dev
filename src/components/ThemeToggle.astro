@@ -46,15 +46,16 @@ import { Icon } from 'astro-icon/components'
     const currentTheme = element.getAttribute('data-theme')
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
 
-    element.classList.add('[&_*]:transition-none')
+    element.classList.add('disable-transitions')
     element.setAttribute('data-theme', newTheme)
     element.classList.remove('scheme-dark', 'scheme-light')
     element.classList.add(newTheme === 'dark' ? 'scheme-dark' : 'scheme-light')
 
-    window.getComputedStyle(element).getPropertyValue('opacity')
+    // 브라우저가 스타일을 적용하도록 강제
+    element.offsetHeight
 
     requestAnimationFrame(() => {
-      element.classList.remove('[&_*]:transition-none')
+      element.classList.remove('disable-transitions')
     })
 
     localStorage.setItem('theme', newTheme)
@@ -73,9 +74,7 @@ import { Icon } from 'astro-icon/components'
     const storedTheme = localStorage.getItem('theme') || 'light'
     const element = document.documentElement
 
-    element.classList.add('[&_*]:transition-none')
-
-    window.getComputedStyle(element).getPropertyValue('opacity')
+    element.classList.add('disable-transitions')
 
     element.setAttribute('data-theme', storedTheme)
     element.classList.remove('scheme-dark', 'scheme-light')
@@ -83,8 +82,11 @@ import { Icon } from 'astro-icon/components'
       storedTheme === 'dark' ? 'scheme-dark' : 'scheme-light',
     )
 
+    // 브라우저가 스타일을 적용하도록 강제
+    element.offsetHeight
+
     requestAnimationFrame(() => {
-      element.classList.remove('[&_*]:transition-none')
+      element.classList.remove('disable-transitions')
     })
 
     initThemeToggle()
