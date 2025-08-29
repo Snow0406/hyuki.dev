@@ -34,7 +34,7 @@ const DiscordSkeleton = () => (
           <Skeleton className="h-6 w-[118px] rounded-xl xl:h-5 xl:w-[100px]" />
         </div>
         <Skeleton className="flex h-[62px] flex-col gap-y-1 rounded-xl p-3 xl:h-[54px] xl:gap-y-0.5 xl:p-2" />
-        <Skeleton className="flex grow rounded-xl p-2 xl:p-1.5" />
+        <Skeleton className="flex min-h-[80px] grow rounded-xl p-2 xl:min-h-[50px] xl:p-1.5" />
       </div>
     </div>
   </div>
@@ -72,18 +72,31 @@ const StatusIndicator = ({ status }: { status: DiscordStatus }) => {
 // 활동 표시 컴포넌트
 const ActivityDisplay = ({ activity }: { activity: Activity }) => {
   const [elapsedTime, setElapsedTime] = useState('')
+  const [spotifyProgress, setSpotifyProgress] = useState<{
+    currentTime: string
+    totalTime: string
+    progress: number
+    isFinished: boolean
+  } | null>(null)
 
   useEffect(() => {
     if (!activity?.timestamps?.start) return
 
-    const updateElapsedTime = () => {
-      if (activity.timestamps?.start) {
-        setElapsedTime(getElapsedTime(activity.timestamps.start))
+    const isSpotify = activity.name === 'Spotify' && activity.type === 2
+
+    const updateProgress = () => {
+      if (isSpotify) {
+        const progress = getSpotifyProgress()
+        setSpotifyProgress(progress)
+      } else {
+        if (activity.timestamps?.start) {
+          setElapsedTime(getElapsedTime(activity.timestamps.start))
+        }
       }
     }
 
-    updateElapsedTime()
-    const intervalId = setInterval(updateElapsedTime, 1000)
+    updateProgress()
+    const intervalId = setInterval(updateProgress, 1000)
 
     return () => clearInterval(intervalId)
   }, [activity])
@@ -98,8 +111,13 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
     const imageValue = activity.assets?.[imageKey]
     if (!imageValue) return ''
 
+    // 스포티파이 이미지 처리
+    if (imageValue.startsWith('spotify:')) {
+      const spotifyImageId = imageValue.replace('spotify:', '')
+      return `https://i.scdn.co/image/${spotifyImageId}`
+    }
     // 외부 이미지(mp:external) 처리
-    if (imageValue.startsWith('mp:external/')) {
+    else if (imageValue.startsWith('mp:external/')) {
       return processExternalImageUrl(imageValue)
     }
     // Discord 미디어 프록시 이미지 처리
@@ -124,6 +142,42 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
     return `${hours.toString().padStart(2, '0')}:${minutes
       .toString()
       .padStart(2, '0')}:${seconds.toString().padStart(2, '0')} elapsed`
+  }
+
+  /**
+   * 밀리초를 mm:ss 형식으로 변환
+   */
+  const formatTime = (ms: number): string => {
+    const seconds = Math.floor(ms / 1000)
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
+
+  /**
+   * 스포티파이 진행률 계산
+   */
+  const getSpotifyProgress = () => {
+    if (!activity.timestamps?.start || !activity.timestamps?.end) return null
+
+    const now = Date.now()
+    const start = activity.timestamps.start
+    const end = activity.timestamps.end
+    const duration = end - start
+    const elapsed = now - start
+
+    // 노래가 끝났는지 확인
+    const isFinished = elapsed >= duration
+
+    // 현재 시간이 곡 시작 전이거나 끝난 후라면 적절히 처리
+    const progress = Math.max(0, Math.min(1, elapsed / duration))
+
+    return {
+      currentTime: formatTime(isFinished ? duration : Math.max(0, elapsed)),
+      totalTime: formatTime(duration),
+      progress: progress * 100,
+      isFinished,
+    }
   }
 
   /**
@@ -166,6 +220,9 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
     return ''
   }
 
+  // 스포티파이 활동인지 확인
+  const isSpotify = activity.name === 'Spotify' && activity.type === 2
+
   return (
     <div className="flex w-full items-center gap-x-3 xl:gap-x-2">
       <div
@@ -200,10 +257,34 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
             {activity.state}
           </div>
         )}
-        {elapsedTime && (
-          <div className="text-muted-foreground text-[11px] leading-none xl:text-[9px]">
-            {elapsedTime}
+
+        {/* 스포티파이는 진행 바, 다른 활동은 elapsed time */}
+        {isSpotify && spotifyProgress ? (
+          <div className="flex items-center gap-x-2 xl:gap-x-1.5">
+            <span className="text-muted-foreground font-mono text-[9px] leading-none xl:text-[8px]">
+              {spotifyProgress.currentTime}
+            </span>
+            <div className="bg-muted-foreground/20 h-1 flex-1 overflow-hidden rounded-full xl:h-[3px]">
+              <div
+                className="bg-snowflake h-full transition-all duration-1000 ease-linear"
+                style={{
+                  width: `${spotifyProgress.progress}%`,
+                  boxShadow:
+                    '0 0 8px var(--color-snowflake), 0 0 12px var(--color-snowflake-hover)',
+                  filter: 'drop-shadow(0 0 4px var(--color-snowflake))',
+                }}
+              />
+            </div>
+            <span className="text-muted-foreground font-mono text-[9px] leading-none xl:text-[8px]">
+              {spotifyProgress.totalTime}
+            </span>
           </div>
+        ) : (
+          elapsedTime && (
+            <div className="text-muted-foreground text-[11px] leading-none xl:text-[9px]">
+              {elapsedTime}
+            </div>
+          )
         )}
       </div>
     </div>
@@ -218,9 +299,21 @@ const DiscordPresence = () => {
 
   const mainActivity = useMemo(() => {
     if (!lanyard?.data?.activities) return null
-    return lanyard.data.activities.find(
+
+    // 우선순위: 코딩 활동(type 0) -> 스포티파이(type 2)
+    const codingActivity = lanyard.data.activities.find(
       (activity: Activity) => activity.type === 0 && activity.assets,
     )
+
+    if (codingActivity) return codingActivity
+
+    // 코딩 활동이 없으면 스포티파이 활동 찾기
+    const spotifyActivity = lanyard.data.activities.find(
+      (activity: Activity) =>
+        activity.type === 2 && activity.name === 'Spotify',
+    )
+
+    return spotifyActivity || null
   }, [lanyard?.data?.activities])
 
   if (isLoading) {

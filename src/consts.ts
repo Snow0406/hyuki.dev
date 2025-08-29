@@ -19,7 +19,7 @@ export const NAV_LINKS: SocialLink[] = [
 
 export const SOCIAL_LINKS: SocialLink[] = [
   { href: 'https://github.com/snow0406', label: 'GitHub' },
-  { href: 'https://twitter.com/snowflake597', label: 'Twitter' },
+  { href: 'https://x.com/hyuki_dev', label: 'Twitter' },
   { href: 'mailto:snow@hyuki.dev', label: 'Email' },
   { href: '/rss.xml', label: 'RSS' },
 ]

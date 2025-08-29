@@ -13,6 +13,8 @@ import {
   SiCss3,
   SiLua,
   SiOpenai,
+  SiUnity,
+  SiCplusplus,
 } from 'react-icons/si'
 import type { IconType } from 'react-icons'
 
@@ -69,6 +71,8 @@ const languageIcons: { [key: string]: IconType } = {
   css: SiCss3,
   lua: SiLua,
   assembly: SiOpenai,
+  unity: SiUnity,
+  'c++': SiCplusplus,
 }
 
 const getLanguageIcon = (name: string | any) => {
@@ -151,15 +155,6 @@ const WakatimeGraph = () => {
 
   if (error) return <div className="text-destructive p-4">오류: {error}</div>
 
-  // 커스텀 Bar 호버 이벤트 핸들러
-  const handleBarMouseEnter = (_data: any, index: number) => {
-    setHoveredIndex(index)
-  }
-
-  const handleBarMouseLeave = () => {
-    setHoveredIndex(null)
-  }
-
   // 커스텀 YAxis 틱 렌더러
   const CustomYAxisTick = ({ x, y, payload }: any) => {
     return (
@@ -177,7 +172,13 @@ const WakatimeGraph = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center p-0">
+    <div
+      className="flex h-full w-full flex-col items-center justify-center p-0"
+      style={{
+        WebkitTapHighlightColor: 'transparent',
+      }}
+      onMouseDown={(e) => e.preventDefault()}
+    >
       <BarChart
         layout="vertical"
         width={320}
@@ -191,6 +192,9 @@ const WakatimeGraph = () => {
         }}
         barSize={18}
         className={isXl ? 'pl-4' : ''}
+        style={{
+          WebkitTapHighlightColor: 'transparent',
+        }}
       >
         <XAxis type="number" hide />
         <YAxis
@@ -201,28 +205,25 @@ const WakatimeGraph = () => {
           axisLine={false}
           tick={<CustomYAxisTick />}
         />
-        <Bar
-          dataKey="value"
-          radius={[4, 4, 4, 4]}
-          animationDuration={1200}
-          onMouseEnter={handleBarMouseEnter}
-          onMouseLeave={handleBarMouseLeave}
-        >
+        <Bar dataKey="value" radius={[4, 4, 4, 4]} isAnimationActive={false}>
           {languages.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
               fill={entry.fill || 'var(--background)'}
               fillOpacity={hoveredIndex === index ? 1 : 0.85}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
               style={{
                 filter:
                   hoveredIndex === index
                     ? 'drop-shadow(0 0 8px rgba(120, 200, 255, 0.7))'
                     : 'none',
-                transition: 'all 0.3s ease',
+                transition: 'filter 0.3s ease, fill-opacity 0.3s ease',
                 cursor: 'pointer',
               }}
             />
           ))}
+
           <LabelList
             dataKey="value"
             position="right"
