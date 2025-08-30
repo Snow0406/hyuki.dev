@@ -369,7 +369,7 @@ const DiscordPresence = () => {
           </div>
 
           {/* 활동 정보 */}
-          <div className="bg-secondary/50 flex grow rounded-xl px-3 py-2 xl:px-2 xl:py-1.5">
+          <div className="bg-secondary/50 flex min-h-[80px] grow rounded-xl px-3 py-2 xl:min-h-[50px] xl:px-2 xl:py-1.5">
             {mainActivity ? (
               <ActivityDisplay activity={mainActivity as Activity} />
             ) : (
