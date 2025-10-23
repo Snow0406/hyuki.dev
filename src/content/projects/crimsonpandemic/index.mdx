@@ -1,0 +1,55 @@
+---
+name: 'Crimson Pandemic'
+description: '2D Action Survival Game Optimization and System improvement'
+tags: ['Unity', 'C#', 'Optimization', 'Performance']
+image: 'crimson-pandemic.webp'
+startDate: '2025-09-17'
+status: 'In Progress'
+sections:
+  - title: 'Links'
+    type: 'links'
+    items:
+      - icon: 'lucide:message-circle'
+        name: 'Discord Server'
+        url: 'https://discord.gg/jcm4ktGQUu'
+  - title: 'My Contributions'
+    type: 'list'
+    items:
+      - '게임 전반의 프레임워크 최적화'
+      - '과도한 메모리 사용(GC) 문제 해결'
+      - '키 바인딩 및 다국어 지원 등 유틸리티 시스템 구현'
+      - '커스텀 에디터 툴 개발로 개발 생산성 향상'
+  - title: 'Credits'
+    type: 'team'
+    items:
+      - name: 'subkan'
+        role: 'Lead Developer'
+      - name: 'hy'
+        role: 'Developer (Optimization and Systems)'
+---
+
+import Callout from '@/components/Callout.astro'
+
+## 프로젝트 개요
+
+**CRIMSON PANDEMIC**은 **subkan** 님이 개발한 2D 픽셀 슈팅 서바이벌 게임입니다. 
+저는 프로젝트에 합류하여 **게임 성능 최적화**와 키 바인딩, 다국어 지원 같은 **유틸리티 및 편의성** 시스템 개발을 담당했습니다.
+
+## 개발 동기
+
+이 게임은 제게 게임 개발자라는 꿈을 심어준 특별한 프로젝트입니다. 
+제가 가진 기술로 게임의 완성도를 높이는 데 기여하고 싶어서 직접 개발자님께 연락하여, 최적화 및 시스템 개발 역할로 프로젝트에 합류하게 되었습니다.
+
+## 핵심 기술 문제 해결
+
+<Callout variant="summary" title="주요 성능 개선 사항 (진행 중)"> 
+최적화 작업은 현재진행형이며, 약 1개월간의 초기 단계를 통해 다음과 같은 의미 있는 성능 개선을 이루었습니다.
+
+> - **CPU 병목 현상 완화**: 게임 로직의 CPU 점유 시간을 평균 **12ms에서 4.5ms로 단축**하여, 부드러운 프레임 유지를 가능하게 했습니다.
+>
+> - **메모리 할당(GC) 최적화**: 프레임당 **0.5MB(500KB) 이상** 발생하던 가비지를 **3.8KB로 99% 이상 감소**시켰습니다. 이를 통해 GC(가비지 컬렉션)로 인한 프레임 스파이크를 원천적으로 방지했습니다.
+
+주요 개선이 이루어질 때마다 관련 데이터를 업데이트하겠습니다.
+
+자세한 최적화 과정은 [Devlog](/blog/unity-optimization)를 확인해 주세요 !
+</Callout>
