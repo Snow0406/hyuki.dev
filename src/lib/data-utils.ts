@@ -25,18 +25,20 @@ export async function getAllPostsAndSubposts(): Promise<
 
 export async function getAllProjects(): Promise<CollectionEntry<'projects'>[]> {
   const projects = await getCollection('projects')
-  return projects.sort((a, b) => {
-    const statusA = a.data.status || 'Other'
-    const statusB = b.data.status || 'Other'
+  return projects
+    .filter((project) => !project.data.draft)
+    .sort((a, b) => {
+      const statusA = a.data.status || 'Other'
+      const statusB = b.data.status || 'Other'
 
-    const statusComparison =
-      PROJECT_STATUS.indexOf(statusA) - PROJECT_STATUS.indexOf(statusB)
-    if (statusComparison !== 0) return statusComparison
+      const statusComparison =
+        PROJECT_STATUS.indexOf(statusA) - PROJECT_STATUS.indexOf(statusB)
+      if (statusComparison !== 0) return statusComparison
 
-    const dateA = a.data.startDate?.getTime() || 0
-    const dateB = b.data.startDate?.getTime() || 0
-    return dateB - dateA
-  })
+      const dateA = a.data.startDate?.getTime() || 0
+      const dateB = b.data.startDate?.getTime() || 0
+      return dateB - dateA
+    })
 }
 
 export function groupProjectsByStatus(
