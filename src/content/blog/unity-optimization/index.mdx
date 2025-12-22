@@ -498,7 +498,7 @@ private void Update()
 사실 유니티에서는 `== null`을 실행할때 필요할때만 `가짜 null 체크` 수행하도록 최적화 되어있습니다.
 
 따라서 그냥 평범한 상황일때는 `== null`을 사용해도 됩니다.
-```csharp
+```csharp title="UnityNullCheckExample.cs"
 private static bool CompareBaseObjects(Object lhs, Object rhs)
 {
     bool flag1 = (object) lhs == null;
@@ -518,25 +518,201 @@ private static bool CompareBaseObjects(Object lhs, Object rhs)
 
 #### Data Structures & Logic
 
-데이터를 얼마나 효율적으로 가져와서 처리하는지에 따라서 CPU 사용량이 크게 달라집니다.
+어떤 자료구조를 선택하고 데이터를 어떻게 접근하느냐에 따라 CPU 캐시 적중률과 명령어 처리 속도가 크게 달라집니다.
 
 ##### Array vs List
 
-`List<T>`는 `A
+`List<T>`는 내부적으로 배열을 감싸고 있습니다.
+인덱서('[]')를 통해 접근할때마다 함수 호출 비용과 유효성 검사가 발생합니다.
+극한의 최적화가 필요한 **Hot Path (매 프레임마다 실행되는 코드)**에서는 `Array`를 사용하는것이 좋습니다.
+
+<Callout variant="note" title="진짜 차이가 있을까?">
+
+JIT 컴파일러 최적화 때문에 차이는 미미합니다.
+1. 함수 호출 비용: `List[i]`는 메서드 호출 (`get_Item`)이지만, JIT가 인라인 처리하여 기계어 수준에서는 **직접 접근**으로 변경됩니다. 즉, 함수 호출 오버헤드가 거의 없습니다.
+
+2. 유효성 검사: `List[i]`는 접근할때마다 `if (index >= _size)` 검사를 수행합니다. `Array` 또한 경계 검사를 하지만, CLR 레벨에서 배열 검사가 훨씬 강력하게 최적화(`Loop Cloning` 등)되어 있어 리스트보다 빠릅니다.
+
+</Callout>
+
+##### Dictionary Key Optimization
+
+`struct`를 Key로 쓸 때 `IEquatable<T>`를 구현하지 않으면 .NET은 기본 비교 방식(`ValueType.Equals`)을 사용합니다.
+기본 비교 방식은 **리플렉션(Reflection)** 을 사용하여 성능이 느립니다.
+
+이때 `int`, `float` 같은 <strong>Blittable 타입일떄는 비트 단위 비교(Bitwise)</strong>로 최적화를 시도하지만, 
+<strong>참조 타입(`string` 등)이 하나라도 섞이면 리플렉션(Reflection)</strong>으로 돌아갑니다. 
+게다가 최적화 여부와 상관없이 **박싱(Boxing)** 문제는 계속 발생합니다.
+
+<Callout variant="danger" title="기본 Struct 사용 (리플렉션 발생)">
+```csharp csharp title="DictionaryKeyExample1.cs"
+struct GridPos { public int x, y; }
+
+// GetHashCode/Equals 미구현 시, 내부적으로 Reflection을 사용하여 비교함
+Dictionary<GridPos, Item> items; 
+```
+</Callout>
+
+<Callout variant="solution" title="IEquatable 구현 (최적화)">
+```csharp csharp title="DictionaryKeyExample2.cs"
+struct GridPos : IEquatable<GridPos>
+{
+    public int x, y;
+    
+    // 이 함수가 있어야 리플렉션을 안 쓰고 직접 비교함
+    public bool Equals(GridPos other) => x == other.x && y == other.y;
+    public override int GetHashCode() => HashCode.Combine(x, y);
+}
+```
+</Callout>
+
+##### Data Locality (Struct vs Class)
+
+CPU는 메모리에서 데이터를 가져올때 하나씩 가져오지 않고 `캐시 라인(cache line, 보통 64바이트)` 단위로 가져옵니다.
+이떄 우리가 사용할 데이터들이 **메모리에 연속적으로 배치**되어 있으면 캐시 적중률이 높아져 성능이 좋아집니다.
+
+> - Class Array
+> 
+>   배열에는 몬스터의 `주소(참조)`만 들어있습니다. 실제 데이터는 힙 메모리 여기저기에 흩어져 있어, 접근할 때마다 `메모리 점프(Pointer Chasing)`가 발생하고 `캐싱 미스(Cache Miss)`가 일어납니다.
+
+> - Struct Array
+>
+>   데이터 자체가 배열 안에 **연속적으로** 꽉 차 있습니다. CPU 캐시에 매우 친화적입니다.
+
+데이터 개수가 많고 자주 순회해야 한다면, `Class` 대신 `Struct` 배열을 사용하는것이 좋습니다.
+
+<Callout variant="explanation" title="구조체 배열도 완벽하지 않다 (AoS vs SoA)">
+
+구조체 배열을 사용하면 메모리가 연속되므로 클래스보다 빠르지만, 여전히 낭비가 존재할 수 있습니다.
+이를 **AoS (Array of Structures)** 방식이라고 합니다.
+
+만약 `MonsterData`에 `HP`, `MP`, `Position`, `Name` 등 필드가 많은데, 루프에서는 `HP`만 깎는다고 가정해 봅시다.
+
+<Callout variant="example" title="AoS">
+
+CPU는 캐시 라인(64byte)을 채우기 위해 지금 필요 없는 `MP`, `Name` 데이터까지 읽어옵니다.
+
+```csharp title="AoS (캐시 대역폭 낭비)"
+// AoS: 일반적인 객체지향 방식 (캐시에 불필요한 필드도 로딩됨)
+struct Enemy { public int hp, mp; public string name; public Vector3 position; }
+Enemy[] enemies;
+
+for (int i = 0; i < enemies.Length; i++)
+{
+    enemies[i].hp -= 10; // 매번 캐시 라인에 불필요한 필드도 로딩됨
+}
+```
+</Callout>
+
+<Callout variant="example" title="SoA">
+
+데이터를 필드별로 별도 배열로 쪼갭니다. `HP` 배열을 순회하면 캐시 라인에는 오직 `HP` 데이터만 꽉 차게 되므로 캐시 효율이 매우 좋아집니다.
+
+```csharp title="SOA"
+// SoA: 데이터 지향 설계 (필요한 데이터만 캐시에 로딩됨)
+int[] enemyHps;
+int[] enemyMps;
+string[] enemyNames;
+Vector3[] enemyPositions;
+
+for (int i = 0; i < enemyHps.Length; i++)
+{
+    enemyHps[i] -= 10;
+}
+```
+</Callout>
+</Callout>
+
+<Callout variant="note" title="Struct 크기와 복사 비용">
+
+구조체는 **값 타입(Value Type)** 이므로 함수 인자로 넘기거나 변수에 할당할 때 **값이 통째로 복사(Deep Copy)** 됩니다.
+
+과거 마이크로소프트 가이드라인에는 <strong>"16바이트를 넘으면 클래스를 고려하라"</strong>는 말이 있었지만, 최근에는 기준이 조금 다릅니다.
+
+1.  단일 객체 전달: 16~24바이트가 넘어가는 큰 구조체를 함수 인자로 넘기면, 단순히 주소(8바이트)만 넘기는 클래스보다 **복사 오버헤드**가 커서 느려질 수 있습니다.
+2.  배열 관리: 데이터가 크더라도, 수천 개를 배열로 관리해야 한다면 **구조체가 압도적으로 유리**합니다. (GC Alloc 0, 캐시 적중률 상승)
+
+<Callout variant="tip" title="복사 비용 해결: ref와 in 키워드">
+구조체 크기가 커서 복사 비용이 걱정된다면, `ref`(참조 전달)나 `in`(읽기 전용)을 사용하여 해결할수 있습니다.
+복사 없이 원본의 주소만 참조하므로 클래스만큼 가볍게 전달할 수 있습니다.
+
+```csharp title="StructCopyCostExample.cs" ins={10-11} del={7-8} ins="added" del="deleted"
+struct BigData 
+{
+    // 40바이트짜리 무거운 구조체
+    int a, b, c, d, e, f, g, h, i, j; 
+}
+
+// Bad: 값이 통째로 복사됨 (40바이트 복사 발생)
+public void ProcessData(BigData data) { ... }
+
+// Good: 참조만 전달됨 (포인터 크기만큼만 비용 발생, 복사 없음)
+public void ProcessData(in BigData data) { ... }
+```
+</Callout>
+
+<Callout variant="warning" title="수정의 불편함">
+구조체는 값 타입이므로 `List<struct>`에 들어있는 값을 직접 수정하기 번거롭습니다.
+
+`list[0].hp = 10`은 컴파일 에러가 나서 복사본을 만든다음 수정을 하고 다시 할당해야합니다. 
+따라서 구조체는 주로 **불변(Immutable) 데이터**나 **배열(Array) 환경**에서 사용하는 것이 가장 좋습니다.
+</Callout>
+
+</Callout>
+
+##### Switch vs If-Else
+
+분기가 많아질수록 `switch`는 `if-else`보다 성능이 매우 좋습니다.
+
+| 방식 | 작동 원리 | 시간 복잡도 | 특징 |
+| :--- | :--- | :--- | :--- |
+| **If-Else** | 선형 탐색 (Linear Scan) | $O(N)$ | 위에서부터 하나씩 검사. 조건이 많을수록 느림. |
+| <span style="white-space:nowrap">**Switch** (연속O)</span> | 점프 테이블 (Jump Table) | $O(1)$ | 값들이 모여있을 때 사용. 계산 한 번으로 주소 점프. |
+| <span style="white-space:nowrap">**Switch** (연속X)</span> | 이진 탐색 (Binary Search) | $O(\log N)$ | 값들이 흩어져 있을 때 사용. 범위를 절반씩 좁힘. |
+
+```csharp title="SwitchVsIfElseExample.cs"
+switch (state)
+{
+    case 0: Run(); break;
+    case 1: Jump(); break;
+    case 2: Attack(); break;
+    // ...
+    case 100: Die(); break; 
+    // If-else 였다면 100번 비교해야 도달함
+    // Switch는 O(1)로 즉시 실행
+}
+```
+<Callout variant="tip">
+분기가 3~4개 미만이라면 `if-else`와 `switch`의 차이는 없습니다.
+하지만 분기가 수십 개 이상 되는 로직에서는 반드시 `switch`를 사용하는것이 좋습니다.
+</Callout>
+
+#### Sealed Class
+
+C#의 `virtual` 메소드나 인터페이스 호출은 런타임에 **가상 함수 테이블(vtable)** 을 조회(Lookup)해야 하므로 일반 함수보다 느립니다.
+더 이상 상속되지 않는 클래스라면 `sealed`을 붙이는것이 좋습니다.
+
+`sealed`를 붙이면 유니티의 IL2CPP 컴파일러가 "이 함수는 오버라이딩 될 리 없다"고 판단하여 **Devirtualization(가상화 제거)** 및 **Inlining(인라인)** 최적화를 수행합니다.
+
+```csharp title="SealedClassExample.cs"
+// IL2CPP가 Move() 함수를 직접 호출(Direct Call)로 최적화함
+public sealed class PlayerMovement : MonoBehaviour 
+{
+    public void Move() { ... }
+}
+```
 
 
-
-{/* #### Object Pooling
-
-
+{/* 
 
 #### Layer Collision Matrix
-#### Dictionary
-#### HashSet
-#### Switch
-#### Sealed Classes */}
+ */}
 
 ## Memory (GC) Optimization
+
+#### GC Alloc
+
+
 
 {/* #### GC Alloc
 #### ZString
