@@ -524,7 +524,7 @@ private static bool CompareBaseObjects(Object lhs, Object rhs)
 
 `List<T>`는 내부적으로 배열을 감싸고 있습니다.
 인덱서('[]')를 통해 접근할때마다 함수 호출 비용과 유효성 검사가 발생합니다.
-극한의 최적화가 필요한 **Hot Path (매 프레임마다 실행되는 코드)**에서는 `Array`를 사용하는것이 좋습니다.
+극한의 최적화가 필요한 <strong>Hot Path (매 프레임마다 실행되는 코드)</strong>에서는 `Array`를 사용하는것이 좋습니다.
 
 <Callout variant="note" title="진짜 차이가 있을까?">
 
