@@ -1,0 +1,482 @@
+---
+import Link from '@/components/Link.astro'
+import { Badge, badgeVariants } from '@/components/ui/badge'
+import { cn, formatDate, getStatusInfo } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import type { CollectionEntry } from 'astro:content'
+
+type LinkSectionItem = {
+  icon?: string
+  name: string
+  url?: string
+}
+
+type ListSectionItem = string
+
+type TeamSectionItem = {
+  name: string
+  role?: string
+}
+
+type ProjectSection =
+  | {
+      title: string
+      type: 'links'
+      items: LinkSectionItem[]
+    }
+  | {
+      title: string
+      type: 'list'
+      items: ListSectionItem[]
+    }
+  | {
+      title: string
+      type: 'team'
+      items: TeamSectionItem[]
+    }
+
+interface Props {
+  projects: CollectionEntry<'projects'>[]
+  relatedPostsByProject: Record<string, CollectionEntry<'blog'>[]>
+}
+
+const { projects, relatedPostsByProject } = Astro.props
+
+function getProjectSections(project: CollectionEntry<'projects'>): ProjectSection[] {
+  const sections = (project.data.sections as ProjectSection[] | undefined) ?? []
+  if (sections.length > 0) return sections
+
+  const legacySections: ProjectSection[] = []
+
+  if (project.data.link && project.data.link.length > 0) {
+    legacySections.push({
+      title: 'Links',
+      type: 'links',
+      items: project.data.link,
+    })
+  }
+
+  if (project.data.contributions && project.data.contributions.length > 0) {
+    legacySections.push({
+      title: 'My Contributions',
+      type: 'list',
+      items: project.data.contributions,
+    })
+  }
+
+  if (project.data.team && project.data.team.length > 0) {
+    legacySections.push({
+      title: 'Team',
+      type: 'team',
+      items: project.data.team,
+    })
+  }
+
+  return legacySections
+}
+
+function getSectionPriority(section: ProjectSection): number {
+  const title = section.title.toLowerCase()
+
+  if (section.type === 'links') return 0
+  if (title.includes('key feature')) return 10
+  if (title.includes('contribution')) return 20
+  if (title.includes('credit')) return 30
+  if (title.includes('team')) return 35
+  return 40
+}
+---
+
+<div id="project-quickview-root">
+  <div
+    id="project-quickview-overlay"
+    class="fixed inset-0 z-40 bg-background/80 opacity-0 backdrop-blur-[2px] pointer-events-none transition-opacity duration-300 ease-out"
+    aria-hidden="true"
+  />
+
+  <aside
+    id="project-quickview-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="project-quickview-title"
+    class="pointer-events-none fixed inset-x-0 bottom-0 z-50 h-[85vh] translate-y-full rounded-t-2xl border border-b-0 bg-background/98 p-5 shadow-2xl transition-all duration-300 ease-out md:top-1/2 md:left-1/2 md:bottom-auto md:h-auto md:w-[min(64rem,calc(100vw-3rem))] md:max-h-[calc(100vh-4rem)] md:-translate-x-1/2 md:translate-y-[calc(-50%+1rem)] md:scale-95 md:rounded-2xl md:border md:opacity-0"
+  >
+    <div class="flex items-center justify-between border-b pb-3">
+      <div>
+        <p class="text-muted-foreground text-xs uppercase tracking-wide">
+          Project
+        </p>
+        <h2 id="project-quickview-title" class="text-xl font-semibold">
+          Quick View
+        </h2>
+      </div>
+      <button
+        id="project-quickview-close"
+        type="button"
+        class="hover:bg-secondary rounded-md p-2 transition-colors"
+        aria-label="Close quick view"
+      >
+        <Icon name="lucide:x" class="size-4" />
+      </button>
+    </div>
+
+    <div
+      class="mt-4 max-h-[calc(85vh-5.5rem)] overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:var(--color-muted-foreground)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/35 hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/50 [&::-webkit-scrollbar-thumb]:border [&::-webkit-scrollbar-thumb]:border-background/70 md:max-h-[calc(100vh-10rem)]"
+    >
+      {
+        projects.map((project) => {
+          const sections = getProjectSections(project)
+          const sortedSections = [...sections].sort(
+            (a, b) => getSectionPriority(a) - getSectionPriority(b),
+          )
+          const linkSections = sortedSections.filter(
+            (section) => section.type === 'links',
+          )
+          const contentSections = sortedSections.filter(
+            (section) => section.type !== 'links',
+          )
+          const relatedPosts = relatedPostsByProject[project.id] ?? []
+          const { variant, icon } = getStatusInfo(project.data.status)
+
+          return (
+            <section data-project-pane={project.id} class="hidden space-y-5 pb-8">
+              <header
+                class={cn(
+                  'space-y-3',
+                  project.data.image &&
+                    'md:grid md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] md:gap-6 md:items-start',
+                )}
+              >
+                {project.data.image && (
+                  <div class="hidden md:block">
+                    <div class="bg-muted/35 overflow-hidden rounded-xl border p-2">
+                      <Image
+                        src={project.data.image}
+                        alt={project.data.name}
+                        width={1200}
+                        height={630}
+                        class="aspect-video w-full rounded-lg object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div class="space-y-3">
+                  <h3 class="text-2xl leading-tight font-semibold">
+                    {project.data.name}
+                  </h3>
+
+                  {project.data.status && (
+                    <div>
+                      <Badge variant={variant}>
+                        <Icon name={icon} class="mr-1 size-3" />
+                        {project.data.status}
+                      </Badge>
+                    </div>
+                  )}
+
+                  <p class="text-muted-foreground text-sm leading-relaxed">
+                    {project.data.description}
+                  </p>
+
+                  {project.data.startDate && (
+                    <p class="text-muted-foreground/80 flex items-center gap-1.5 text-xs">
+                      <Icon name="lucide:calendar" class="size-3" />
+                      {formatDate(project.data.startDate)}
+                      {project.data.endDate
+                        ? ` → ${formatDate(project.data.endDate)}`
+                        : ' → Present'}
+                    </p>
+                  )}
+
+                  {project.data.tags && project.data.tags.length > 0 && (
+                    <div class="flex flex-wrap gap-2">
+                      {project.data.tags.map((tag) => (
+                        <span class={badgeVariants({ variant: 'secondary' })}>
+                          <Icon name="lucide:hash" class="size-3" />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {linkSections.length > 0 && (
+                    <section class="space-y-3">
+                      {linkSections.map((section) => (
+                        <div class="bg-muted/35 rounded-xl border p-3">
+                          <h4 class="mb-2 text-sm font-semibold">{section.title}</h4>
+                          <ul class="space-y-1.5">
+                            {section.items.map((item) => (
+                              <li class="text-sm">
+                                {item.url ? (
+                                  <Link
+                                    href={item.url}
+                                    external
+                                    underline
+                                    class="text-muted-foreground hover:text-foreground"
+                                  >
+                                    {item.name}
+                                  </Link>
+                                ) : (
+                                  <span class="text-muted-foreground">{item.name}</span>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </section>
+                  )}
+                </div>
+              </header>
+
+              {contentSections.length > 0 && (
+                <section class="space-y-4">
+                  {contentSections.map((section) => (
+                    <div class="bg-muted/35 rounded-xl border p-3">
+                      <h4 class="mb-2 text-sm font-semibold">{section.title}</h4>
+
+                      {section.type === 'list' && (
+                        <ul class="text-muted-foreground list-disc space-y-1 pl-5 text-sm">
+                          {section.items.map((item) => (
+                            <li>{item}</li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {section.type === 'team' && (
+                        <ul class="text-muted-foreground list-disc space-y-1 pl-5 text-sm">
+                          {section.items.map((member) => (
+                            <li>
+                              {member.name}
+                              {member.role && (
+                                <span class="text-muted-foreground/80 text-xs">
+                                  {' '}
+                                  - {member.role}
+                                </span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </section>
+              )}
+
+              {relatedPosts.length > 0 && (
+                <section class="space-y-2">
+                  <h4 class="flex items-center gap-1.5 text-sm font-semibold">
+                    <Icon name="lucide:book-open-text" class="size-4" />
+                    Related Blog Posts
+                  </h4>
+                  <ul class="space-y-2">
+                    {relatedPosts.map((post) => (
+                      <li>
+                        <Link
+                          href={`/blog/${post.id}`}
+                          class="hover:bg-secondary/50 block rounded-xl border p-3 transition-colors"
+                        >
+                          <div class="flex items-start justify-between gap-2">
+                            <div>
+                              <p class="font-medium">{post.data.title}</p>
+                              <p class="text-muted-foreground line-clamp-2 text-sm">
+                                {post.data.description}
+                              </p>
+                            </div>
+                            <Icon
+                              name="lucide:arrow-up-right"
+                              class="text-muted-foreground mt-0.5 size-4 shrink-0"
+                            />
+                          </div>
+                          <p class="text-muted-foreground/80 mt-2 text-xs">
+                            {formatDate(post.data.date)}
+                          </p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </section>
+          )
+        })
+      }
+    </div>
+  </aside>
+</div>
+
+<script>
+  class ProjectQuickViewState {
+    overlay: HTMLElement | null = null
+    panel: HTMLElement | null = null
+    closeButton: HTMLButtonElement | null = null
+    triggers: HTMLButtonElement[] = []
+    panes: HTMLElement[] = []
+    triggerHandlers: Map<HTMLButtonElement, EventListener> = new Map()
+    overlayHandler: EventListener | null = null
+    closeHandler: EventListener | null = null
+    keydownHandler: EventListener | null = null
+    lastFocusedElement: HTMLElement | null = null
+    isOpen = false
+
+    reset() {
+      this.overlay = null
+      this.panel = null
+      this.closeButton = null
+      this.triggers = []
+      this.panes = []
+      this.triggerHandlers = new Map()
+      this.overlayHandler = null
+      this.closeHandler = null
+      this.keydownHandler = null
+      this.lastFocusedElement = null
+      this.isOpen = false
+    }
+  }
+
+  const state = new ProjectQuickViewState()
+
+  class ProjectQuickViewController {
+    static init() {
+      this.cleanup()
+
+      state.overlay = document.getElementById('project-quickview-overlay')
+      state.panel = document.getElementById('project-quickview-panel')
+      state.closeButton = document.getElementById(
+        'project-quickview-close',
+      ) as HTMLButtonElement | null
+      state.triggers = Array.from(
+        document.querySelectorAll<HTMLButtonElement>(
+          '[data-project-quickview-id]',
+        ),
+      )
+      state.panes = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-project-pane]'),
+      )
+
+      if (!state.overlay || !state.panel || !state.closeButton) return
+
+      state.triggers.forEach((trigger) => {
+        const handler = () => {
+          const projectId = trigger.getAttribute('data-project-quickview-id')
+          if (!projectId) return
+          ProjectQuickViewController.open(projectId, trigger)
+        }
+        trigger.addEventListener('click', handler)
+        state.triggerHandlers.set(trigger, handler)
+      })
+
+      state.overlayHandler = () => ProjectQuickViewController.close()
+      state.closeHandler = () => ProjectQuickViewController.close()
+      state.keydownHandler = (event: Event) => {
+        const keyboardEvent = event as KeyboardEvent
+        if (keyboardEvent.key === 'Escape' && state.isOpen) {
+          ProjectQuickViewController.close()
+        }
+      }
+
+      state.overlay.addEventListener('click', state.overlayHandler)
+      state.closeButton.addEventListener('click', state.closeHandler)
+      document.addEventListener('keydown', state.keydownHandler)
+    }
+
+    static open(projectId: string, trigger: HTMLButtonElement) {
+      if (!state.overlay || !state.panel || !state.closeButton) return
+
+      let hasVisiblePane = false
+      state.panes.forEach((pane) => {
+        const isTarget = pane.getAttribute('data-project-pane') === projectId
+        pane.classList.toggle('hidden', !isTarget)
+        if (isTarget) hasVisiblePane = true
+      })
+
+      if (!hasVisiblePane) return
+
+      state.lastFocusedElement = trigger
+      state.isOpen = true
+      state.overlay.classList.remove('opacity-0', 'pointer-events-none')
+      state.overlay.classList.add('opacity-100')
+      state.panel.classList.remove(
+        'translate-y-full',
+        'md:translate-y-[calc(-50%+1rem)]',
+        'md:scale-95',
+        'md:opacity-0',
+        'pointer-events-none',
+      )
+      state.panel.classList.add(
+        'translate-y-0',
+        'md:translate-y-[-50%]',
+        'md:scale-100',
+        'md:opacity-100',
+        'pointer-events-auto',
+      )
+      state.panel.setAttribute('aria-hidden', 'false')
+      document.body.classList.add('overflow-hidden')
+
+      window.setTimeout(() => {
+        state.closeButton?.focus()
+      }, 50)
+    }
+
+    static close(restoreFocus = true) {
+      if (!state.overlay || !state.panel) return
+
+      state.isOpen = false
+      state.overlay.classList.add('opacity-0', 'pointer-events-none')
+      state.overlay.classList.remove('opacity-100')
+      state.panel.classList.add(
+        'translate-y-full',
+        'md:translate-y-[calc(-50%+1rem)]',
+        'md:scale-95',
+        'md:opacity-0',
+        'pointer-events-none',
+      )
+      state.panel.classList.remove(
+        'translate-y-0',
+        'md:translate-y-[-50%]',
+        'md:scale-100',
+        'md:opacity-100',
+        'pointer-events-auto',
+      )
+      state.panel.setAttribute('aria-hidden', 'true')
+      document.body.classList.remove('overflow-hidden')
+
+      if (restoreFocus && state.lastFocusedElement) {
+        state.lastFocusedElement.focus()
+      }
+    }
+
+    static cleanup() {
+      if (state.overlay && state.overlayHandler) {
+        state.overlay.removeEventListener('click', state.overlayHandler)
+      }
+      if (state.closeButton && state.closeHandler) {
+        state.closeButton.removeEventListener('click', state.closeHandler)
+      }
+      if (state.keydownHandler) {
+        document.removeEventListener('keydown', state.keydownHandler)
+      }
+
+      state.triggerHandlers.forEach((handler, trigger) => {
+        trigger.removeEventListener('click', handler)
+      })
+
+      document.body.classList.remove('overflow-hidden')
+      state.reset()
+    }
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    ProjectQuickViewController.init()
+  })
+  document.addEventListener('astro:after-swap', () => {
+    ProjectQuickViewController.cleanup()
+    ProjectQuickViewController.init()
+  })
+  document.addEventListener('astro:before-swap', () => {
+    ProjectQuickViewController.cleanup()
+  })
+</script>

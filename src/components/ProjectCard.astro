@@ -8,73 +8,146 @@ import type { CollectionEntry } from 'astro:content'
 
 type Props = {
   project: CollectionEntry<'projects'>
+  mode?: 'link' | 'quickview'
 }
 
-const { project } = Astro.props
+const { project, mode = 'link' } = Astro.props
 const { variant, icon } = getStatusInfo(project.data.status)
+const isQuickView = mode === 'quickview'
 ---
 
 <div
   class="hover:bg-secondary/50 snow-border rounded-xl p-4 transition-colors duration-300 ease-in-out"
 >
-  <Link href={`/project/${project.id}`} class="flex flex-col gap-4 sm:flex-row">
-    {
-      project.data.image && (
-        <div class="max-w-[200px] sm:shrink-0">
-          <Image
-            src={project.data.image}
-            alt={project.data.name}
-            width={1200}
-            height={630}
-            class="rounded-xl object-cover"
-          />
-        </div>
-      )
-    }
-    <div class="grow">
-      <div class="flex items-center justify-between">
-        <h3 class="mb-1 text-lg font-medium">
-          {project.data.name}
-        </h3>
+  {
+    isQuickView ? (
+      <button
+        type="button"
+        class="flex w-full cursor-pointer flex-col gap-4 text-left sm:flex-row"
+        data-project-quickview-id={project.id}
+        aria-haspopup="dialog"
+        aria-controls="project-quickview-panel"
+      >
         {
-          project.data.status && (
-            <Badge variant={variant}>
-              <Icon name={icon} class="mr-1 size-3" />
-              {project.data.status}
-            </Badge>
+          project.data.image && (
+            <div class="max-w-[200px] sm:shrink-0">
+              <Image
+                src={project.data.image}
+                alt={project.data.name}
+                width={1200}
+                height={630}
+                class="rounded-xl object-cover"
+              />
+            </div>
           )
         }
-      </div>
-      <p class="text-muted-foreground mb-2 text-sm">
-        {project.data.description}
-      </p>
-      {
-        project.data.startDate && (
-          <p class="text-muted-foreground/70 mb-2 flex items-center gap-x-1.5 text-xs">
-            <span class="flex items-center gap-x-1.5">
-              <Icon name="lucide:calendar" class="size-3" />
-              <span>
-                {formatDate(project.data.startDate)}
-                {project.data.endDate
-                  ? ` → ${formatDate(project.data.endDate)}`
-                  : ' → Present'}
-              </span>
-            </span>
-          </p>
-        )
-      }
-      {
-        project.data.tags && (
-          <div class="flex flex-wrap gap-2">
-            {project.data.tags.map((tag: string) => (
-              <Badge variant="secondary" className="flex items-center gap-x-1">
-                <Icon name="lucide:hash" class="size-3" />
-                {tag}
-              </Badge>
-            ))}
+        <div class="grow">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="mb-1 text-lg font-medium">
+              {project.data.name}
+            </h3>
+            {
+              project.data.status && (
+                <Badge variant={variant}>
+                  <Icon name={icon} class="mr-1 size-3" />
+                  {project.data.status}
+                </Badge>
+              )
+            }
           </div>
-        )
-      }
-    </div>
-  </Link>
+          <p class="text-muted-foreground mb-2 text-sm">
+            {project.data.description}
+          </p>
+          {
+            project.data.startDate && (
+              <p class="text-muted-foreground/70 mb-2 flex items-center gap-x-1.5 text-xs">
+                <span class="flex items-center gap-x-1.5">
+                  <Icon name="lucide:calendar" class="size-3" />
+                  <span>
+                    {formatDate(project.data.startDate)}
+                    {project.data.endDate
+                      ? ` → ${formatDate(project.data.endDate)}`
+                      : ' → Present'}
+                  </span>
+                </span>
+              </p>
+            )
+          }
+          {
+            project.data.tags && (
+              <div class="flex flex-wrap gap-2">
+                {project.data.tags.map((tag: string) => (
+                  <Badge variant="secondary" className="flex items-center gap-x-1">
+                    <Icon name="lucide:hash" class="size-3" />
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )
+          }
+        </div>
+      </button>
+    ) : (
+      <Link href="/project" class="flex flex-col gap-4 sm:flex-row">
+        {
+          project.data.image && (
+            <div class="max-w-[200px] sm:shrink-0">
+              <Image
+                src={project.data.image}
+                alt={project.data.name}
+                width={1200}
+                height={630}
+                class="rounded-xl object-cover"
+              />
+            </div>
+          )
+        }
+        <div class="grow">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="mb-1 text-lg font-medium">
+              {project.data.name}
+            </h3>
+            {
+              project.data.status && (
+                <Badge variant={variant}>
+                  <Icon name={icon} class="mr-1 size-3" />
+                  {project.data.status}
+                </Badge>
+              )
+            }
+          </div>
+          <p class="text-muted-foreground mb-2 text-sm">
+            {project.data.description}
+          </p>
+          {
+            project.data.startDate && (
+              <p class="text-muted-foreground/70 mb-2 flex items-center gap-x-1.5 text-xs">
+                <span class="flex items-center gap-x-1.5">
+                  <Icon name="lucide:calendar" class="size-3" />
+                  <span>
+                    {formatDate(project.data.startDate)}
+                    {project.data.endDate
+                      ? ` → ${formatDate(project.data.endDate)}`
+                      : ' → Present'}
+                  </span>
+                </span>
+              </p>
+            )
+          }
+          {
+            project.data.tags && (
+              <div class="flex flex-wrap gap-2">
+                {project.data.tags.map((tag: string) => (
+                  <Badge variant="secondary" className="flex items-center gap-x-1">
+                    <Icon name="lucide:hash" class="size-3" />
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )
+          }
+        </div>
+      </Link>
+    )
+  }
 </div>

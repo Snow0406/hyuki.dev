@@ -2,11 +2,13 @@
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PageHead from '@/components/PageHead.astro'
 import ProjectCard from '@/components/ProjectCard.astro'
+import ProjectQuickView from '@/components/ProjectQuickView.astro'
 import PaginationComponent from '@/components/ui/pagination'
 import { SITE } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
 import {
   getAllProjects,
+  getPostsByIds,
   groupProjectsByStatus,
   PROJECT_STATUS,
 } from '@/lib/data-utils'
@@ -25,6 +27,14 @@ const { page } = Astro.props
 
 // 프로젝트를 상태별로 그룹화 (이미 정렬된 상태에서 그룹화만 수행)
 const projectsByStatus = groupProjectsByStatus(page.data)
+const relatedPostsByProject = Object.fromEntries(
+  await Promise.all(
+    page.data.map(async (project) => [
+      project.id,
+      await getPostsByIds(project.data.relatedPosts ?? []),
+    ]),
+  ),
+)
 
 const statuses = Object.keys(projectsByStatus).sort(
   (a, b) => PROJECT_STATUS.indexOf(a) - PROJECT_STATUS.indexOf(b),
@@ -48,7 +58,7 @@ const statuses = Object.keys(projectsByStatus).sort(
           <ul class="not-prose flex flex-col gap-4">
             {projectsByStatus[status].map((project) => (
               <li>
-                <ProjectCard project={project} />
+                <ProjectCard project={project} mode="quickview" />
               </li>
             ))}
           </ul>
@@ -56,6 +66,11 @@ const statuses = Object.keys(projectsByStatus).sort(
       ))
     }
   </div>
+
+  <ProjectQuickView
+    projects={page.data}
+    relatedPostsByProject={relatedPostsByProject}
+  />
 
   <PaginationComponent
     currentPage={page.currentPage}

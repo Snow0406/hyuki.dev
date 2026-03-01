@@ -46,6 +46,7 @@ const projects = defineCollection({
         .enum(['Completed', 'In Progress', 'Planned', 'Paused'])
         .optional(),
       draft: z.boolean().optional(),
+      relatedPosts: z.array(z.string()).optional(),
 
       sections: z
         .array(

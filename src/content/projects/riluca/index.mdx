@@ -1,0 +1,23 @@
+---
+name: 'Riluca'
+description: '2D Visual Novel Project'
+tags: ['Unity', 'C#', 'Reflex']
+startDate: '2025-09-06'
+status: 'In Progress'
+relatedPosts: []
+sections:
+  - title: 'Key Features'
+    type: 'list'
+    items:
+      - 'Division(게임서버) / DivisionGateway(로비·대기열) / Division1D(클라) 분리 아키텍처'
+      - 'TCP(세션·게임 흐름) + UDP(이동·스킬·적 동기화) 이중 채널 설계'
+      - 'UDP 토큰 인증(SessionId+Token)과 서버 검증/보정 기반 이동 동기화 구현'
+      - 'Redis Lua 원자 처리 + Docker 슬롯(0~9)으로 매칭/운영 안정화'
+      - 'Oracle self-hosted runner 기반 CI/CD 및 3개 저장소 PacketId 정합성 자동 검증'
+  - title: 'My Contributions'
+    type: 'list'
+    items:
+      - '서버 파트 단독 개발/운영 (게임서버 + 게이트웨이 + 배포 파이프라인)'
+      - '클라 싱글 로직을 서버 권한 기준으로 리팩터링하고 멀티 동기화 구조로 전환'
+      - 'Oracle/Docker/Redis 운영 환경 구성 및 GitHub Actions CI/CD 구축'
+---

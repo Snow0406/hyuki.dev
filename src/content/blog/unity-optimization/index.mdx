@@ -17,6 +17,16 @@ import Callout from '@/components/Callout.astro'
 제가 직접 박치기 하면서 "이 코드가 왜 CPU 사용량을 많이 잡아먹는지", "왜 GC.Alloc을 유발하는지"
 원인을 분석해보고, 해결책을 찾아가면서 느꼈던 점들을 중심으로 작성했습니다.
 
+<Callout variant="summary" title="주요 성능 개선 사항 (진행 중)">
+최적화 작업은 현재진행형이며, 약 1개월간의 초기 단계를 통해 다음과 같은 의미 있는 성능 개선을 이루었습니다.
+
+> - **CPU 병목 현상 완화**: 게임 로직의 CPU 점유 시간을 평균 **12ms에서 4.5ms로 단축**하여, 부드러운 프레임 유지를 가능하게 했습니다.
+>
+> - **메모리 할당(GC) 최적화**: 프레임당 **0.5MB(500KB) 이상** 발생하던 가비지를 **3.8KB로 99% 이상 감소**시켰습니다. 이를 통해 GC(가비지 컬렉션)로 인한 프레임 스파이크를 원천적으로 방지했습니다.
+
+주요 개선이 이루어질 때마다 관련 데이터를 업데이트하겠습니다.
+</Callout>
+
 <Callout variant="note">
     - Unity 6000.0.59f2 기준으로 작성되었으며, 다른 버전도 비슷할겁니다. 아마도?
     - 현재 다른 작업으로 인해 글이 완성되지 않았습니다. 지속적으로 업데이트할 예정입니다.
@@ -712,8 +722,6 @@ public sealed class PlayerMovement : MonoBehaviour
 
 #### GC Alloc
 
-
-
 {/* #### GC Alloc
 #### ZString
 #### UniTask
@@ -721,7 +729,7 @@ public sealed class PlayerMovement : MonoBehaviour
 #### ArrayPool
 #### Span
 #### Struct
-#### Enum */}
+ */}
 
 ## GPU Optimization
 

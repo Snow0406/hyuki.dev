@@ -287,6 +287,21 @@ export async function getPostById(
   return allPosts.find((post) => post.id === postId) || null
 }
 
+export async function getPostsByIds(
+  postIds: string[] = [],
+): Promise<CollectionEntry<'blog'>[]> {
+  if (!postIds.length) {
+    return []
+  }
+
+  const allPosts = await getAllPostsAndSubposts()
+  const postMap = new Map(allPosts.map((post) => [post.id, post]))
+
+  return postIds
+    .map((postId) => postMap.get(postId))
+    .filter((post): post is CollectionEntry<'blog'> => !!post)
+}
+
 export async function getSubpostCount(parentId: string): Promise<number> {
   const subposts = await getSubpostsForParent(parentId)
   return subposts.length
