@@ -91,7 +91,8 @@ function getSectionPriority(section: ProjectSection): number {
 <div id="project-quickview-root">
   <div
     id="project-quickview-overlay"
-    class="fixed inset-0 z-40 bg-background/80 opacity-0 backdrop-blur-[2px] pointer-events-none transition-opacity duration-300 ease-out"
+    data-state="closed"
+    class="fixed inset-0 z-40 bg-background/80 opacity-0 backdrop-blur-[2px] pointer-events-none transition-opacity duration-300 ease-out data-[state=open]:opacity-100 data-[state=open]:pointer-events-auto"
     aria-hidden="true"
   />
 
@@ -100,8 +101,9 @@ function getSectionPriority(section: ProjectSection): number {
     role="dialog"
     aria-modal="true"
     aria-hidden="true"
+    data-state="closed"
     aria-labelledby="project-quickview-title"
-    class="pointer-events-none fixed inset-x-0 bottom-0 z-50 h-[85vh] translate-y-full rounded-t-2xl border border-b-0 bg-background/98 p-5 shadow-2xl transition-all duration-300 ease-out md:top-1/2 md:left-1/2 md:bottom-auto md:h-auto md:w-[min(64rem,calc(100vw-3rem))] md:max-h-[calc(100vh-4rem)] md:-translate-x-1/2 md:translate-y-[calc(-50%+1rem)] md:scale-95 md:rounded-2xl md:border md:opacity-0"
+    class="pointer-events-none fixed inset-x-0 bottom-0 z-50 h-[85vh] translate-y-full rounded-t-2xl border border-b-0 bg-background/98 p-5 shadow-2xl transition-all duration-300 ease-out md:top-1/2 md:left-1/2 md:bottom-auto md:h-auto md:w-[min(64rem,calc(100vw-3rem))] md:max-h-[calc(100vh-4rem)] md:-translate-x-1/2 md:translate-y-[calc(-50%+1rem)] md:scale-95 md:rounded-2xl md:border md:opacity-0 data-[state=open]:translate-y-0 data-[state=open]:pointer-events-auto md:data-[state=open]:-translate-y-1/2 md:data-[state=open]:scale-100 md:data-[state=open]:opacity-100"
   >
     <div class="flex items-center justify-between border-b pb-3">
       <div>
@@ -358,6 +360,9 @@ function getSectionPriority(section: ProjectSection): number {
       )
 
       if (!state.overlay || !state.panel || !state.closeButton) return
+      state.overlay.setAttribute('data-state', 'closed')
+      state.panel.setAttribute('data-state', 'closed')
+      state.panel.setAttribute('aria-hidden', 'true')
 
       state.triggers.forEach((trigger) => {
         const handler = () => {
@@ -397,22 +402,8 @@ function getSectionPriority(section: ProjectSection): number {
 
       state.lastFocusedElement = trigger
       state.isOpen = true
-      state.overlay.classList.remove('opacity-0', 'pointer-events-none')
-      state.overlay.classList.add('opacity-100')
-      state.panel.classList.remove(
-        'translate-y-full',
-        'md:translate-y-[calc(-50%+1rem)]',
-        'md:scale-95',
-        'md:opacity-0',
-        'pointer-events-none',
-      )
-      state.panel.classList.add(
-        'translate-y-0',
-        'md:translate-y-[-50%]',
-        'md:scale-100',
-        'md:opacity-100',
-        'pointer-events-auto',
-      )
+      state.overlay.setAttribute('data-state', 'open')
+      state.panel.setAttribute('data-state', 'open')
       state.panel.setAttribute('aria-hidden', 'false')
       document.body.classList.add('overflow-hidden')
 
@@ -425,22 +416,8 @@ function getSectionPriority(section: ProjectSection): number {
       if (!state.overlay || !state.panel) return
 
       state.isOpen = false
-      state.overlay.classList.add('opacity-0', 'pointer-events-none')
-      state.overlay.classList.remove('opacity-100')
-      state.panel.classList.add(
-        'translate-y-full',
-        'md:translate-y-[calc(-50%+1rem)]',
-        'md:scale-95',
-        'md:opacity-0',
-        'pointer-events-none',
-      )
-      state.panel.classList.remove(
-        'translate-y-0',
-        'md:translate-y-[-50%]',
-        'md:scale-100',
-        'md:opacity-100',
-        'pointer-events-auto',
-      )
+      state.overlay.setAttribute('data-state', 'closed')
+      state.panel.setAttribute('data-state', 'closed')
       state.panel.setAttribute('aria-hidden', 'true')
       document.body.classList.remove('overflow-hidden')
 
@@ -450,6 +427,14 @@ function getSectionPriority(section: ProjectSection): number {
     }
 
     static cleanup() {
+      if (state.overlay) {
+        state.overlay.setAttribute('data-state', 'closed')
+      }
+      if (state.panel) {
+        state.panel.setAttribute('data-state', 'closed')
+        state.panel.setAttribute('aria-hidden', 'true')
+      }
+
       if (state.overlay && state.overlayHandler) {
         state.overlay.removeEventListener('click', state.overlayHandler)
       }
