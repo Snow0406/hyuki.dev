@@ -200,7 +200,7 @@ const tocSections = await getTOCSections(currentPostId)
               post.data.tags.map((tag) => (
                 <a
                   href={`/tags/${tag}`}
-                  class={badgeVariants({ variant: 'secondary' })}
+                  class={badgeVariants({ variant: 'muted' })}
                 >
                   <Icon name="lucide:hash" class="size-3" />
                   {tag}
@@ -282,3 +282,18 @@ const tocSections = await getTOCSections(currentPostId)
     })
   </script>
 </Layout>
+
+<script>
+  const ensureKatexStyles = () => {
+    if (!document.querySelector('.katex')) return
+    if (document.querySelector('link[href*="katex.min.css"]')) return
+
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css'
+    document.head.appendChild(link)
+  }
+
+  document.addEventListener('astro:page-load', ensureKatexStyles)
+  document.addEventListener('astro:after-swap', ensureKatexStyles)
+</script>

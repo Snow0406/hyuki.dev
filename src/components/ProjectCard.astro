@@ -17,7 +17,7 @@ const isQuickView = mode === 'quickview'
 ---
 
 <div
-  class="hover:bg-secondary/50 snow-border rounded-xl p-4 transition-colors duration-300 ease-in-out"
+  class="hover:bg-muted/50 snow-border rounded-xl p-4 transition-colors duration-300 ease-in-out"
 >
   {
     isQuickView ? (
@@ -30,7 +30,7 @@ const isQuickView = mode === 'quickview'
       >
         {
           project.data.image && (
-            <div class="max-w-[200px] sm:shrink-0">
+            <div class="w-full sm:max-w-[200px] sm:shrink-0">
               <Image
                 src={project.data.image}
                 alt={project.data.name}
@@ -77,7 +77,7 @@ const isQuickView = mode === 'quickview'
             project.data.tags && (
               <div class="flex flex-wrap gap-2">
                 {project.data.tags.map((tag: string) => (
-                  <Badge variant="secondary" className="flex items-center gap-x-1">
+                  <Badge variant="muted" className="flex items-center gap-x-1">
                     <Icon name="lucide:hash" class="size-3" />
                     {tag}
                   </Badge>
@@ -91,7 +91,7 @@ const isQuickView = mode === 'quickview'
       <Link href="/project" class="flex flex-col gap-4 sm:flex-row">
         {
           project.data.image && (
-            <div class="max-w-[200px] sm:shrink-0">
+            <div class="w-full sm:max-w-[200px] sm:shrink-0">
               <Image
                 src={project.data.image}
                 alt={project.data.name}
@@ -138,7 +138,7 @@ const isQuickView = mode === 'quickview'
             project.data.tags && (
               <div class="flex flex-wrap gap-2">
                 {project.data.tags.map((tag: string) => (
-                  <Badge variant="secondary" className="flex items-center gap-x-1">
+                  <Badge variant="muted" className="flex items-center gap-x-1">
                     <Icon name="lucide:hash" class="size-3" />
                     {tag}
                   </Badge>
