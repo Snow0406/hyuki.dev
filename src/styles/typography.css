@@ -40,6 +40,12 @@
       @apply text-foreground scroll-mt-32 font-medium xl:scroll-mt-20;
     }
 
+    :where(h1, h2, h3, h4, h5, h6):first-child:not(
+        :where([class~='not-prose'], [class~='not-prose'] *)
+      ) {
+      @apply mt-0;
+    }
+
     /* Don't use an <h1> in your posts, one is already generated in blog/[...id].astro */
     :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
       @apply mt-8 mb-6 text-4xl;
