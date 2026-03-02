@@ -29,7 +29,9 @@ const author =
 <meta property="og:description" content={description} />
 <meta
   property="og:image"
-  content={`${SITE.href}${post?.data?.image?.src}` || image}
+  content={post?.data?.image?.src
+    ? `${SITE.href}${post.data.image.src}`
+    : image}
 />
 <meta property="og:image:alt" content={title} />
 <meta property="og:type" content="website" />
@@ -42,7 +44,9 @@ const author =
 <meta name="twitter:description" content={description} />
 <meta
   property="twitter:image"
-  content={`${SITE.href}${post?.data?.image?.src}` || image}
+  content={post?.data?.image?.src
+    ? `${SITE.href}${post.data.image.src}`
+    : image}
 />
 <meta name="twitter:image:alt" content={title} />
 <meta name="twitter:card" content="summary_large_image" />
