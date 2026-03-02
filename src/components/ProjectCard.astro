@@ -17,7 +17,7 @@ const isQuickView = mode === 'quickview'
 ---
 
 <div
-  class="hover:bg-secondary/50 snow-border rounded-xl p-4 transition-colors duration-300 ease-in-out"
+  class="hover:bg-muted/50 snow-border rounded-xl p-4 transition-colors duration-300 ease-in-out"
 >
   {
     isQuickView ? (
@@ -77,7 +77,7 @@ const isQuickView = mode === 'quickview'
             project.data.tags && (
               <div class="flex flex-wrap gap-2">
                 {project.data.tags.map((tag: string) => (
-                  <Badge variant="secondary" className="flex items-center gap-x-1">
+                  <Badge variant="muted" className="flex items-center gap-x-1">
                     <Icon name="lucide:hash" class="size-3" />
                     {tag}
                   </Badge>
@@ -138,7 +138,7 @@ const isQuickView = mode === 'quickview'
             project.data.tags && (
               <div class="flex flex-wrap gap-2">
                 {project.data.tags.map((tag: string) => (
-                  <Badge variant="secondary" className="flex items-center gap-x-1">
+                  <Badge variant="muted" className="flex items-center gap-x-1">
                     <Icon name="lucide:hash" class="size-3" />
                     {tag}
                   </Badge>
