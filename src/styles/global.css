@@ -151,6 +151,10 @@
     @apply border-border outline-ring/50 tracking-tight;
   }
 
+  html {
+    scrollbar-gutter: stable;
+  }
+
   .snowflake-icon {
     color: var(--color-snowflake);
     filter: drop-shadow(0 0 2px var(--color-snowflake));
