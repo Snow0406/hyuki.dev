@@ -52,11 +52,28 @@ const contacts = [
     items={[{ label: 'About', href: '/about', icon: 'lucide:user' }]}
   />
 
-  <section class="not-prose flex flex-col gap-y-2">
-    <p class="text-base leading-relaxed">아직 뭐적을지 생각중</p>
-    <p class="text-muted-foreground text-sm leading-relaxed">
-      여긴 영어로 적을꺼임
-    </p>
+  <section class="not-prose flex flex-col items-center sm:clear-both sm:block">
+    <img
+      src="/web-app-manifest-512x512.png"
+      alt="hyuki"
+      class="ring-border mb-4 size-28 shrink-0 rounded-full ring-1 sm:float-left sm:mr-6 sm:mb-2 sm:size-48 sm:[shape-outside:circle(50%)]"
+    />
+    <div
+      class="text-muted-foreground text-center text-base leading-relaxed sm:pt-4 sm:text-left"
+    >
+      <p>
+        안녕하세요! 서브컬처 게임을 좋아하고, <br class="hidden sm:inline" /> 유니티로
+        게임을 만드는 개발자입니다.
+        <br class="hidden sm:inline" />
+        새로운 기술은 일단 부딪혀보는 스타일이라, <br
+          class="hidden sm:inline"
+        /> 개인 프젝으로 ECS나 Reflex를 직접 구현해보고 <br
+          class="hidden sm:inline"
+        /> 팀 프젝을 통해 최적화와 네트워크도 설계하고 구현했습니다 !<br
+          class="hidden sm:inline"
+        /> 애니메이션과 딸기라떼를 좋아합니다 !!! 🍓🥛
+      </p>
+    </div>
   </section>
 
   <section class="not-prose flex flex-col gap-y-4">
@@ -93,27 +110,6 @@ const contacts = [
     </div>
     <div class="flex flex-col gap-4">
       {featured.map((project) => <FeaturedProjectCard project={project!} />)}
-    </div>
-  </section>
-
-  <section class="not-prose flex flex-col gap-y-4">
-    <div class="flex items-center gap-2">
-      <h2 class="text-lg font-semibold">Contact</h2>
-      <span class="text-muted-foreground/50">·</span>
-      <div class="flex items-center gap-3">
-        {
-          contacts.map((contact) => (
-            <Link
-              href={contact.href}
-              external
-              class="text-muted-foreground hover:text-foreground"
-              aria-label={contact.label}
-            >
-              <Icon name={contact.icon} class="size-5" />
-            </Link>
-          ))
-        }
-      </div>
     </div>
   </section>
 </Layout>
