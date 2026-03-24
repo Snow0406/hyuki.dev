@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(grep -A 10 \"relatedPosts\" /c/Project/Web/hyuki.dev/src/content/projects/*/index.mdx | head -30)",
+      "WebFetch(domain:www.gamasutra.com)",
+      "WebFetch(domain:www.gamedesigning.org)",
+      "WebFetch(domain:www.gamedeveloper.com)",
+      "WebFetch(domain:www.reddit.com)",
+      "WebFetch(domain:www.constructivearts.com)",
+      "WebFetch(domain:www.artstation.com)",
+      "WebFetch(domain:www.gameinformer.com)",
+      "WebFetch(domain:www.interaction-design.org)",
+      "WebFetch(domain:dribbble.com)",
+      "WebFetch(domain:www.behance.net)",
+      "WebFetch(domain:ixdf.org)",
+      "WebFetch(domain:itch.io)",
+      "WebFetch(domain:www.nngroup.com)",
+      "WebFetch(domain:www.smashingmagazine.com)",
+      "WebFetch(domain:www.creativebloq.com)",
+      "WebFetch(domain:www.awwwards.com)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "Bash(find /c/Project/Web/hyuki.dev/src/pages -name \"*.astro\" | xargs grep -l \"project\" | head -10)",
+      "Bash(git show:*)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//c/Project/Web/hyuki.dev/**)",
+      "Bash(done)",
+      "WebFetch(domain:brittanychiang.com)",
+      "WebFetch(domain:leerob.com)",
+      "WebFetch(domain:www.joshwcomeau.com)",
+      "WebFetch(domain:bruno-simon.com)",
+      "WebFetch(domain:www.craftz.dog)"
+    ]
+  }
+}
