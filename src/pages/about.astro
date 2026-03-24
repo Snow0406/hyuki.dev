@@ -1,0 +1,119 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import FeaturedProjectCard from '@/components/FeaturedProjectCard.astro'
+import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
+import { Badge } from '@/components/ui/badge'
+import Layout from '@/layouts/Layout.astro'
+import { getAllProjects } from '@/lib/data-utils'
+import { Icon } from 'astro-icon/components'
+
+const allProjects = await getAllProjects()
+const featuredIds = ['division1d', 'crimson-pandemic']
+const featured = featuredIds
+  .map((id) => allProjects.find((p) => p.id === id))
+  .filter(Boolean)
+
+const skills = [
+  {
+    category: 'Language',
+    items: ['C#', 'C++', 'C', 'JS', 'TS', 'Lua', 'Python'],
+  },
+  {
+    category: 'Client',
+    items: [
+      'Unity',
+      'Mirror',
+      'Steamworks',
+      'Reflex',
+      'ECS',
+      'Job System',
+      'Burst',
+    ],
+  },
+  { category: 'Server', items: ['.NET', 'Redis', 'Oracle', 'TCP/UDP'] },
+  { category: 'Infra', items: ['Docker', 'Oracle', 'CI/CD'] },
+]
+
+const contacts = [
+  { href: 'mailto:snow@hyuki.dev', label: 'Email', icon: 'lucide:mail' },
+  {
+    href: 'https://github.com/snow0406',
+    label: 'GitHub',
+    icon: 'lucide:github',
+  },
+  { href: 'https://x.com/hyuki_dev', label: 'Twitter', icon: 'lucide:twitter' },
+]
+---
+
+<Layout class="max-w-3xl">
+  <PageHead slot="head" title="About" />
+  <Breadcrumbs
+    items={[{ label: 'About', href: '/about', icon: 'lucide:user' }]}
+  />
+
+  <section class="not-prose flex flex-col gap-y-2">
+    <p class="text-base leading-relaxed">아직 뭐적을지 생각중</p>
+    <p class="text-muted-foreground text-sm leading-relaxed">
+      여긴 영어로 적을꺼임
+    </p>
+  </section>
+
+  <section class="not-prose flex flex-col gap-y-4">
+    <h2 class="text-lg font-semibold">Skills</h2>
+    <div class="flex flex-col gap-y-3">
+      {
+        skills.map((group) => (
+          <div class="flex flex-col gap-y-1.5">
+            <span class="text-muted-foreground text-xs font-medium">
+              {group.category}
+            </span>
+            <div class="flex flex-wrap gap-1.5">
+              {group.items.map((item) => (
+                <Badge variant="muted">{item}</Badge>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="not-prose flex flex-col gap-y-4">
+    <div class="flex items-center gap-2">
+      <h2 class="text-lg font-semibold">Featured Projects</h2>
+      <span class="text-muted-foreground/50">·</span>
+      <Link
+        href="/project"
+        class="text-muted-foreground hover:text-foreground flex items-center gap-x-1 text-sm"
+      >
+        모든 프로젝트 보기
+        <Icon name="lucide:arrow-right" class="size-4" />
+      </Link>
+    </div>
+    <div class="flex flex-col gap-4">
+      {featured.map((project) => <FeaturedProjectCard project={project!} />)}
+    </div>
+  </section>
+
+  <section class="not-prose flex flex-col gap-y-4">
+    <div class="flex items-center gap-2">
+      <h2 class="text-lg font-semibold">Contact</h2>
+      <span class="text-muted-foreground/50">·</span>
+      <div class="flex items-center gap-3">
+        {
+          contacts.map((contact) => (
+            <Link
+              href={contact.href}
+              external
+              class="text-muted-foreground hover:text-foreground"
+              aria-label={contact.label}
+            >
+              <Icon name={contact.icon} class="size-5" />
+            </Link>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,72 @@
+---
+import Link from '@/components/Link.astro'
+import { getStatusInfo } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import type { CollectionEntry } from 'astro:content'
+
+type Props = {
+  project: CollectionEntry<'projects'>
+}
+
+const { project } = Astro.props
+const { variant } = getStatusInfo(project.data.status)
+const tags = project.data.tags ?? []
+
+const dotColorMap: Record<string, string> = {
+  default: 'bg-success',
+  success: 'bg-primary',
+  secondary: 'bg-muted-foreground/50',
+  destructive: 'bg-destructive',
+}
+const dotColor = dotColorMap[variant] ?? 'bg-muted-foreground'
+---
+
+<Link
+  href={`/project/${project.id}`}
+  class="snow-border group flex flex-col gap-4 rounded-xl p-4 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:bg-muted/50 sm:flex-row"
+>
+  {
+    project.data.image ? (
+      <div class="aspect-video shrink-0 overflow-hidden rounded-lg sm:w-[150px]">
+        <Image
+          src={project.data.image}
+          alt={project.data.name}
+          width={300}
+          height={170}
+          class="aspect-video w-full object-cover"
+        />
+      </div>
+    ) : (
+      <div class="bg-muted/30 flex aspect-video shrink-0 items-center justify-center rounded-lg sm:w-[150px]">
+        <Icon name="lucide:code-2" class="text-muted-foreground/50 size-8" />
+      </div>
+    )
+  }
+
+  <div class="flex min-w-0 flex-col gap-y-1.5">
+    <div class="flex items-center gap-3">
+      <h3 class="font-medium">{project.data.name}</h3>
+      {
+        project.data.status && (
+          <span class="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+            <span class:list={['size-1.5 shrink-0 rounded-full', dotColor, variant === 'success' && 'animate-pulse']} />
+            {project.data.status}
+          </span>
+        )
+      }
+    </div>
+
+    <p class="text-muted-foreground line-clamp-2 text-sm">
+      {project.data.description}
+    </p>
+
+    {
+      tags.length > 0 && (
+        <p class="text-muted-foreground/70 text-xs">
+          {tags.join(' · ')}
+        </p>
+      )
+    }
+  </div>
+</Link>
