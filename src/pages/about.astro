@@ -1,10 +1,10 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import FeaturedProjectCard from '@/components/FeaturedProjectCard.astro'
-import Link from '@/components/Link.astro'
-import PageHead from '@/components/PageHead.astro'
+import Breadcrumbs from '@/components/breadcrumbs.astro'
+import FeaturedProjectCard from '@/components/featured-project-card.astro'
+import Link from '@/components/link.astro'
+import PageHead from '@/components/page-head.astro'
 import { Badge } from '@/components/ui/badge'
-import Layout from '@/layouts/Layout.astro'
+import Layout from '@/layouts/layout.astro'
 import { getAllProjects } from '@/lib/data-utils'
 import { Icon } from 'astro-icon/components'
 
@@ -33,16 +33,6 @@ const skills = [
   },
   { category: 'Server', items: ['.NET', 'Redis', 'Oracle', 'TCP/UDP'] },
   { category: 'Infra', items: ['Docker', 'Oracle', 'CI/CD'] },
-]
-
-const contacts = [
-  { href: 'mailto:snow@hyuki.dev', label: 'Email', icon: 'lucide:mail' },
-  {
-    href: 'https://github.com/snow0406',
-    label: 'GitHub',
-    icon: 'lucide:github',
-  },
-  { href: 'https://x.com/hyuki_dev', label: 'Twitter', icon: 'lucide:twitter' },
 ]
 ---
 

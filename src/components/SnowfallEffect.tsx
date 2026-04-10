@@ -1,11 +1,21 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
 
+interface Snowflake {
+  id: string
+  size: number
+  left: number
+  baseOpacity: number
+  duration: number
+  delay: number
+  isStrawberry: boolean
+}
+
 const SnowfallEffect = () => {
-  const [snowflakes, setSnowflakes] = useState([])
+  const [snowflakes, setSnowflakes] = useState<Snowflake[]>([])
   const [isDark, setIsDark] = useState(false)
-  const containerRef = useRef(null)
-  const animationFrameRef = useRef(null)
-  const observerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const observerRef = useRef<MutationObserver | null>(null)
   const initializedRef = useRef(false)
 
   useEffect(() => {
@@ -30,7 +40,7 @@ const SnowfallEffect = () => {
       attributeFilter: ['data-theme'],
     })
 
-    const createSnowflake = (isInitial = false) => {
+    const createSnowflake = (isInitial = false): Snowflake => {
       const id = Math.random().toString(36).substring(2, 9)
       const size = Math.random() * 4 + 3 // 3px ~ 7px
       const left = Math.random() * 100 // 0% ~ 100%
@@ -116,7 +126,7 @@ const SnowfallEffect = () => {
 
     return () => {
       clearInterval(interval)
-      observerRef.current.disconnect()
+      observerRef.current?.disconnect()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
@@ -129,12 +139,9 @@ const SnowfallEffect = () => {
   const snowflakeStyles = useMemo(() => {
     return snowflakes.map((flake) => {
       // 눈송이 색상 결정
-      let backgroundColor
-      if (flake.isStrawberry) {
-        backgroundColor = isDark ? 'var(--strawberry)' : 'var(--strawberry)'
-      } else {
-        backgroundColor = isDark ? 'var(--snowflake)' : 'var(--snowflake)'
-      }
+      const backgroundColor = flake.isStrawberry
+        ? 'var(--strawberry)'
+        : 'var(--snowflake)'
 
       return {
         width: `${flake.size}px`,
@@ -144,7 +151,7 @@ const SnowfallEffect = () => {
         '--opacity': flake.baseOpacity,
         animation: `snowfall ${flake.duration}s linear ${flake.delay}s infinite`,
         filter: `blur(${flake.size > 5 ? 0.8 : 0.4}px) drop-shadow(0 0 1px ${backgroundColor})`,
-      }
+      } as React.CSSProperties
     })
   }, [snowflakes, isDark])
 
@@ -161,7 +168,7 @@ const SnowfallEffect = () => {
           style={snowflakeStyles[index]}
         />
       ))}
-      <style jsx global>{`
+      <style>{`
         @keyframes snowfall {
           0% {
             transform: translateY(-10px) rotate(0deg);

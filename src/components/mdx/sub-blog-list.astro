@@ -51,7 +51,7 @@ const subPostsWithReadingTime = await Promise.all(
           >
             <div class="flex flex-row items-center gap-4 p-4">
               {!showImage && post.data.image && (
-                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
+                <div class="h-24 w-24 shrink-0 overflow-hidden rounded-lg">
                   <Image
                     src={post.data.image}
                     alt={post.data.title}

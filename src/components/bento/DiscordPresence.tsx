@@ -226,7 +226,7 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
   return (
     <div className="flex w-full items-center gap-x-3 xl:gap-x-2">
       <div
-        className="relative aspect-square h-full w-auto flex-shrink-0 rounded-md bg-contain"
+        className="relative aspect-square h-full w-auto shrink-0 rounded-md bg-contain"
         style={{
           backgroundImage: `url('${getActivityImageUrl('large_image')}')`,
         }}

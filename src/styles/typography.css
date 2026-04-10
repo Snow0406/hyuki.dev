@@ -68,7 +68,7 @@
     }
 
     :where(a):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-      @apply text-foreground decoration-muted-foreground hover:decoration-foreground font-medium break-words underline underline-offset-[3px] transition-colors;
+      @apply text-foreground decoration-muted-foreground hover:decoration-foreground font-medium wrap-break-word underline underline-offset-[3px] transition-colors;
     }
 
     :where(strong):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -81,7 +81,7 @@
 
     :where(ol):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
       @apply marker:text-foreground/30 my-5 ml-6 list-decimal [&>li]:mt-2;
-      @apply [&[type='A']]:list-[upper-alpha] [&[type='I']]:list-[upper-roman] [&[type='a']]:list-[lower-alpha] [&[type='i']]:list-[lower-roman];
+      @apply [[type='A']]:list-[upper-alpha] [[type='I']]:list-[upper-roman] [[type='a']]:list-[lower-alpha] [[type='i']]:list-[lower-roman];
     }
 
     :where(li):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -95,11 +95,11 @@
     }
 
     :where(code):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-      @apply bg-muted/50 text-foreground relative rounded-sm px-[0.3rem] py-[0.2rem] text-sm font-medium break-words;
+      @apply bg-muted/50 text-foreground relative rounded-sm px-[0.3rem] py-[0.2rem] text-sm font-medium wrap-break-word;
     }
 
     :where(.shiki):not(:where(pre *, [class~='not-prose'], [class~='not-prose'] *)) {
-      @apply bg-muted/50! text-foreground relative rounded-sm px-[0.3rem] py-[0.2rem] text-sm font-medium break-words;
+      @apply bg-muted/50! text-foreground relative rounded-sm px-[0.3rem] py-[0.2rem] text-sm font-medium wrap-break-word;
     }
 
     :where(.shiki code):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -113,7 +113,7 @@
     :where(blockquote):not(
         :where([class~='not-prose'], [class~='not-prose'] *)
       ) {
-      @apply [&_*]:text-muted-foreground small my-6 border-l-2 pl-6;
+      @apply **:text-muted-foreground small my-6 border-l-2 pl-6;
     }
 
     :where(hr):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -130,7 +130,7 @@
 
     :where(th):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
       @apply px-4 py-2 font-medium;
-      @apply text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+      @apply text-left [[align=center]]:text-center [[align=right]]:text-right;
     }
 
     :where(tr):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -138,8 +138,8 @@
     }
 
     :where(td):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-      @apply text-foreground/80 small fix-margin px-4 py-2 align-top break-words;
-      @apply text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+      @apply text-foreground/80 small fix-margin px-4 py-2 align-top wrap-break-word;
+      @apply text-left [[align=center]]:text-center [[align=right]]:text-right;
     }
 
     :where(img, video, figure, .expressive-code):not(

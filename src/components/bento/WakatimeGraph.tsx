@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BarChart, Bar, XAxis, YAxis, Cell, LabelList } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Rectangle, LabelList } from 'recharts'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   SiSharp,
@@ -10,7 +10,7 @@ import {
   SiTypescript,
   SiMarkdown,
   SiC,
-  SiCss3,
+  SiCss,
   SiLua,
   SiOpenai,
   SiUnity,
@@ -68,7 +68,7 @@ const languageIcons: { [key: string]: IconType } = {
   typescript: SiTypescript,
   markdown: SiMarkdown,
   c: SiC,
-  css: SiCss3,
+  css: SiCss,
   lua: SiLua,
   assembly: SiOpenai,
   unity: SiUnity,
@@ -205,24 +205,27 @@ const WakatimeGraph = () => {
           axisLine={false}
           tick={<CustomYAxisTick />}
         />
-        <Bar dataKey="value" radius={[4, 4, 4, 4]} isAnimationActive={false}>
-          {languages.map((entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={entry.fill || 'var(--background)'}
-              fillOpacity={hoveredIndex === index ? 1 : 0.85}
-              onMouseEnter={() => setHoveredIndex(index)}
+        <Bar
+          dataKey="value"
+          radius={[4, 4, 4, 4]}
+          isAnimationActive={false}
+          shape={(props: any) => (
+            <Rectangle
+              {...props}
+              fillOpacity={hoveredIndex === props.index ? 1 : 0.85}
+              onMouseEnter={() => setHoveredIndex(props.index)}
               onMouseLeave={() => setHoveredIndex(null)}
               style={{
                 filter:
-                  hoveredIndex === index
+                  hoveredIndex === props.index
                     ? 'drop-shadow(0 0 8px rgba(120, 200, 255, 0.7))'
                     : 'none',
                 transition: 'filter 0.3s ease, fill-opacity 0.3s ease',
                 cursor: 'pointer',
               }}
             />
-          ))}
+          )}
+        >
 
           <LabelList
             dataKey="value"

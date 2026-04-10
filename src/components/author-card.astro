@@ -1,10 +1,10 @@
 ---
-import Link from '@/components/Link.astro'
+import Link from '@/components/link.astro'
 import AvatarComponent from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import type { SocialLink } from '@/types'
 import type { CollectionEntry } from 'astro:content'
-import SocialIcons from './SocialIcons.astro'
+import SocialIcons from './social-icons.astro'
 
 interface Props {
   author: CollectionEntry<'authors'>
@@ -38,7 +38,7 @@ const socialLinks: SocialLink[] = [
         alt={`Avatar of ${name}`}
         fallback={name[0]}
         className={cn(
-          'size-32 rounded-md [&>[data-slot="avatar-fallback"]]:rounded-md',
+          'size-32 rounded-md *:data-[slot="avatar-fallback"]:rounded-md',
           !isAuthorPage &&
             'hover:ring-primary transition-shadow duration-300 hover:cursor-pointer hover:ring-2',
         )}

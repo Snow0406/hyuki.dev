@@ -1,5 +1,5 @@
 ---
-import Link from '@/components/Link.astro'
+import Link from '@/components/link.astro'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   getCombinedReadingTime,
@@ -57,7 +57,7 @@ const subpostsWithReadingTime = await Promise.all(
                 <div class="text-foreground bg-muted subposts-sidebar-active-item flex items-center gap-2 rounded-md py-1.5 pr-3 pl-2 text-sm font-medium text-pretty">
                   <Icon
                     name="lucide:book-open-text"
-                    class="size-4 flex-shrink-0"
+                    class="size-4 shrink-0"
                     aria-hidden="true"
                   />
                   <div class="flex flex-col">
@@ -86,7 +86,7 @@ const subpostsWithReadingTime = await Promise.all(
                 >
                   <Icon
                     name="lucide:book-open"
-                    class="size-4 flex-shrink-0"
+                    class="size-4 shrink-0"
                     aria-hidden="true"
                   />
                   <div class="flex flex-col">
@@ -121,7 +121,7 @@ const subpostsWithReadingTime = await Promise.all(
                   <div class="text-foreground bg-muted subposts-sidebar-active-item flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-pretty">
                     <Icon
                       name="lucide:file-text"
-                      class="size-4 flex-shrink-0"
+                      class="size-4 shrink-0"
                       aria-hidden="true"
                     />
                     <div class="flex flex-col">
@@ -140,7 +140,7 @@ const subpostsWithReadingTime = await Promise.all(
                   >
                     <Icon
                       name="lucide:file"
-                      class="size-4 flex-shrink-0"
+                      class="size-4 shrink-0"
                       aria-hidden="true"
                     />
                     <div class="flex flex-col">
