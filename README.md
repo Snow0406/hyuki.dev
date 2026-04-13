@@ -1,5 +1,4 @@
 ![Showcase Card](/public/static/twitter-card.png)
-_Artwork by [@hanamori59ya](https://twitter.com/hanamori59ya)_
 
 <div align="center">
 
