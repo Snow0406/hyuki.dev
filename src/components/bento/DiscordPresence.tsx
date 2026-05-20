@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from 'react'
-import { useLanyard } from 'react-use-lanyard'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import AvatarComponent from '@/components/ui/avatar'
@@ -22,6 +21,21 @@ interface Activity {
     small_image?: string
   }
 }
+
+interface LanyardResponse {
+  success: boolean
+  data?: {
+    discord_status: DiscordStatus
+    activities: Activity[]
+  }
+  error?: {
+    message?: string
+  }
+}
+
+const DISCORD_USER_ID = '453729488191094809'
+const LANYARD_API_URL = `https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`
+const LANYARD_REFRESH_MS = 60_000
 
 // 스켈레톤 로딩 컴포넌트
 const DiscordSkeleton = () => (
@@ -201,22 +215,15 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
         if (urlPath.startsWith('https/')) {
           // URL 디코딩하여 %40 등의 문자를 복원
           const decodedPath = decodeURIComponent(urlPath.substring(6))
-          const finalUrl = 'https://' + decodedPath
-          console.log('Processed image URL:', finalUrl)
-          return finalUrl
+          return 'https://' + decodedPath
         } else if (urlPath.startsWith('http/')) {
           // URL 디코딩하여 %40 등의 문자를 복원
           const decodedPath = decodeURIComponent(urlPath.substring(5))
-          const finalUrl = 'http://' + decodedPath
-          console.log('Processed image URL:', finalUrl)
-          return finalUrl
+          return 'http://' + decodedPath
         }
-      } catch (e) {
-        console.error('Error decoding URL:', e)
-      }
+      } catch {}
     }
 
-    console.error('Could not process external URL:', fullPath)
     return ''
   }
 
@@ -293,9 +300,78 @@ const ActivityDisplay = ({ activity }: { activity: Activity }) => {
 
 // 메인 컴포넌트
 const DiscordPresence = () => {
-  const { data: lanyard, isLoading } = useLanyard({
-    userId: '453729488191094809',
-  })
+  const [lanyard, setLanyard] = useState<LanyardResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+    let controller: AbortController | null = null
+    let inFlight = false
+
+    const fetchPresence = async (showLoading = false) => {
+      if (inFlight) return
+
+      inFlight = true
+      if (showLoading) setIsLoading(true)
+
+      const requestController = new AbortController()
+      controller = requestController
+
+      try {
+        const response = await fetch(LANYARD_API_URL, {
+          signal: requestController.signal,
+        })
+
+        if (!response.ok) {
+          throw new Error(`Lanyard request failed: ${response.status}`)
+        }
+
+        const body = (await response.json()) as LanyardResponse
+
+        if (!body.success || !body.data) {
+          throw new Error(body.error?.message || 'Invalid Lanyard response')
+        }
+
+        if (mounted) {
+          setLanyard(body)
+        }
+      } catch {
+        if (requestController.signal.aborted) {
+          return
+        }
+      } finally {
+        if (controller === requestController) {
+          controller = null
+        }
+        inFlight = false
+
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') {
+        void fetchPresence()
+      }
+    }
+
+    void fetchPresence(true)
+
+    const intervalId = window.setInterval(
+      refreshWhenVisible,
+      LANYARD_REFRESH_MS,
+    )
+    document.addEventListener('visibilitychange', refreshWhenVisible)
+
+    return () => {
+      mounted = false
+      controller?.abort()
+      window.clearInterval(intervalId)
+      document.removeEventListener('visibilitychange', refreshWhenVisible)
+    }
+  }, [])
 
   const mainActivity = useMemo(() => {
     if (!lanyard?.data?.activities) return null
