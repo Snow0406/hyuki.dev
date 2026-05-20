@@ -1,99 +1,113 @@
 'use client'
 
 import { Skeleton } from '@/components/ui/skeleton'
-import { type FunctionComponent, useCallback, useEffect, useState } from 'react'
-import Calendar, {
-  type Props as ActivityCalendarProps,
-} from 'react-activity-calendar'
-
-// Adopted from https://github.com/grubersjoe/react-github-calendar
-// Copyright (c) 2019 Jonathan Gruber, MIT License
-
-interface Props extends Omit<ActivityCalendarProps, 'data' | 'theme'> {
-  username?: string
-}
+import { type FunctionComponent, useEffect, useState } from 'react'
 
 interface Day {
   date: string
   total: number
-  categories: Array<{
-    name: string
-    total: number
-  }>
 }
 
 interface ApiResponse {
   days: Array<Day>
-  status: string
-  is_up_to_date: boolean
-  is_up_to_date_pending_future: boolean
-  is_stuck: boolean
-  is_already_updating: boolean
-  range: string
-  percent_calculated: number
-  writes_only: boolean
-  user_id: string
-  is_including_today: boolean
-  human_readable_range: string
 }
 
-interface Activity {
+interface PricePoint {
   date: string
-  count: number
-  level: 0 | 1 | 2 | 3 | 4
+  value: number
 }
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    setMatches(media.matches)
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches)
+    media.addEventListener('change', listener)
+    return () => media.removeEventListener('change', listener)
+  }, [query])
+
+  return matches
+}
+
+const SHARE_URL =
+  'https://wakatime.com/share/@Hy/df946edc-3066-4748-bf37-849b26161e78.json'
 
 async function fetchCalendarData(): Promise<ApiResponse> {
-  const response = await fetch(
-    'https://wakatime.com/share/@Hy/df946edc-3066-4748-bf37-849b26161e78.json',
-  )
-
-  if (!response.ok) {
-    throw new Error('데이터를 불러오는데 실패했습니다')
+  try {
+    const proxied = await fetch('/api/wakatime')
+    if (proxied.ok) return (await proxied.json()) as ApiResponse
+  } catch {
+    // ignore, fall back to share URL
   }
 
-  return await response.json()
+  const fallback = await fetch(SHARE_URL)
+  if (!fallback.ok) {
+    throw new Error('데이터를 불러오는데 실패했습니다')
+  }
+  return (await fallback.json()) as ApiResponse
 }
 
-const WakatimeCalendar: FunctionComponent<Props> = ({ ...props }) => {
-  const [data, setData] = useState<Activity[]>([])
+function buildChartGeometry(
+  points: PricePoint[],
+  width: number,
+  height: number,
+  padX: number,
+  padY: number,
+) {
+  if (points.length === 0) {
+    return {
+      path: '',
+      baselineY: height / 2,
+      xAt: (_i: number) => 0,
+      yAt: (_v: number) => 0,
+    }
+  }
+
+  const values = points.map((p) => p.value)
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const range = max - min || 1
+
+  const innerW = width - padX * 2
+  const innerH = height - padY * 2
+
+  const xStep = points.length > 1 ? innerW / (points.length - 1) : 0
+
+  const xAt = (i: number) => padX + i * xStep
+  const yAt = (v: number) => padY + innerH - ((v - min) / range) * innerH
+
+  const path = points
+    .map(
+      (p, i) =>
+        `${i === 0 ? 'M' : 'L'} ${xAt(i).toFixed(2)},${yAt(p.value).toFixed(2)}`,
+    )
+    .join(' ')
+
+  return { path, baselineY: yAt(points[0].value), xAt, yAt }
+}
+
+// Parse "YYYY-MM-DD" as local date so timezone shifts don't change the day.
+function formatHoverDate(dateStr: string) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+const WakatimeCalendar: FunctionComponent = () => {
+  const [days, setDays] = useState<PricePoint[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null)
 
-  // 다크 모드 감지
+  const isSm = useMediaQuery('(min-width: 640px)')
+  const isXl = useMediaQuery('(min-width: 1280px)')
+
   useEffect(() => {
-    // 초기 테마 상태 감지
-    const isDark =
-      document.documentElement.getAttribute('data-theme') === 'dark'
-    setIsDarkMode(isDark)
-
-    // MutationObserver를 사용하여 테마 변경 감지
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (
-          mutation.type === 'attributes' &&
-          mutation.attributeName === 'data-theme'
-        ) {
-          const isDark =
-            document.documentElement.getAttribute('data-theme') === 'dark'
-          setIsDarkMode(isDark)
-        }
-      })
-    })
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    })
-
-    return () => observer.disconnect()
-  }, [])
-
-  const fetchData = useCallback(() => {
-    setLoading(true)
-    setError(null)
-
     fetchCalendarData()
       .then((apiData) => {
         if (!apiData.days || !Array.isArray(apiData.days)) {
@@ -103,33 +117,12 @@ const WakatimeCalendar: FunctionComponent<Props> = ({ ...props }) => {
           return
         }
 
-        // Wakatime API에서 받은 데이터를 Calendar 컴포넌트에 맞게 변환
-        const transformedData = apiData.days.map((day) => {
-          // 코딩 시간을 초 단위로 변환 (total은 초 단위)
-          const totalSeconds = day.total
+        const transformed = apiData.days.map((d) => ({
+          date: d.date,
+          value: Math.round(d.total / 60),
+        }))
 
-          // 레벨 계산 (0-4 사이의 값)
-          // 여기서는 간단히 시간에 따라 레벨 설정 (예: 4시간 이상이면 레벨 4)
-          // 필요에 따라 조정 가능
-          let level: 0 | 1 | 2 | 3 | 4 = 0
-          if (totalSeconds > 0) {
-            if (totalSeconds < 1800)
-              level = 1 // 30분 미만
-            else if (totalSeconds < 7200)
-              level = 2 // 2시간 미만
-            else if (totalSeconds < 14400)
-              level = 3 // 4시간 미만
-            else level = 4 // 4시간 이상
-          }
-
-          return {
-            date: day.date,
-            count: Math.round(totalSeconds / 60), // 분 단위로 변환
-            level: level,
-          }
-        })
-
-        setData(transformedData)
+        setDays(transformed)
         setLoading(false)
       })
       .catch((err) => {
@@ -138,10 +131,6 @@ const WakatimeCalendar: FunctionComponent<Props> = ({ ...props }) => {
         setLoading(false)
       })
   }, [])
-
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
 
   if (error) {
     return (
@@ -157,91 +146,133 @@ const WakatimeCalendar: FunctionComponent<Props> = ({ ...props }) => {
     return <Skeleton className="h-[70%] w-[85%] rounded-3xl" />
   }
 
-  const selectLastNDays = (activities: Activity[], days: number) => {
-    const today = new Date()
-    const startDate = new Date(today)
-    startDate.setDate(today.getDate() - days)
+  const pointCount = isXl ? 90 : isSm ? 60 : 30
+  const visibleDays = days.slice(-pointCount)
+  const lastIdx = visibleDays.length - 1
 
-    return activities.filter((activity) => {
-      const activityDate = new Date(activity.date)
-      return activityDate >= startDate && activityDate <= today
-    })
-  }
+  // Base: today vs yesterday — determines line color, never changes on hover.
+  const todayValue = visibleDays[lastIdx]?.value ?? 0
+  const yesterdayValue = lastIdx > 0 ? visibleDays[lastIdx - 1].value : 0
+  const baseDiff = todayValue - yesterdayValue
+  const baseIsUp = baseDiff >= 0
+  const lineColor = baseIsUp ? 'var(--strawberry)' : 'var(--chart-4)'
 
-  const themeColors = {
-    light: [
-      'var(--background)',
-      'var(--chart-1)',
-      'var(--chart-3)',
-      'var(--chart-5)',
-      'var(--chart-6)',
-    ],
-    dark: [
-      'var(--background)',
-      'var(--chart-7)',
-      'var(--chart-5)',
-      'var(--chart-3)',
-      'var(--chart-1)',
-    ],
+  // Active: hovered point (or today by default) — drives the header values.
+  const activeIdx = hoverIndex ?? lastIdx
+  const activePoint = visibleDays[activeIdx]
+  const activeValue = activePoint?.value ?? 0
+  const prevValue = activeIdx > 0 ? visibleDays[activeIdx - 1].value : 0
+  const activeDiff = activeValue - prevValue
+  const activeDiffPercent = prevValue > 0 ? (activeDiff / prevValue) * 100 : 0
+  const activeIsUp = activeDiff >= 0
+  const activeSign = activeIsUp ? '+' : ''
+  const activeDiffColor = activeIsUp ? 'var(--strawberry)' : 'var(--chart-4)'
+
+  const width = 400
+  const height = 140
+  const padX = 4
+  const padY = 8
+  const { path, baselineY, xAt, yAt } = buildChartGeometry(
+    visibleDays,
+    width,
+    height,
+    padX,
+    padY,
+  )
+
+  const isHovering = hoverIndex !== null
+  const hoverX = isHovering ? xAt(hoverIndex) : 0
+  const hoverY =
+    isHovering && activePoint ? yAt(activePoint.value) : 0
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (visibleDays.length < 2) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const relX = (e.clientX - rect.left) / rect.width
+    const idx = Math.round(relX * (visibleDays.length - 1))
+    setHoverIndex(Math.max(0, Math.min(visibleDays.length - 1, idx)))
   }
 
   return (
-    <>
-      {/* 모바일 화면 (sm 미만): 60일 데이터 */}
-      <div className="m-4 scale-110 sm:hidden">
-        <Calendar
-          data={selectLastNDays(data, 60)}
-          theme={{
-            light: themeColors.light,
-            dark: themeColors.dark,
-          }}
-          colorScheme={isDarkMode ? 'dark' : 'light'}
-          blockSize={20}
-          blockMargin={6}
-          blockRadius={7}
-          {...props}
-          maxLevel={4}
-          hideTotalCount
-          hideColorLegend
-        />
+    <div className="relative flex h-full w-full flex-col px-6 py-5">
+      <div className="text-muted-foreground text-xs font-semibold tracking-wide">
+        {isHovering && activePoint
+          ? formatHoverDate(activePoint.date)
+          : 'Strawberry Index'}
       </div>
-
-      {/* 중간 화면 (sm 이상, xl 미만): 133일 데이터 */}
-      <div className="m-4 hidden sm:block xl:hidden">
-        <Calendar
-          data={selectLastNDays(data, 133)}
-          theme={{
-            light: themeColors.light,
-            dark: themeColors.dark,
-          }}
-          colorScheme={isDarkMode ? 'dark' : 'light'}
-          blockSize={20}
-          blockMargin={6}
-          blockRadius={7}
-          {...props}
-          maxLevel={4}
-          hideTotalCount
-        />
+      <div className="mt-1 text-2xl leading-none font-bold">
+        {activeValue.toLocaleString('ko-KR')}
+        <span className="text-muted-foreground ml-1 text-sm font-normal">
+          STRAW
+        </span>
       </div>
-
-      {/* 대형 화면 (xl 이상): 180일 데이터 */}
-      <div className="m-4 hidden xl:block">
-        <Calendar
-          data={selectLastNDays(data, 161)}
-          theme={{
-            light: themeColors.light,
-            dark: themeColors.dark,
-          }}
-          colorScheme={isDarkMode ? 'dark' : 'light'}
-          blockSize={20}
-          blockMargin={6}
-          blockRadius={7}
-          {...props}
-          maxLevel={4}
-          hideTotalCount
-        />
+      <div
+        className="mt-1 text-sm font-semibold"
+        style={{ color: activeDiffColor }}
+      >
+        {activeSign}
+        {activeDiff.toLocaleString('ko-KR')}
+        {prevValue > 0 && ` (${activeSign}${activeDiffPercent.toFixed(1)}%)`}
       </div>
-    </>
+      <div
+        className="relative mt-2 min-h-0 flex-1"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setHoverIndex(null)}
+      >
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="none"
+          className="h-full w-full overflow-visible"
+          aria-label="Strawberry Index"
+        >
+          <line
+            x1={padX}
+            y1={baselineY}
+            x2={width - padX}
+            y2={baselineY}
+            stroke="var(--muted-foreground)"
+            strokeWidth={1}
+            strokeDasharray="3 4"
+            opacity={0.35}
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            d={path}
+            fill="none"
+            stroke={lineColor}
+            strokeWidth={2}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          {isHovering && (
+            <line
+              x1={hoverX}
+              y1={padY}
+              x2={hoverX}
+              y2={height - padY}
+              stroke="var(--muted-foreground)"
+              strokeWidth={1}
+              opacity={0.5}
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
+        </svg>
+        {isHovering && (
+          <div
+            className="border-background pointer-events-none absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+            style={{
+              left: `${(hoverX / width) * 100}%`,
+              top: `${(hoverY / height) * 100}%`,
+              backgroundColor: lineColor,
+            }}
+          />
+        )}
+      </div>
+      <div className="text-muted-foreground/70 mt-2 text-[10px] italic">
+        * Daily WakaTime coding minutes
+      </div>
+    </div>
   )
 }
 
