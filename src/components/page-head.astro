@@ -12,12 +12,14 @@ const {
   description = SITE.description,
   noindex = false,
 } = Astro.props
-const image = new URL('/static/twitter-card.png', Astro.site)
+const base = Astro.site ?? new URL(Astro.url.origin)
+const canonical = new URL(Astro.url.pathname, base)
+const image = new URL('/static/twitter-card.png', base)
 ---
 
 <title>{`${title} | ${SITE.title}`}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={SITE.href} />
+<link rel="canonical" href={canonical} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
 
 <meta property="og:title" content={title} />
@@ -27,7 +29,7 @@ const image = new URL('/static/twitter-card.png', Astro.site)
 <meta property="og:type" content="website" />
 <meta property="og:locale" content={SITE.locale} />
 <meta property="og:site_name" content={SITE.title} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={canonical} />
 
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />

@@ -21,7 +21,21 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   site: 'https://hyuki.dev',
-  integrations: [mdx(), react(), sitemap(), icon()],
+  integrations: [
+    mdx(),
+    react(),
+    sitemap({
+      filter: (page) => {
+        const { pathname } = new URL(page)
+        return !(
+          /^\/blog\/[^/]+\/[^/]+\/?$/.test(pathname) ||
+          /^\/tags\/.+/.test(pathname) ||
+          /^\/authors\/[^/]+\/?$/.test(pathname)
+        )
+      },
+    }),
+    icon(),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
