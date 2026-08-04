@@ -1,26 +1,26 @@
 ---
-import Breadcrumbs from '@/components/breadcrumbs.astro'
-import PageHead from '@/components/page-head.astro'
-import ProjectCard from '@/components/project-card.astro'
-import Layout from '@/layouts/layout.astro'
-import { getAllProjects } from '@/lib/data-utils'
+import MetaPage from "@/components/MetaPage.astro"
+import ProjectCard from "@/components/ProjectCard.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getCollection } from "astro:content"
 
-const projects = await getAllProjects()
+const projects = (await getCollection("projects")).sort(
+  (a, b) =>
+    (b.data.startDate?.getTime() ?? 0) - (a.data.startDate?.getTime() ?? 0),
+)
 ---
 
-<Layout class="max-w-3xl">
-  <PageHead slot="head" title="Project" />
-  <Breadcrumbs
-    items={[{ label: 'Project', href: '/project', icon: 'lucide:code-2' }]}
-  />
-
-  <ul class="not-prose grid grid-cols-1 gap-5 sm:grid-cols-2">
-    {
-      projects.map((project) => (
-        <li>
-          <ProjectCard project={project} />
-        </li>
-      ))
-    }
+<Layout crumbs={[{ label: "Project", href: "/project" }]}>
+  <MetaPage slot="head" title="Project" />
+  <ul>
+    {projects.map((project) => <ProjectCard project={project} />)}
   </ul>
 </Layout>
+
+<style>
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+</style>

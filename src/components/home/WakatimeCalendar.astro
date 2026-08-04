@@ -1,0 +1,441 @@
+---
+const WAKATIME_URL = "/api/wakatime"
+---
+
+<wakatime-calendar data-url={WAKATIME_URL} aria-busy="true">
+  <div class="calendar-skeleton" aria-hidden="true">
+    <span class="skeleton-label" />
+    <span class="skeleton-value" />
+    <span class="skeleton-diff" />
+    <span class="skeleton-chart" />
+  </div>
+
+  <div class="calendar-content" hidden>
+    <span class="calendar-label">Strawberry Index</span>
+    <strong><span class="calendar-value">0m</span></strong>
+    <div class="calendar-comparison">
+      <span class="calendar-diff">→ 0m</span>
+      <span class="calendar-compare">vs. yesterday</span>
+    </div>
+
+    <div class="calendar-chart-wrap">
+      <svg
+        class="calendar-chart"
+        viewBox="0 0 400 140"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label="Daily WakaTime coding minutes"
+      >
+        <path class="chart-baseline" />
+        <path class="chart-line" />
+        <path class="chart-hover-line" />
+      </svg>
+      <span class="chart-hover-dot" hidden />
+    </div>
+  </div>
+</wakatime-calendar>
+
+<script>
+  interface WakatimeDay {
+    date: string
+    total: number
+  }
+
+  interface WakatimeResponse {
+    days?: WakatimeDay[]
+  }
+
+  interface ChartPoint {
+    date: string
+    value: number
+  }
+
+  const CHART_WIDTH = 400
+  const CHART_HEIGHT = 140
+  const PAD_X = 4
+  const PAD_Y = 8
+
+  class WakatimeCalendar extends HTMLElement {
+    private days: ChartPoint[] = []
+    private visibleDays: ChartPoint[] = []
+    private pointCount = 0
+    private abortController?: AbortController
+
+    connectedCallback() {
+      this.loadCalendar()
+      window.addEventListener("resize", this.handleResize)
+    }
+
+    disconnectedCallback() {
+      this.abortController?.abort()
+      window.removeEventListener("resize", this.handleResize)
+    }
+
+    private async loadCalendar() {
+      const url = this.dataset.url
+      if (!url) return
+
+      this.abortController = new AbortController()
+      const timeout = window.setTimeout(
+        () => this.abortController?.abort(),
+        8000,
+      )
+
+      try {
+        const response = await fetch(url, {
+          signal: this.abortController.signal,
+        })
+        if (!response.ok) throw new Error("WakaTime request failed")
+
+        const body = (await response.json()) as WakatimeResponse
+        if (!Array.isArray(body.days) || body.days.length === 0) {
+          throw new Error("No WakaTime data")
+        }
+
+        this.days = body.days.map(({ date, total }) => ({
+          date,
+          value: Math.round(total / 60),
+        }))
+        this.renderChart()
+      } catch {
+        if (!this.isConnected) return
+        this.setAttribute("data-error", "")
+        this.setAttribute("aria-label", "WakaTime data unavailable")
+      } finally {
+        window.clearTimeout(timeout)
+        this.setAttribute("aria-busy", "false")
+      }
+    }
+
+    private handleResize = () => {
+      const nextPointCount = this.getPointCount()
+      if (this.days.length > 0 && nextPointCount !== this.pointCount) {
+        this.renderChart()
+      }
+    }
+
+    private getPointCount() {
+      if (window.innerWidth >= 1280) return 90
+      if (window.innerWidth >= 640) return 60
+      return 30
+    }
+
+    private renderChart() {
+      this.pointCount = this.getPointCount()
+      this.visibleDays = this.days.slice(-this.pointCount)
+      if (this.visibleDays.length === 0) return
+
+      const values = this.visibleDays.map(({ value }) => value)
+      const min = Math.min(...values)
+      const max = Math.max(...values)
+      const range = max - min || 1
+      const innerWidth = CHART_WIDTH - PAD_X * 2
+      const innerHeight = CHART_HEIGHT - PAD_Y * 2
+      const xStep =
+        this.visibleDays.length > 1
+          ? innerWidth / (this.visibleDays.length - 1)
+          : 0
+      const xAt = (index: number) => PAD_X + index * xStep
+      const yAt = (value: number) =>
+        PAD_Y + innerHeight - ((value - min) / range) * innerHeight
+
+      const path = this.visibleDays
+        .map(
+          ({ value }, index) =>
+            `${index === 0 ? "M" : "L"} ${xAt(index).toFixed(2)},${yAt(value).toFixed(2)}`,
+        )
+        .join(" ")
+      const lastIndex = this.visibleDays.length - 1
+      const latest = this.visibleDays[lastIndex]
+      const previous = this.visibleDays[lastIndex - 1]?.value ?? 0
+      const lineColor =
+        latest.value - previous >= 0 ? "var(--strawberry)" : "var(--chart-4)"
+
+      const line = this.querySelector<SVGPathElement>(".chart-line")!
+      line.setAttribute("d", path)
+      line.style.stroke = lineColor
+
+      const baseline = this.querySelector<SVGPathElement>(".chart-baseline")!
+      const baselineY = yAt(this.visibleDays[0].value)
+      baseline.setAttribute(
+        "d",
+        `M ${PAD_X},${baselineY.toFixed(2)} H ${CHART_WIDTH - PAD_X}`,
+      )
+
+      const chartWrap = this.querySelector<HTMLElement>(".calendar-chart-wrap")!
+      chartWrap.onpointermove = (event) => {
+        if (this.visibleDays.length < 2 || event.pointerType === "touch") return
+        const rect = chartWrap.getBoundingClientRect()
+        const relativeX = (event.clientX - rect.left) / rect.width
+        const index = Math.max(
+          0,
+          Math.min(
+            this.visibleDays.length - 1,
+            Math.round(relativeX * (this.visibleDays.length - 1)),
+          ),
+        )
+        this.updateActivePoint(
+          index,
+          xAt(index),
+          yAt(this.visibleDays[index].value),
+        )
+      }
+      chartWrap.onpointerleave = () => {
+        this.hideHover()
+        this.updateSummary(lastIndex)
+      }
+
+      this.querySelector<HTMLElement>(".calendar-skeleton")!.hidden = true
+      this.querySelector<HTMLElement>(".calendar-content")!.hidden = false
+      this.updateSummary(lastIndex)
+    }
+
+    private updateActivePoint(index: number, x: number, y: number) {
+      const hoverLine = this.querySelector<SVGPathElement>(".chart-hover-line")!
+      hoverLine.classList.add("is-visible")
+      hoverLine.setAttribute("d", `M ${x},${PAD_Y} V ${CHART_HEIGHT - PAD_Y}`)
+
+      const dot = this.querySelector<HTMLElement>(".chart-hover-dot")!
+      dot.hidden = false
+      dot.style.left = `${(x / CHART_WIDTH) * 100}%`
+      dot.style.top = `${(y / CHART_HEIGHT) * 100}%`
+      dot.style.backgroundColor =
+        this.querySelector<SVGPathElement>(".chart-line")!.style.stroke
+
+      this.updateSummary(index, true)
+    }
+
+    private hideHover() {
+      this.querySelector<SVGPathElement>(".chart-hover-line")!.classList.remove(
+        "is-visible",
+      )
+      this.querySelector<HTMLElement>(".chart-hover-dot")!.hidden = true
+    }
+
+    private updateSummary(index: number, showDate = false) {
+      const point = this.visibleDays[index]
+      if (!point) return
+
+      const previous = this.visibleDays[index - 1]?.value ?? 0
+      const difference = point.value - previous
+      const differencePercent = previous > 0 ? (difference / previous) * 100 : 0
+      const isUp = difference >= 0
+      const trend = difference > 0 ? "↗" : difference < 0 ? "↘" : "→"
+
+      const label = this.querySelector<HTMLElement>(".calendar-label")!
+      label.textContent = showDate
+        ? this.formatDate(point.date)
+        : "Strawberry Index"
+      this.querySelector<HTMLElement>(".calendar-value")!.textContent =
+        this.formatDuration(point.value)
+
+      const diff = this.querySelector<HTMLElement>(".calendar-diff")!
+      diff.textContent = `${trend} ${this.formatDuration(Math.abs(difference))}${
+        previous > 0 ? ` · ${Math.abs(differencePercent).toFixed(1)}%` : ""
+      }`
+      diff.style.color = isUp ? "var(--strawberry)" : "var(--chart-4)"
+      this.querySelector<HTMLElement>(".calendar-compare")!.textContent =
+        showDate ? "vs. previous day" : "vs. yesterday"
+    }
+
+    private formatDuration(minutes: number) {
+      const hours = Math.floor(minutes / 60)
+      const remainingMinutes = minutes % 60
+
+      if (hours === 0) return `${remainingMinutes}m`
+      return `${hours}h ${remainingMinutes.toString().padStart(2, "0")}m`
+    }
+
+    private formatDate(date: string) {
+      const [year, month, day] = date.split("-").map(Number)
+      return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    }
+  }
+
+  if (!customElements.get("wakatime-calendar")) {
+    customElements.define("wakatime-calendar", WakatimeCalendar)
+  }
+</script>
+
+<style>
+  wakatime-calendar {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: grid;
+    min-block-size: 0;
+    container-type: size;
+    place-items: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  wakatime-calendar [hidden] {
+    display: none;
+  }
+
+  .calendar-content {
+    display: flex;
+    inline-size: 100%;
+    block-size: 100%;
+    min-block-size: 0;
+    flex-direction: column;
+    padding: clamp(1rem, 5cqw, 1.5rem);
+  }
+
+  .calendar-label {
+    color: var(--muted-foreground);
+    font-size: clamp(0.6875rem, 2.8cqw, 0.75rem);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .calendar-content > strong {
+    margin-block-start: var(--space-3xs);
+    font-size: clamp(1.5rem, 7cqw, 2rem);
+    line-height: 1;
+  }
+
+  .calendar-comparison {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-3xs);
+  }
+
+  .calendar-diff,
+  .calendar-compare {
+    font-size: clamp(0.75rem, 3.4cqw, 0.875rem);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .calendar-diff {
+    font-weight: 600;
+  }
+
+  .calendar-compare {
+    color: var(--muted-foreground);
+  }
+
+  .calendar-chart-wrap {
+    position: relative;
+    flex: 1;
+    min-block-size: 0;
+    margin-block-start: var(--space-xs);
+    cursor: crosshair;
+  }
+
+  .calendar-chart {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  .chart-baseline,
+  .chart-line,
+  .chart-hover-line {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .chart-baseline {
+    stroke: var(--muted-foreground);
+    stroke-dasharray: 3 4;
+    stroke-width: 1;
+    opacity: 0.35;
+  }
+
+  .chart-line {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+  }
+
+  .chart-hover-line {
+    stroke: var(--muted-foreground);
+    stroke-width: 1;
+    opacity: 0;
+  }
+
+  .chart-hover-line.is-visible {
+    opacity: 0.5;
+  }
+
+  .chart-hover-dot {
+    position: absolute;
+    inline-size: 0.625rem;
+    block-size: 0.625rem;
+    border: 2px solid var(--background);
+    border-radius: var(--radius-full);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+
+  .calendar-skeleton {
+    display: flex;
+    inline-size: 85%;
+    block-size: 70%;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .calendar-skeleton span {
+    display: block;
+    border-radius: var(--radius-md);
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--muted) 72%, transparent) 25%,
+      color-mix(in oklab, var(--muted-foreground) 18%, transparent) 50%,
+      color-mix(in oklab, var(--muted) 72%, transparent) 75%
+    );
+    background-size: 200% 100%;
+    animation: calendar-skeleton 1.4s ease-in-out infinite;
+  }
+
+  .skeleton-label {
+    inline-size: 35%;
+    block-size: 0.75rem;
+  }
+
+  .skeleton-value {
+    inline-size: 42%;
+    block-size: 2rem;
+  }
+
+  .skeleton-diff {
+    inline-size: 30%;
+    block-size: 0.875rem;
+  }
+
+  .skeleton-chart {
+    flex: 1;
+    inline-size: 100%;
+    margin-block-start: var(--space-xs);
+    border-radius: var(--radius-xl) !important;
+  }
+
+  @keyframes calendar-skeleton {
+    from {
+      background-position: 100% 0;
+    }
+
+    to {
+      background-position: -100% 0;
+    }
+  }
+
+  wakatime-calendar[data-error] .calendar-skeleton span {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .calendar-skeleton span {
+      animation: none;
+    }
+  }
+</style>

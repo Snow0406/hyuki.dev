@@ -1,0 +1,54 @@
+:root {
+  --background:         light-dark(oklch(0.97 0.02 240), oklch(0.15 0.05 220));
+  --foreground:         light-dark(oklch(0.3 0.02 240), oklch(0.9 0.02 240));
+  --primary:            oklch(0.7 0.15 240);
+  --primary-foreground: oklch(0.98 0.005 240);
+  --secondary:          light-dark(oklch(0.85 0.07 240), oklch(0.25 0.05 240));
+  --secondary-foreground: light-dark(oklch(0.3 0.02 240), oklch(0.9 0.02 240));
+  --muted:              light-dark(oklch(0.9 0.05 240), oklch(0.2 0.03 240));
+  --muted-foreground:   light-dark(oklch(0.4 0.03 240), oklch(0.75 0.05 240));
+  --accent:             light-dark(oklch(0.85 0.08 240), oklch(0.3 0.07 240));
+  --accent-foreground:  light-dark(oklch(0.25 0.02 240), oklch(0.9 0.02 240));
+  --additive:           light-dark(oklch(0.55 0.15 220), oklch(0.7 0.15 240));
+  --additive-foreground: light-dark(oklch(0.98 0.005 240), oklch(0.9 0.02 240));
+  --destructive:        oklch(0.65 0.25 30);
+  --destructive-foreground: light-dark(oklch(0.98 0 0), oklch(0.9 0.02 240));
+  --success:            light-dark(oklch(0.75 0.12 195), oklch(0.55 0.1 210));
+  --success-foreground: light-dark(oklch(0.2 0.03 195), oklch(0.98 0.005 240));
+  --border:             light-dark(oklch(0.85 0.03 240), oklch(0.3 0.07 240));
+  --ring:               light-dark(oklch(0.75 0.07 240), oklch(0.2 0.03 240));
+
+  --snowflake:       light-dark(oklch(0.65 0.07 220), oklch(0.7 0.1 210));
+  --snowflake-hover: light-dark(oklch(0.55 0.15 220), oklch(0.8 0.15 200));
+  --strawberry:      light-dark(oklch(0.75 0.15 0), oklch(0.75 0.12 10));
+  --strawberry-hover: light-dark(oklch(0.65 0.25 10), oklch(0.82 0.18 15));
+
+  --chart-1: oklch(0.85 0.1 240);
+  --chart-2: oklch(0.75 0.12 245);
+  --chart-3: oklch(0.65 0.14 250);
+  --chart-4: oklch(0.55 0.16 255);
+  --chart-5: oklch(0.45 0.15 250);
+  --chart-6: oklch(0.35 0.13 245);
+  --chart-7: oklch(0.25 0.1 240);
+
+  color-scheme: light dark;
+}
+
+*,
+::before,
+::after,
+::backdrop,
+::file-selector-button {
+  border-color: var(--border);
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 0.25rem;
+    border-radius: var(--radius-sm);
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}

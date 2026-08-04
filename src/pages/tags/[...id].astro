@@ -1,61 +1,68 @@
 ---
-import BlogCard from '@/components/blog-card.astro'
-import Breadcrumbs from '@/components/breadcrumbs.astro'
-import PageHead from '@/components/page-head.astro'
-import ProjectCard from '@/components/project-card.astro'
-import Layout from '@/layouts/layout.astro'
-import { getAllCombinedTags, getContentByTag } from '@/lib/data-utils'
+import BlogCard from "@/components/BlogCard.astro"
+import MetaPage from "@/components/MetaPage.astro"
+import ProjectCard from "@/components/ProjectCard.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getTags } from "@/lib/content"
+import type { CollectionEntry } from "astro:content"
 
 export async function getStaticPaths() {
-  const tagMap = await getAllCombinedTags()
-  const uniqueTags = Array.from(tagMap.keys())
+  const tags = await getTags()
+  return [...tags].map(([tag, { posts, projects }]) => ({
+    params: { id: tag },
+    props: { tag, posts, projects },
+  }))
+}
 
-  return Promise.all(
-    uniqueTags.map(async (tag) => {
-      const { posts, projects } = await getContentByTag(tag)
-      return {
-        params: { id: tag },
-        props: {
-          tag,
-          posts,
-          projects,
-        },
-      }
-    }),
-  )
+type Props = {
+  tag: string
+  posts: CollectionEntry<"blog">[]
+  projects: CollectionEntry<"projects">[]
 }
 
 const { tag, posts, projects } = Astro.props
 ---
 
-<Layout class="max-w-3xl">
-  <PageHead
+<Layout
+  crumbs={[
+    { label: "Tags", href: "/tags" },
+    { label: `#${tag}`, href: `/tags/${tag}` },
+  ]}
+>
+  <MetaPage
     slot="head"
-    title={`Posts tagged with "${tag}"`}
-    description={`A collection of posts tagged with ${tag}.`}
+    title={`Content tagged "${tag}"`}
+    description={`Projects and posts tagged with ${tag}.`}
     noindex
   />
-  <Breadcrumbs
-    items={[
-      { href: '/tags', label: 'Tags', icon: 'lucide:tags' },
-      { label: tag, icon: 'lucide:tag' },
-    ]}
-  />
-
-  <ul class="flex flex-col gap-y-4">
-    {
-      posts.map((post) => (
-        <li>
-          <BlogCard entry={post} />
-        </li>
-      ))
-    }
-    {
-      projects.map((project) => (
-        <li>
-          <ProjectCard project={project} />
-        </li>
-      ))
-    }
-  </ul>
+  {projects.length > 0 && (
+      <section>
+        <h2>Projects</h2>
+        <ul>{projects.map((project) => <ProjectCard project={project} />)}</ul>
+      </section>
+    )}
+  {posts.length > 0 && (
+      <section>
+        <h2>Posts</h2>
+        <ul>{posts.map((post) => <BlogCard post={post} />)}</ul>
+      </section>
+    )}
 </Layout>
+
+<style>
+  section + section {
+    margin-block-start: var(--space-l);
+  }
+
+  h2 {
+    margin-block-end: var(--space-s);
+    font-size: var(--step-1);
+    font-weight: var(--font-weight-medium);
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+</style>

@@ -1,105 +1,250 @@
 ---
-import Breadcrumbs from '@/components/breadcrumbs.astro'
-import FeaturedProjectCard from '@/components/featured-project-card.astro'
-import Link from '@/components/link.astro'
-import PageHead from '@/components/page-head.astro'
-import { Badge } from '@/components/ui/badge'
-import Layout from '@/layouts/layout.astro'
-import { getAllProjects } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
+import MetaPage from "@/components/MetaPage.astro"
+import ProjectCard from "@/components/ProjectCard.astro"
+import SocialIcons from "@/components/SocialIcons.astro"
+import { SOCIALS } from "@/consts"
+import Layout from "@/layouts/Layout.astro"
+import { getCollection } from "astro:content"
 
-const allProjects = await getAllProjects()
-const featuredIds = ['division1d', 'crimson-pandemic']
-const featured = featuredIds
-  .map((id) => allProjects.find((p) => p.id === id))
-  .filter(Boolean)
+const featuredProjectDescriptions = new Map([
+  ["division1d", "서버·Gateway·실시간 네트워크 설계 및 구현"],
+  ["crimson-pandemic", "Unity 성능 최적화 및 시스템 개발"],
+])
+
+const featuredProjects = (await getCollection("projects"))
+  .filter((project) => featuredProjectDescriptions.has(project.id))
+  .sort(
+    (a, b) =>
+      [...featuredProjectDescriptions.keys()].indexOf(a.id) -
+      [...featuredProjectDescriptions.keys()].indexOf(b.id),
+  )
 
 const skills = [
   {
-    category: 'Language',
-    items: ['C#', 'C++', 'C', 'JS', 'TS', 'Lua', 'Python'],
+    category: "Languages",
+    items: ["C#", "C++", "C", "JavaScript", "TypeScript", "Lua"],
   },
   {
-    category: 'Client',
-    items: [
-      'Unity',
-      'Mirror',
-      'Steamworks',
-      'Reflex',
-      'ECS',
-      'Job System',
-      'Burst',
-    ],
+    category: "Client",
+    items: ["Unity", "Mirror", "Steamworks", "Reflex", "ECS", "Burst"],
   },
-  { category: 'Server', items: ['.NET', 'Redis', 'Oracle', 'TCP/UDP'] },
-  { category: 'Infra', items: ['Docker', 'Oracle', 'CI/CD'] },
+  { category: "Server", items: [".NET", "Redis", "Oracle", "TCP/UDP"] },
+  { category: "Infra", items: ["Docker", "CI/CD"] },
 ]
 ---
 
-<Layout class="max-w-3xl">
-  <PageHead slot="head" title="About" />
-  <Breadcrumbs
-    items={[{ label: 'About', href: '/about', icon: 'lucide:user' }]}
+<Layout crumbs={[{ label: "About", href: "/about" }]}>
+  <MetaPage
+    slot="head"
+    title="About"
+    description="서브컬쳐와 코딩을 좋아하는 개발자 hy의 소개입니다."
   />
 
-  <section class="not-prose flex flex-col items-center sm:clear-both sm:block">
-    <img
-      src="/web-app-manifest-512x512.png"
-      alt="hyuki"
-      class="ring-border mb-4 size-28 shrink-0 rounded-full ring-1 sm:float-left sm:mr-6 sm:mb-2 sm:size-48 sm:[shape-outside:circle(50%)]"
-    />
-    <div
-      class="text-muted-foreground text-center text-base leading-relaxed sm:pt-4 sm:text-left"
-    >
-      <p>
-        안녕하세요! 서브컬처 게임을 좋아하고, <br class="hidden sm:inline" /> 유니티로
-        게임을 만드는 개발자입니다.
-        <br class="hidden sm:inline" />
-        새로운 기술은 일단 부딪혀보는 스타일이라, <br
-          class="hidden sm:inline"
-        /> 개인 프젝으로 ECS나 Reflex를 직접 구현해보고 <br
-          class="hidden sm:inline"
-        /> 팀 프젝을 통해 최적화와 네트워크도 설계하고 구현했습니다 !<br
-          class="hidden sm:inline"
-        /> 애니메이션과 딸기라떼를 좋아합니다 !!! 🍓🥛
-      </p>
-    </div>
-  </section>
-
-  <section class="not-prose flex flex-col gap-y-4">
-    <h2 class="text-lg font-semibold">Skills</h2>
-    <div class="flex flex-col gap-y-3">
-      {
-        skills.map((group) => (
-          <div class="flex flex-col gap-y-1.5">
-            <span class="text-muted-foreground text-xs font-medium">
-              {group.category}
-            </span>
-            <div class="flex flex-wrap gap-1.5">
-              {group.items.map((item) => (
-                <Badge variant="muted">{item}</Badge>
-              ))}
-            </div>
-          </div>
-        ))
-      }
-    </div>
-  </section>
-
-  <section class="not-prose flex flex-col gap-y-4">
-    <div class="flex items-center gap-2">
-      <h2 class="text-lg font-semibold">Featured Projects</h2>
-      <span class="text-muted-foreground/50">·</span>
-      <Link
-        href="/project"
-        class="text-muted-foreground hover:text-foreground flex items-center gap-x-1 text-sm"
+  <article data-url="/about">
+    <header class="profile">
+      <img
+        src="https://github.com/snow0406.png?size=256"
+        alt="hy 프로필 이미지"
+        width="256"
+        height="256"
       >
-        모든 프로젝트 보기
-        <Icon name="lucide:arrow-right" class="size-4" />
-      </Link>
-    </div>
-    <div class="flex flex-col gap-4">
-      {featured.map((project) => <FeaturedProjectCard project={project!} />)}
-    </div>
-  </section>
+      <div>
+        <p class="eyebrow">Hello, I&rsquo;m</p>
+        <h1>hy</h1>
+        <p class="summary">
+          안녕하세요! 서브컬처 서브컬쳐와 코딩을 좋아하는 개발자입니다.
+        </p>
+        <SocialIcons links={SOCIALS} />
+      </div>
+    </header>
+
+    <section aria-labelledby="now-heading">
+      <h2 id="now-heading">What I do</h2>
+      <p>
+        대학교에서 공부하며 Unity 게임 개발과 최적화를 주로 하고 있습니다.
+        새로운 기술은 직접 부딪혀보며 배우는 편이고, 팀 프로젝트에서는 최적화와
+        네트워크를 설계하고 구현했습니다.
+      </p>
+    </section>
+
+    <section aria-labelledby="skills-heading">
+      <h2 id="skills-heading">Skills</h2>
+      <div class="skill-groups">
+        {skills.map((group) => (
+          <div class="skill-group">
+            <h3>{group.category}</h3>
+            <ul>
+              {group.items.map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="projects-heading">
+      <h2 id="projects-heading">Featured Projects</h2>
+      <ul class="featured-projects">
+        {featuredProjects.map((project) => (
+            <ProjectCard
+              project={project}
+              description={featuredProjectDescriptions.get(project.id)}
+            />
+          ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="more-heading">
+      <h2 id="more-heading">A little more about me</h2>
+      <div class="prose">
+        <p>
+          조금 더 개인적인 이야기를 하자면, 저는 어릴 때 처음 코딩을 접했습니다.
+          당시 직접 만든 게임을 다른 사람들이 플레이하는 모습을 보며 큰 보람을
+          느꼈고, 이를 계기로 게임 개발에 관심을 갖게 되었습니다.
+        </p>
+        <p>
+          이후에는 코딩 그 자체의 매력에 빠졌습니다. 특히 프로파일러로 병목
+          지점을 찾아내고, 최적화를 통해 성능이 개선되는 과정을 직접 확인할 때
+          가장 큰 즐거움을 느낍니다. 이러한 경험이 좋아 지금까지 꾸준히 개발을
+          이어오고 있습니다.
+        </p>
+        <p>
+          현재는 대학교에서 임베디드 시스템을 공부하는 한편, 여러 팀 프로젝트에
+          참여해 게임 구조와 최적화, 네트워크를 설계하고 구현하고 있습니다.
+          최근에는 렌더링 성능을 직접 개선해보고 싶어 그래픽스와 렌더링
+          파이프라인을 공부하고 있습니다.
+        </p>
+        <p>
+          새로운 기술이나 문제를 접하면 단순히 해결하는 데서 끝내기보다, 왜 그런
+          결과가 나왔는지 이해하려고 합니다. 그 과정에서 알게 된 내용과
+          시행착오는 나중에 다시 참고하고 다른 사람과 공유할 수 있도록 이
+          블로그에 기록하고 있습니다.
+        </p>
+        <p>
+          개발 밖에서는 애니메이션을 보거나 서브컬처 게임과 오버워치를 즐기며
+          시간을 보냅니다. 카페에 가면 먼저 딸기라떼부터 찾을 정도로 딸기라떼를
+          좋아합니다. 반갑게 인사하거나 함께 이야기하고 싶다면 편하게
+          연락해주세요. 🍓🥛
+        </p>
+      </div>
+    </section>
+  </article>
 </Layout>
+
+<style>
+  article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+
+    > img {
+      inline-size: 8rem;
+      block-size: 8rem;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      box-shadow: 0 0 0 0.375rem
+        color-mix(in oklab, var(--secondary) 35%, transparent);
+    }
+
+    > div {
+      min-inline-size: 0;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--muted-foreground);
+      font-size: var(--step--1);
+      font-weight: var(--font-weight-medium);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: var(--step-3);
+      line-height: 1.15;
+    }
+
+    .summary {
+      max-inline-size: 30rem;
+      margin-block: var(--space-2xs) 0;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+    }
+  }
+
+  section {
+    h2 {
+      margin-block: 0 var(--space-s);
+      font-size: var(--step-1);
+    }
+
+    > p,
+    .prose p {
+      margin: 0;
+      color: var(--prose-foreground);
+      font-size: var(--step-0);
+      line-height: calc(var(--leading-offset) + 1em);
+    }
+
+    .prose {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+  }
+
+  .skill-groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-s);
+  }
+
+  .skill-group {
+    h3 {
+      margin-block: 0 var(--space-2xs);
+      color: var(--muted-foreground);
+      font-size: var(--step--1);
+      font-weight: var(--font-weight-medium);
+    }
+
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3xs);
+    }
+
+    li {
+      padding: 0.2rem var(--space-2xs);
+      color: var(--muted-foreground);
+      background-color: color-mix(in oklab, var(--muted) 50%, transparent);
+      border-radius: var(--radius-full);
+      font-size: var(--step--1);
+    }
+  }
+
+  .featured-projects {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  @media (width < 32rem) {
+    .profile {
+      align-items: flex-start;
+
+      > img {
+        inline-size: 5rem;
+        block-size: 5rem;
+      }
+    }
+
+    .skill-groups {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

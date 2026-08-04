@@ -1,0 +1,89 @@
+<button
+  id="snowfall-toggle"
+  data-icon-button
+  type="button"
+  aria-label="Switch to strawberry latte mode"
+  aria-pressed="false"
+  title="Strawberry latte mode"
+>
+  <strawberry-icon aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+      <path
+        d="M12 8.1C9.5 6.8 6.1 7.1 5.3 9.8 4.2 13.5 8.6 19.1 12 21c3.4-1.9 7.8-7.5 6.7-11.2-.8-2.7-4.2-3-6.7-1.7Z"
+      />
+      <path
+        d="m7.1 7.9-1.4-3.3 4.4 1L12 2.8l1.9 2.8 4.4-1-1.4 3.3A7.7 7.7 0 0 0 12 8.1a7.7 7.7 0 0 0-4.9-.2Z"
+      />
+    </svg>
+  </strawberry-icon>
+  <snow-icon aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+      <path
+        d="M12 2v20M4.2 6.5l15.6 11M4.2 17.5l15.6-11M9 3.7 12 6l3-2.3M9 20.3l3-2.3 3 2.3M3.8 9.5 7.2 9l.5-3.4M20.2 14.5l-3.4.5-.5 3.4M3.8 14.5l3.4.5.5 3.4M20.2 9.5l-3.4-.5-.5-3.4"
+      />
+    </svg>
+  </snow-icon>
+</button>
+
+<style is:global>
+  #snowfall-toggle {
+    strawberry-icon,
+    snow-icon {
+      display: inline-flex;
+    }
+
+    snow-icon {
+      display: none;
+    }
+
+    svg {
+      fill: currentColor;
+    }
+  }
+
+  :root[data-snowfall-mode="latte"] #snowfall-toggle {
+    strawberry-icon {
+      display: none;
+    }
+
+    snow-icon {
+      display: inline-flex;
+
+      svg {
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+      }
+    }
+  }
+</style>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>("#snowfall-toggle")
+
+  const updateButton = (mode: "snow" | "latte") => {
+    if (!button) return
+    const latte = mode === "latte"
+    button.ariaPressed = String(latte)
+    button.ariaLabel = latte
+      ? "Switch to snow mode"
+      : "Switch to strawberry latte mode"
+    button.title = latte ? "Snow mode" : "Strawberry latte mode"
+  }
+
+  const currentMode =
+    document.documentElement.dataset.snowfallMode === "latte" ? "latte" : "snow"
+  updateButton(currentMode)
+
+  if (button) {
+    button.onclick = () => {
+      const root = document.documentElement
+      const mode = root.dataset.snowfallMode === "latte" ? "snow" : "latte"
+      root.dataset.snowfallMode = mode
+      localStorage.snowfallMode = mode
+      updateButton(mode)
+    }
+  }
+</script>

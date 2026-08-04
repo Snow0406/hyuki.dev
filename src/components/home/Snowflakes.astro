@@ -1,0 +1,81 @@
+<div class="snowflakes" aria-hidden="true">
+  {Array.from({ length: 6 }, (_, index) => (
+      <svg
+        class:list={{ strawberry: index === 1 || index === 4 }}
+        viewBox="0 0 24 24"
+      >
+        <path d="M12 2v20M4.2 6.5l15.6 11M4.2 17.5l15.6-11M9 3.7 12 6l3-2.3M9 20.3l3-2.3 3 2.3M3.8 9.5 7.2 9l.5-3.4M20.2 14.5l-3.4.5-.5 3.4M3.8 14.5l3.4.5.5 3.4M20.2 9.5l-3.4-.5-.5-3.4" />
+      </svg>
+    ))}
+</div>
+
+<style>
+  .snowflakes {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  svg {
+    position: absolute;
+    inline-size: 1.1rem;
+    fill: none;
+    stroke: var(--snowflake);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.6;
+    opacity: 0.16;
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s ease;
+
+    &:nth-child(1) {
+      inset: 14% auto auto 10%;
+    }
+
+    &:nth-child(2) {
+      inset: 9% 17% auto auto;
+      inline-size: 0.9rem;
+    }
+
+    &:nth-child(3) {
+      inset: auto auto 18% 22%;
+      inline-size: 0.95rem;
+    }
+
+    &:nth-child(4) {
+      inset: 48% 8% auto auto;
+      inline-size: 0.75rem;
+    }
+
+    &:nth-child(5) {
+      inset: auto 28% 8% auto;
+      inline-size: 0.8rem;
+    }
+
+    &:nth-child(6) {
+      inset: 42% auto auto 46%;
+      inline-size: 0.7rem;
+    }
+  }
+
+  svg.strawberry {
+    stroke: var(--strawberry);
+  }
+
+  :global(.bento-card:hover) svg {
+    opacity: 0.55;
+    transform: translateY(0.15rem) rotate(45deg);
+  }
+
+  :global(.bento-card:hover) svg:nth-child(even) {
+    transform: translateY(-0.1rem) rotate(-45deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    svg {
+      transition: none;
+    }
+  }
+</style>

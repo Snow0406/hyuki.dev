@@ -1,0 +1,214 @@
+---
+import ExternalIcon from "@/assets/icons/external.svg"
+import MetaPage from "@/components/MetaPage.astro"
+import ScrollToTop from "@/components/ScrollToTop.astro"
+import TableOfContents from "@/components/TableOfContents.astro"
+import Layout from "@/layouts/Layout.astro"
+import { formatDate } from "@/lib/utils"
+import { Image } from "astro:assets"
+import { getCollection, render, type CollectionEntry } from "astro:content"
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects")
+
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project },
+  }))
+}
+
+type Props = { project: CollectionEntry<"projects"> }
+
+const { project } = Astro.props
+const { Content, headings } = await render(project)
+const { name, description, image, startDate, endDate, tags, links } =
+  project.data
+const tocHeadings = headings.filter(
+  ({ depth, text }) => depth >= 2 && depth <= 4 && text.trim(),
+)
+const crumbs = [
+  { label: "Project", href: "/project" },
+  { label: name, href: `/project/${project.id}` },
+]
+---
+
+<Layout crumbs={crumbs}>
+  <MetaPage slot="head" title={name} description={description} image={image} />
+  {tocHeadings.length > 0 && (
+      <TableOfContents
+        slot="toc"
+        title={name}
+        sections={[{ label: name, headings: tocHeadings }]}
+      />
+    )}
+  <ScrollToTop floating />
+
+  <article>
+    <header class="project-header">
+      <h1>{name}</h1>
+      <p>{description}</p>
+      {links && links.length > 0 && (
+          <project-actions>
+            {links.map(({ label, url }) => (
+              <a href={url} target="_blank" rel="noreferrer">
+                {label}
+                <ExternalIcon aria-hidden="true" />
+              </a>
+            ))}
+          </project-actions>
+        )}
+    </header>
+
+    {image && (
+        <project-banner>
+          <Image
+            src={image}
+            alt={name}
+            width={1200}
+            height={630}
+            priority
+          />
+        </project-banner>
+      )}
+
+    {(startDate || (tags && tags.length > 0)) && (
+        <dl class="project-facts">
+          {startDate && (
+            <div>
+              <dt>Timeline</dt>
+              <dd>
+                <time datetime={startDate.toISOString()}>
+                  {formatDate(startDate)}
+                </time>
+                <span aria-hidden="true"> → </span>
+                {endDate ? (
+                  <time datetime={endDate.toISOString()}>
+                    {formatDate(endDate)}
+                  </time>
+                ) : (
+                  "Present"
+                )}
+              </dd>
+            </div>
+          )}
+          {tags && tags.length > 0 && (
+            <div>
+              <dt>Stack</dt>
+              <dd class="project-stack">
+                {tags.map((tag) => <a href={`/tags/${tag}`}>{tag}</a>)}
+              </dd>
+            </div>
+          )}
+        </dl>
+      )}
+
+    <prose-content>
+      <Content />
+    </prose-content>
+  </article>
+</Layout>
+
+<style>
+  .project-header {
+    margin-block-end: var(--space-l);
+
+    h1 {
+      font-size: var(--step-3);
+      line-height: calc(var(--leading-offset) + 1em);
+      font-weight: var(--font-weight-medium);
+    }
+
+    > p {
+      max-inline-size: 42rem;
+      margin-block-start: var(--space-xs);
+      font-size: var(--step-1);
+      color: var(--muted-foreground);
+    }
+  }
+
+  project-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-block-start: var(--space-s);
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2xs);
+      padding-block: var(--space-2xs);
+      padding-inline: var(--space-xs);
+      color: var(--foreground);
+      background-color: color-mix(in oklab, var(--muted) 50%, transparent);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      text-decoration: none;
+
+      &:hover {
+        background-color: var(--muted);
+      }
+
+      :global(svg) {
+        inline-size: 1em;
+        block-size: 1em;
+      }
+    }
+  }
+
+  project-banner {
+    display: block;
+    margin-block-end: var(--space-m);
+
+    :global(img) {
+      inline-size: 100%;
+      block-size: auto;
+      border-radius: var(--radius-xl);
+    }
+  }
+
+  .project-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-s);
+    margin-block-end: var(--space-l);
+    padding-block: var(--space-s);
+    border-block: 1px solid var(--border);
+
+    dt {
+      margin-block-end: var(--space-3xs);
+      font-size: var(--step--1);
+      color: var(--muted-foreground);
+    }
+
+    dd {
+      font-size: var(--step--1);
+    }
+
+    .project-stack {
+      display: flex;
+      flex-wrap: wrap;
+
+      a {
+        color: inherit;
+        text-decoration-line: none;
+
+        &:hover {
+          color: var(--foreground);
+          text-decoration-line: underline;
+        }
+      }
+
+      a:not(:last-child)::after {
+        content: "·";
+        display: inline-block;
+        margin-inline: var(--space-3xs);
+        color: var(--muted-foreground);
+        text-decoration-line: none;
+      }
+    }
+
+    @media (width < 40rem) {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,55 @@
+---
+import ArrowLeft from "@/assets/icons/arrow-left.svg"
+import ArrowRight from "@/assets/icons/arrow-right.svg"
+import ScrollToTop from "@/components/ScrollToTop.astro"
+import type { CollectionEntry } from "astro:content"
+
+type Post = CollectionEntry<"blog">
+type Props = { prev?: Post; next?: Post }
+
+const { prev, next } = Astro.props
+---
+
+<post-actions>
+  <a
+    href={prev && `/blog/${prev.id}`}
+    data-icon-button
+    data-dir="prev"
+    aria-label={prev && `Previous post: ${prev.data.title}`}
+    aria-hidden={!prev || undefined}
+    title={prev?.data.title}
+  >
+    <ArrowLeft />
+  </a>
+  <a
+    href={next && `/blog/${next.id}`}
+    data-icon-button
+    data-dir="next"
+    aria-label={next && `Next post: ${next.data.title}`}
+    aria-hidden={!next || undefined}
+    title={next?.data.title}
+  >
+    <ArrowRight />
+  </a>
+  <ScrollToTop />
+</post-actions>
+
+<style>
+  post-actions {
+    display: contents;
+
+    @media (width < 64rem) {
+      display: none;
+    }
+  }
+
+  a {
+    color: var(--foreground);
+
+    &:not([href]) {
+      color: var(--muted-foreground);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+</style>

@@ -1,0 +1,265 @@
+<latest-optimization>
+  <header>Latest Optimization</header>
+
+  <div class="result">
+    <span>Factory System</span>
+    <div>
+      <strong>8.25×</strong>
+      <small>Faster</small>
+    </div>
+  </div>
+
+  <div
+    class="comparison"
+    role="img"
+    aria-label="Factory system reduced from 330 milliseconds to 40 milliseconds"
+  >
+    <div class="comparison-row">
+      <span>Prev</span>
+      <b>330 ms</b>
+      <i><em class="previous" /></i>
+    </div>
+    <div class="comparison-row">
+      <span>Now</span>
+      <b>40 ms</b>
+      <i><em class="current" /></i>
+    </div>
+  </div>
+
+  <p class="change change-summary">
+    <b>+</b><span>Array Sim · View LOD · Events</span>
+  </p>
+
+  <ul class="change-details" aria-label="Optimization changes">
+    <li><b class="removed">−</b><span>Logic in MonoBehaviour Views</span></li>
+    <li><b>+</b><span>MonoBehaviour as View / Adapter</span></li>
+    <li><b>+</b><span>Array Sim · View LOD · Events</span></li>
+  </ul>
+
+  <footer>
+    <span>Crimson Pandemic</span>
+    <a href="/blog/cp-facility-optimization">Details ↗</a>
+  </footer>
+</latest-optimization>
+
+<style>
+  latest-optimization {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: flex;
+    min-block-size: 0;
+    flex-direction: column;
+    padding: clamp(1rem, 6cqw, 1.25rem);
+  }
+
+  header,
+  footer {
+    color: var(--muted-foreground);
+    font-size: clamp(0.625rem, 4cqw, 0.6875rem);
+    font-weight: var(--font-weight-medium);
+  }
+
+  header {
+    font-family: var(--font-mono);
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+
+  .result {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-s);
+  }
+
+  .result > span {
+    color: var(--muted-foreground);
+    font-family: var(--font-mono);
+    font-size: clamp(0.625rem, 4cqw, 0.6875rem);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+  }
+
+  .result > div {
+    display: flex;
+    align-items: end;
+    gap: var(--space-3xs);
+  }
+
+  .result strong {
+    font-size: clamp(1.5rem, 10cqw, 2rem);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .result small {
+    margin-block-end: 0.1rem;
+    color: var(--strawberry);
+    font-family: var(--font-mono);
+    font-size: clamp(0.625rem, 4cqw, 0.6875rem);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+  }
+
+  .comparison {
+    display: grid;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-s);
+    font-family: var(--font-mono);
+    font-size: clamp(0.625rem, 4cqw, 0.6875rem);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .comparison-row {
+    display: grid;
+    grid-template-columns: 1.75rem 2.75rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+
+  .comparison-row > span {
+    color: var(--muted-foreground);
+  }
+
+  .comparison-row > b {
+    font-weight: var(--font-weight-medium);
+    text-align: end;
+  }
+
+  .comparison-row > i {
+    display: block;
+    block-size: 0.4375rem;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background-color: color-mix(
+      in oklab,
+      var(--muted-foreground) 18%,
+      transparent
+    );
+  }
+
+  .comparison-row em {
+    display: block;
+    block-size: 100%;
+    border-radius: inherit;
+  }
+
+  .comparison-row .previous {
+    inline-size: 100%;
+    background-color: var(--muted-foreground);
+  }
+
+  .comparison-row .current {
+    min-inline-size: 0.5rem;
+    inline-size: 12.12%;
+    background-color: var(--strawberry);
+  }
+
+  .change {
+    display: none;
+    grid-template-columns: 1rem minmax(0, 1fr);
+    gap: var(--space-3xs);
+    margin: var(--space-s) 0 var(--space-xs);
+    color: color-mix(in oklab, var(--foreground) 78%, var(--primary));
+    font-family: var(--font-mono);
+    font-size: clamp(0.625rem, 4cqw, 0.6875rem);
+  }
+
+  .change b {
+    color: var(--primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .change-details {
+    display: grid;
+    gap: var(--space-3xs);
+    margin: var(--space-s) 0 var(--space-xs);
+    padding: 0;
+    color: color-mix(in oklab, var(--foreground) 78%, var(--primary));
+    font-family: var(--font-mono);
+    font-size: clamp(0.625rem, 4cqw, 0.6875rem);
+    list-style: none;
+  }
+
+  .change-details li {
+    display: grid;
+    grid-template-columns: 1rem minmax(0, 1fr);
+    gap: var(--space-3xs);
+  }
+
+  .change-details b {
+    color: var(--primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .change-details .removed {
+    color: var(--strawberry);
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2xs);
+    margin-block-start: auto;
+    padding-block-start: var(--space-2xs);
+    border-block-start: 1px solid
+      color-mix(in oklab, var(--muted-foreground) 18%, transparent);
+  }
+
+  footer a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  footer a:hover,
+  footer a:focus-visible {
+    color: var(--primary);
+  }
+
+  @container (inline-size < 16rem) {
+    latest-optimization {
+      padding: 1rem 0.75rem 0.75rem;
+    }
+
+    .result {
+      margin-block-start: 0.625rem;
+    }
+
+    .comparison {
+      gap: 0.5rem;
+    }
+
+    .change {
+      margin-block: 0.625rem 0 0.5rem;
+    }
+
+    .change-details {
+      margin-block: 0.625rem 0 0.5rem;
+    }
+
+    footer {
+      padding-block-start: 0.375rem;
+    }
+  }
+
+  @media (width >= 80rem) {
+    .change-summary {
+      display: grid;
+    }
+
+    .change-details {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    footer a {
+      transition: none;
+    }
+  }
+</style>

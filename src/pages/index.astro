@@ -1,228 +1,340 @@
 ---
-import DiscordPresence from '@/components/bento/DiscordPresence'
-import WakatimeCalendar from '@/components/bento/WakatimeCalendar'
-import WakatimeGraph from '@/components/bento/WakatimeGraph'
-import Link from '@/components/link.astro'
-import PageHead from '@/components/page-head.astro'
-import Layout from '@/layouts/layout.astro'
-import { getRecentPosts } from '@/lib/data-utils'
-import { Icon } from 'astro-icon/components'
+import MetaPage from "@/components/MetaPage.astro"
+import DiscordPresence from "@/components/home/DiscordPresence.astro"
+import LatestOptimization from "@/components/home/LatestOptimization.astro"
+import Snowflakes from "@/components/home/Snowflakes.astro"
+import WakatimeCalendar from "@/components/home/WakatimeCalendar.astro"
+import WakatimeGraph from "@/components/home/WakatimeGraph.astro"
+import Layout from "@/layouts/Layout.astro"
+import { getPosts } from "@/lib/content"
+import { Image } from "astro:assets"
 
-const latestPost = await getRecentPosts(1)
+const latestPost = (await getPosts()).at(0)
 ---
 
-<Layout>
-  <PageHead slot="head" title="Home" />
-  <section
-    class="*:bg-secondary/25 mx-auto grid max-w-[375px] grid-cols-2 gap-4 px-4 [grid-template-areas:'a_a'_'a_a'_'b_b'_'f_f'_'e_e'] *:rounded-3xl *:bg-cover *:bg-center *:bg-no-repeat sm:max-w-screen-sm sm:[grid-template-areas:'a_a'_'b_f'_'e_e'] xl:max-w-screen-md xl:grid-cols-3 xl:[grid-template-areas:'a_a_b'_'f_d_d'_'e_e_e']"
-  >
-    <div
-      class="first group snow-border relative overflow-hidden rounded-3xl border bg-cover bg-center bg-no-repeat [grid-area:a] sm:aspect-[2.7/1] xl:aspect-auto"
-    >
-      <div class="snowflake-container pointer-events-none absolute inset-0">
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-12 left-10 opacity-20 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-45 group-hover:opacity-70"
-          size={22}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute top-8 right-30 opacity-20 transition-all duration-600 ease-in-out group-hover:translate-y-3 group-hover:rotate-90 group-hover:opacity-50"
-          size={19}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute bottom-14 left-20 opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-5px] group-hover:rotate-180 group-hover:opacity-50"
-          size={18}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute bottom-28 left-40 opacity-15 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-[-45deg] group-hover:opacity-40"
-          size={15}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-32 right-16 opacity-15 transition-all duration-650 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-55"
-          size={14}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute right-40 bottom-6 opacity-30 transition-all duration-500 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-45 group-hover:opacity-50"
-          size={15}
-        />
-      </div>
-      <div class="relative flex flex-col space-y-1.5 p-6">
-        <h3 class="text-3xl leading-none font-semibold">Hey, I'm Hy !</h3>
-      </div>
-      <div class="text-muted-foreground relative p-6 pt-0 text-sm">
-        <p class="mb-2">
-          I'm a developer and student at Incheon National University from Korea,
-          active online as hy and snow.
-        </p>
-        <p class="mb-2">
-          I'm interested in Unity game development and optimization (Job System/Burst)
-        </p>
-        <p class="mb-2">I adore subculture games and strawberry lattes ✨</p>
-      </div>
-    </div>
-
-    <div
-      class="group snow-border relative hidden items-start overflow-hidden rounded-3xl border p-4 [grid-area:d] xl:flex xl:aspect-auto"
-    >
-      <div class="snowflake-container pointer-events-none absolute inset-0">
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-2 right-5 opacity-20 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-45 group-hover:opacity-70"
-          size={16}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute right-10 bottom-12 opacity-10 transition-all duration-600 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-90 group-hover:opacity-60"
-          size={14}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute top-10 left-8 opacity-18 transition-all duration-750 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-65"
-          size={15}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute bottom-4 left-14 opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-30deg] group-hover:opacity-55"
-          size={12}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute top-[40%] right-[20%] opacity-12 transition-all duration-850 ease-in-out group-hover:translate-y-3 group-hover:rotate-[120deg] group-hover:opacity-50"
-          size={13}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-[30%] left-[15%] opacity-14 transition-all duration-650 ease-in-out group-hover:translate-y-[-1px] group-hover:rotate-[45deg] group-hover:opacity-60"
-          size={11}
-        />
-      </div>
-      {
-        latestPost && (
-          <div class="border-border relative aspect-[477/251] w-[85%] overflow-hidden rounded-2xl border">
-            <img
-              src={latestPost[0].data.image?.src ?? '#'}
-              alt={latestPost[0].data.title}
-              width={477}
-              height={251}
-              class="h-full w-full object-cover"
-              loading="lazy"
-            />
+<Layout wide>
+  <MetaPage slot="head" />
+  <home-container>
+    <home-bento>
+      <article class="bento-card intro-card" style="grid-area: a">
+        <Snowflakes />
+        <div class="intro-content">
+          <h1>Hello, I&rsquo;m Hy !</h1>
+          <div>
+            <p>
+              I&rsquo;m a developer and student at University from Korea, active
+              online as hy and snow.
+            </p>
+            <p>
+              I&rsquo;m interested in Unity game development and optimization
+            </p>
+            <p>I adore subculture games and strawberry lattes ✨</p>
           </div>
-          <Link
-              href={`/blog/${latestPost[0].id}`}
-              aria-label={`Read blog post: ${latestPost[0].data.title}`}
-              title={`Read blog post: ${latestPost[0].data.title}`}
+        </div>
+      </article>
+
+      <article
+        class="bento-card discord-card"
+        style="grid-area: b"
+        aria-label="Discord status preview"
+      >
+        <Snowflakes />
+        <DiscordPresence />
+      </article>
+
+      <article class="bento-card latest-card" style="grid-area: d">
+        <Snowflakes />
+        {latestPost ? (
+          <>
+            <div class="latest-image">
+              {latestPost.data.image ? (
+                  <Image
+                    src={latestPost.data.image}
+                    alt={latestPost.data.title}
+                    width={640}
+                    height={336}
+                  />
+                ) : (
+                  <div class="latest-placeholder" aria-hidden="true">
+                    <span>Latest post</span>
+                  </div>
+                )}
+            </div>
+            <a
+              class="card-action"
+              href={`/blog/${latestPost.id}`}
+              title={`Read blog post: ${latestPost.data.title}`}
+              aria-label={`Read blog post: ${latestPost.data.title}`}
             >
-              <div class="bg-secondary/50 text-primary hover:ring-primary absolute right-0 bottom-0 m-3 flex w-fit items-end rounded-full border p-3 transition-all duration-300 hover:ring-1">
-                <Icon name="lucide:move-up-right" size={16} />
-              </div>
-            </Link>
-        )
-      }
-    </div>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 17 17 7M7 7h10v10" />
+              </svg>
+            </a>
+          </>
+        ) : (
+          <p class="empty-state">The latest post will appear here.</p>
+        )}
+      </article>
 
-    <div
-      class="group snow-border relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl border [grid-area:e] sm:aspect-[2.1/1]"
-    >
-      <div class="snowflake-container pointer-events-none absolute inset-0">
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-5 left-[15%] opacity-15 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-90 group-hover:opacity-60"
-          size={20}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute right-[20%] bottom-5 opacity-10 transition-all duration-600 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-45 group-hover:opacity-50"
-          size={16}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute top-3 right-[15%] opacity-20 transition-all duration-750 ease-in-out group-hover:translate-y-2 group-hover:rotate-[30deg] group-hover:opacity-65"
-          size={14}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute bottom-10 left-[25%] opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-90deg] group-hover:opacity-55"
-          size={18}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute top-[40%] left-[10%] opacity-18 transition-all duration-650 ease-in-out group-hover:translate-y-1 group-hover:rotate-[60deg] group-hover:opacity-60"
-          size={12}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-[30%] right-[10%] opacity-12 transition-all duration-700 ease-in-out group-hover:translate-y-[-1px] group-hover:rotate-[120deg] group-hover:opacity-45"
-          size={13}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute right-[25%] bottom-[30%] opacity-18 transition-all duration-600 ease-in-out group-hover:translate-y-3 group-hover:rotate-[-30deg] group-hover:opacity-55"
-          size={11}
-        />
-      </div>
-      <WakatimeCalendar client:load />
-    </div>
+      <article
+        class="bento-card calendar-card"
+        style="grid-area: e"
+        aria-label="WakaTime calendar preview"
+      >
+        <Snowflakes />
+        <WakatimeCalendar />
+      </article>
 
-    <div
-      class="group snow-border relative overflow-hidden rounded-3xl border [grid-area:b] sm:aspect-square"
-    >
-      <div class="snowflake-container pointer-events-none absolute inset-0">
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-2 right-4 opacity-20 transition-all duration-600 ease-in-out group-hover:translate-y-1 group-hover:rotate-45 group-hover:opacity-70"
-          size={15}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute top-8 right-12 opacity-20 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-[60deg] group-hover:opacity-65"
-          size={12}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-4 left-10 opacity-15 transition-all duration-800 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-45deg] group-hover:opacity-55"
-          size={17}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute top-2 left-3 opacity-18 transition-all duration-650 ease-in-out group-hover:translate-y-1 group-hover:rotate-[30deg] group-hover:opacity-60"
-          size={13}
-        />
-      </div>
-      <DiscordPresence client:load />
-    </div>
+      <article
+        class="bento-card language-card"
+        style="grid-area: f"
+        aria-label="WakaTime language preview"
+      >
+        <Snowflakes />
+        <WakatimeGraph />
+      </article>
 
-    <div
-      class="group snow-border relative aspect-square rounded-3xl border [grid-area:f]"
-    >
-      <div class="snowflake-container pointer-events-none absolute inset-0">
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-3 left-3 opacity-20 transition-all duration-700 ease-in-out group-hover:translate-y-2 group-hover:rotate-[135deg] group-hover:opacity-70"
-          size={16}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute right-3 bottom-3 opacity-15 transition-all duration-600 ease-in-out group-hover:translate-y-[-2px] group-hover:rotate-[-45deg] group-hover:opacity-60"
-          size={14}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-strawberry absolute right-14 bottom-14 opacity-10 transition-all duration-800 ease-in-out group-hover:translate-y-[-3px] group-hover:rotate-[60deg] group-hover:opacity-50"
-          size={12}
-        />
-        <Icon
-          name="lucide:snowflake"
-          class="snowflake-icon absolute top-12 right-5 opacity-10 transition-all duration-750 ease-in-out group-hover:translate-y-2 group-hover:rotate-[30deg] group-hover:opacity-40"
-          size={10}
-        />
-      </div>
-      <WakatimeGraph client:load />
-    </div>
-  </section>
+      <article
+        class="bento-card optimization-card"
+        style="grid-area: g"
+        aria-label="Latest game optimization"
+      >
+        <Snowflakes />
+        <LatestOptimization />
+      </article>
+    </home-bento>
+  </home-container>
 </Layout>
+
+<style>
+  home-container {
+    container-type: inline-size;
+    display: block;
+    inline-size: 100%;
+    max-inline-size: 23.4375rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  home-bento {
+    --bento-gap: 1rem;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "a" "b" "f" "g" "e";
+    gap: var(--bento-gap);
+    inline-size: 100%;
+  }
+
+  .bento-card {
+    position: relative;
+    min-inline-size: 0;
+    overflow: hidden;
+    border: 2px solid rgba(180, 220, 255, 0.5);
+    border-radius: var(--radius-3xl);
+    background-color: color-mix(in oklab, var(--secondary) 25%, transparent);
+    box-shadow:
+      0 0 15px 3px rgba(100, 180, 255, 0.25),
+      0 0 25px 5px rgba(130, 200, 255, 0.15) inset;
+  }
+
+  :global(:root[data-theme="dark"]) .bento-card {
+    border-color: rgba(180, 220, 255, 0.3);
+    box-shadow:
+      0 0 12px 2px rgba(120, 200, 255, 0.15),
+      0 0 20px 4px rgba(150, 220, 255, 0.08) inset;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme="light"])) .bento-card {
+      border-color: rgba(180, 220, 255, 0.3);
+      box-shadow:
+        0 0 12px 2px rgba(120, 200, 255, 0.15),
+        0 0 20px 4px rgba(150, 220, 255, 0.08) inset;
+    }
+  }
+
+  .intro-card {
+    min-block-size: 17rem;
+  }
+
+  .intro-content {
+    position: relative;
+    z-index: 1;
+    padding: var(--space-m);
+
+    h1 {
+      margin: 0 0 var(--space-m);
+      font-size: var(--step-3);
+      line-height: 1;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted-foreground);
+      font-size: var(--step--1);
+      line-height: 1.5;
+      text-wrap: pretty;
+    }
+
+    p + p {
+      margin-block-start: var(--space-2xs);
+    }
+  }
+
+  .discord-card,
+  .language-card,
+  .calendar-card,
+  .optimization-card {
+    aspect-ratio: 1;
+  }
+
+  .calendar-card {
+    display: block;
+  }
+
+  .optimization-card {
+    container-type: size;
+  }
+
+  .latest-card {
+    display: none;
+  }
+
+  .latest-image {
+    position: relative;
+    flex: none;
+    inline-size: 85%;
+    aspect-ratio: 477 / 251;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+
+    :global(img),
+    .latest-placeholder {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .latest-placeholder {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--muted), var(--secondary));
+    color: var(--muted-foreground);
+  }
+
+  .card-action {
+    position: absolute;
+    z-index: 2;
+    inset: auto var(--space-xs) var(--space-xs) auto;
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    aspect-ratio: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background-color: color-mix(in oklab, var(--secondary) 55%, transparent);
+    color: var(--primary);
+    transition: box-shadow 0.3s ease;
+
+    &:hover,
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--ring);
+    }
+
+    svg {
+      inline-size: 1rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover svg {
+      transform: rotate(12deg);
+    }
+  }
+
+  .empty-state {
+    position: relative;
+    z-index: 1;
+    padding: var(--space-m);
+    color: var(--muted-foreground);
+  }
+
+  .language-card {
+    container-type: size;
+  }
+
+  @media (width >= 40rem) {
+    home-container {
+      max-inline-size: 40rem;
+    }
+
+    home-bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas: "a a" "b f" "e e";
+    }
+
+    .intro-card {
+      min-block-size: auto;
+      aspect-ratio: 2.7 / 1;
+    }
+
+    .intro-content {
+      position: absolute;
+      inset: 0;
+    }
+
+    .calendar-card {
+      display: block;
+      aspect-ratio: 2.1 / 1;
+    }
+
+    .optimization-card {
+      display: none;
+    }
+  }
+
+  @media (width >= 80rem) {
+    home-container {
+      max-inline-size: 48rem;
+    }
+
+    home-bento {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-areas: "a a b" "f d d" "e e g";
+    }
+
+    .intro-card {
+      aspect-ratio: auto;
+    }
+
+    .latest-card {
+      display: flex;
+      align-items: flex-start;
+      padding: 1rem;
+    }
+
+    .calendar-card {
+      aspect-ratio: auto;
+    }
+
+    .optimization-card {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-action,
+    .card-action svg {
+      transition: none;
+    }
+  }
+</style>

@@ -1,3 +1,0 @@
-# MDX 파일들은 prettier 포맷팅 제외
-*.mdx
-src/content/**/*.mdx 

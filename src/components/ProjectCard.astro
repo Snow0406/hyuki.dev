@@ -1,0 +1,127 @@
+---
+import { formatDate } from "@/lib/utils"
+import { Image } from "astro:assets"
+import type { CollectionEntry } from "astro:content"
+
+type Props = {
+  project: CollectionEntry<"projects">
+  description?: string
+}
+
+const { project, description: descriptionOverride } = Astro.props
+const { name, description, tags, image, startDate, endDate } = project.data
+const href = `/project/${project.id}`
+---
+
+<li>
+  {image && (
+      <a
+        href={href}
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <Image src={image} alt="" width={640} height={336} />
+      </a>
+    )}
+  <entry-info>
+    <a href={href}>{name}</a>
+    <entry-meta>
+      {startDate && (
+          <project-dates>
+            <time datetime={startDate.toISOString()}>
+              {formatDate(startDate)}
+            </time>
+            {" → "}
+            {endDate ? (
+              <time datetime={endDate.toISOString()}>
+                {formatDate(endDate)}
+              </time>
+            ) : (
+              "Present"
+            )}
+          </project-dates>
+        )}
+    </entry-meta>
+    <p>{descriptionOverride ?? description}</p>
+    {tags && tags.length > 0 && (
+        <project-tags>
+          {tags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </project-tags>
+      )}
+  </entry-info>
+</li>
+
+<style>
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-s);
+
+    > a {
+      flex-shrink: 0;
+      inline-size: 14rem;
+
+      :global(img) {
+        inline-size: 100%;
+        block-size: auto;
+      }
+    }
+
+    entry-info {
+      display: flex;
+      flex-direction: column;
+
+      > a {
+        font-size: var(--step-1);
+        line-height: calc(var(--leading-offset) + 1em);
+        font-weight: var(--font-weight-medium);
+      }
+
+      entry-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3xs);
+        margin-block-end: var(--space-3xs);
+        font-size: var(--step--1);
+        color: var(--muted-foreground);
+
+        project-dates {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3xs);
+        }
+      }
+
+      p {
+        color: var(--muted-foreground);
+      }
+
+      project-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3xs);
+        margin-block-start: var(--space-2xs);
+        font-size: var(--step--1);
+
+        span {
+          padding-inline: var(--space-2xs);
+          color: var(--muted-foreground);
+          background-color: color-mix(in oklab, var(--muted) 50%, transparent);
+          border-radius: var(--radius-full);
+        }
+      }
+    }
+
+    @media (width < 40rem) {
+      flex-direction: column;
+
+      > a {
+        inline-size: 100%;
+        max-inline-size: 32rem;
+      }
+    }
+  }
+</style>

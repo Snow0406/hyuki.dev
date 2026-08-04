@@ -1,0 +1,171 @@
+---
+const snowflakes = Array.from({ length: 18 }, (_, index) => ({
+  left: (index * 37 + 11) % 100,
+  size: 3 + ((index * 7) % 5),
+  opacity: 0.08 + ((index * 13) % 18) / 100,
+  duration: 16 + ((index * 11) % 15),
+  delay: -((index * 17) % 29),
+  strawberry: index % 5 === 1,
+}))
+
+const latteParticles = Array.from({ length: 12 }, (_, index) => ({
+  left: (index * 43 + 7) % 100,
+  size: 14 + ((index * 5) % 7),
+  opacity: 0.38 + ((index * 11) % 18) / 100,
+  duration: 18 + ((index * 7) % 13),
+  delay: -((index * 19) % 31),
+  kind: index % 4 === 0 ? "cup" : "strawberry",
+}))
+---
+
+<div class="snowfall" aria-hidden="true">
+  {snowflakes.map((flake) => (
+      <i
+        class:list={{ snow: true, strawberry: flake.strawberry }}
+        style={`--left:${flake.left}%;--size:${flake.size}px;--opacity:${flake.opacity};--duration:${flake.duration}s;--delay:${flake.delay}s`}
+      />
+    ))}
+  {latteParticles.map((particle) => (
+      <i
+        class:list={["latte-particle", particle.kind]}
+        style={`--left:${particle.left}%;--size:${particle.size}px;--opacity:${particle.opacity};--duration:${particle.duration}s;--delay:${particle.delay}s`}
+      >
+        {particle.kind === "strawberry" ? (
+          <svg viewBox="0 0 24 24">
+            <path class="berry" d="M5.5 9.3C6.2 6.4 9 5.7 12 7c3-1.3 5.8-.6 6.5 2.3.9 4-3.2 9.3-6.5 11.2C8.7 18.6 4.6 13.3 5.5 9.3Z" />
+            <path class="leaves" d="m8 7-1.3-3L11 5l1-3 1.2 3 4.1-1L16 7" />
+            <path class="seeds" d="M9 11h.01M14.5 10.5h.01M11.5 15h.01M15 14.5h.01" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24">
+            <path class="straw" d="m15 7 2-5" />
+            <path class="lid" d="M5 7h14" />
+            <path class="cup" d="m6 7 1.2 14h9.6L18 7Z" />
+            <path class="drink" d="m7 13 .7 8h8.6l.7-8Z" />
+          </svg>
+        )}
+      </i>
+    ))}
+</div>
+
+<style>
+  .snowfall {
+    position: fixed;
+    z-index: 1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  i {
+    position: absolute;
+    inset-block-start: -0.75rem;
+    inset-inline-start: var(--left);
+    inline-size: var(--size);
+    block-size: var(--size);
+    opacity: 0;
+    animation: snowfall var(--duration) linear var(--delay) infinite;
+    will-change: transform, opacity;
+  }
+
+  i.snow {
+    border-radius: 50%;
+    background: var(--snowflake);
+    filter: blur(0.5px) drop-shadow(0 0 1px var(--snowflake));
+  }
+
+  i.snow.strawberry {
+    background: var(--strawberry);
+    filter: blur(0.5px) drop-shadow(0 0 1px var(--strawberry));
+  }
+
+  .latte-particle {
+    display: none;
+
+    svg {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      overflow: visible;
+      filter: drop-shadow(
+        0 0 1px color-mix(in oklab, var(--strawberry) 45%, transparent)
+      );
+    }
+
+    .berry {
+      fill: var(--strawberry);
+    }
+
+    .leaves {
+      fill: oklch(0.7 0.14 145);
+      stroke: oklch(0.55 0.12 145);
+      stroke-linejoin: round;
+      stroke-width: 1;
+    }
+
+    .seeds {
+      fill: none;
+      stroke: color-mix(in oklab, white 75%, var(--strawberry));
+      stroke-linecap: round;
+      stroke-width: 1.6;
+    }
+
+    .cup {
+      fill: color-mix(in oklab, var(--background) 80%, white);
+      stroke: color-mix(in oklab, var(--foreground) 45%, transparent);
+      stroke-linejoin: round;
+      stroke-width: 1.25;
+    }
+
+    .drink {
+      fill: color-mix(in oklab, var(--strawberry) 65%, white);
+    }
+
+    .lid,
+    .straw {
+      fill: none;
+      stroke: color-mix(in oklab, var(--foreground) 55%, transparent);
+      stroke-linecap: round;
+      stroke-width: 1.5;
+    }
+  }
+
+  :global(:root[data-snowfall-mode="latte"]) {
+    .snowfall .snow {
+      display: none;
+    }
+
+    .snowfall .latte-particle {
+      display: block;
+    }
+  }
+
+  @keyframes snowfall {
+    0% {
+      transform: translate3d(0, -0.75rem, 0) rotate(0deg);
+      opacity: 0;
+    }
+
+    10%,
+    90% {
+      opacity: var(--opacity);
+    }
+
+    100% {
+      transform: translate3d(1.5rem, calc(100vh + 0.75rem), 0) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  @media (width < 48rem) {
+    i:nth-child(3n) {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .snowfall {
+      display: none;
+    }
+  }
+</style>

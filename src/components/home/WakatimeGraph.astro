@@ -1,0 +1,231 @@
+---
+const WAKATIME_URL = "/api/wakatime"
+const SKELETON_WIDTHS = [85, 73, 61, 49, 37, 25, 13]
+---
+
+<wakatime-graph data-url={WAKATIME_URL} aria-busy="true">
+  <div class="wakatime-rows" aria-hidden="true">
+    {SKELETON_WIDTHS.map((width) => (
+        <div class="wakatime-row wakatime-skeleton-row">
+          <span class="wakatime-skeleton-icon" />
+          <span class="wakatime-skeleton-bar" style={`--skeleton-width: ${width}%`} />
+        </div>
+      ))}
+  </div>
+</wakatime-graph>
+
+<script>
+  interface WakatimeLanguage {
+    name: string
+    hours: number
+    minutes: number
+    percent: number
+  }
+
+  interface WakatimeResponse {
+    data?: WakatimeLanguage[]
+  }
+
+  const languageLabels: Record<string, string> = {
+    "c#": "C#",
+    unity: "U",
+    markdown: "M",
+    typescript: "TS",
+    "c++": "C+",
+    astro: "A",
+    mdx: "MD",
+    c: "C",
+    css: "#",
+    lua: "Lua",
+    assembly: "A",
+  }
+
+  class WakatimeGraph extends HTMLElement {
+    connectedCallback() {
+      this.loadLanguages()
+    }
+
+    private async loadLanguages() {
+      const url = this.dataset.url
+      if (!url) return
+
+      const controller = new AbortController()
+      const timeout = window.setTimeout(() => controller.abort(), 8000)
+
+      try {
+        const response = await fetch(url, { signal: controller.signal })
+        if (!response.ok) throw new Error("WakaTime request failed")
+
+        const body = (await response.json()) as WakatimeResponse
+        const languages = body.data?.slice(0, 7) ?? []
+        if (languages.length === 0) throw new Error("No WakaTime data")
+
+        this.renderLanguages(languages)
+      } catch {
+        this.setAttribute("data-error", "")
+        this.setAttribute("aria-label", "WakaTime data unavailable")
+      } finally {
+        window.clearTimeout(timeout)
+        this.setAttribute("aria-busy", "false")
+      }
+    }
+
+    private renderLanguages(languages: WakatimeLanguage[]) {
+      const maxHours = Math.max(
+        ...languages.map(({ hours, minutes }) => hours + minutes / 60),
+        1,
+      )
+      const rows = document.createElement("div")
+      rows.className = "wakatime-rows"
+
+      for (const [index, language] of languages.entries()) {
+        const totalHours = language.hours + language.minutes / 60
+        const row = document.createElement("div")
+        row.className = "wakatime-row"
+
+        const icon = document.createElement("span")
+        icon.className = "wakatime-language-icon"
+        icon.title = language.name
+        icon.textContent =
+          languageLabels[language.name.toLowerCase()] ??
+          language.name.slice(0, 1)
+
+        const track = document.createElement("span")
+        track.className = "wakatime-track"
+
+        const bar = document.createElement("i")
+        bar.style.setProperty(
+          "--wakatime-width",
+          `${(totalHours / maxHours) * 100}%`,
+        )
+        bar.style.setProperty("--wakatime-color", `var(--chart-${index + 1})`)
+        track.append(bar)
+
+        const hours = document.createElement("strong")
+        hours.textContent = `${language.hours.toLocaleString()}h`
+
+        row.append(icon, track, hours)
+        rows.append(row)
+      }
+
+      this.replaceChildren(rows)
+    }
+  }
+
+  if (!customElements.get("wakatime-graph")) {
+    customElements.define("wakatime-graph", WakatimeGraph)
+  }
+</script>
+
+<style>
+  wakatime-graph {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: grid;
+    min-block-size: 0;
+    place-items: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  wakatime-graph :global(.wakatime-rows) {
+    display: flex;
+    inline-size: 100%;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(0.5rem, 4cqh, 0.9375rem);
+    padding: clamp(1.25rem, 10cqw, 2.5rem);
+  }
+
+  wakatime-graph :global(.wakatime-row) {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(0.75rem, 5cqw, 1.25rem);
+  }
+
+  wakatime-graph :global(.wakatime-row > strong) {
+    min-inline-size: 2.5rem;
+    color: var(--foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    text-align: start;
+  }
+
+  wakatime-graph :global(.wakatime-language-icon) {
+    display: grid;
+    place-items: center;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    color: var(--foreground);
+    font-size: 0.625rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  wakatime-graph :global(.wakatime-track) {
+    position: relative;
+    display: block;
+    block-size: 1.125rem;
+  }
+
+  wakatime-graph :global(.wakatime-track i) {
+    position: absolute;
+    inset: 0 auto 0 0;
+    inline-size: max(var(--wakatime-width), 0.35rem);
+    border-radius: var(--radius-md);
+    background-color: var(--wakatime-color);
+    opacity: 0.85;
+  }
+
+  wakatime-graph :global(.wakatime-skeleton-row) {
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+  }
+
+  wakatime-graph :global(.wakatime-skeleton-icon),
+  wakatime-graph :global(.wakatime-skeleton-bar) {
+    display: block;
+    block-size: 1.125rem;
+    border-radius: var(--radius-md);
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--muted) 72%, transparent) 25%,
+      color-mix(in oklab, var(--muted-foreground) 18%, transparent) 50%,
+      color-mix(in oklab, var(--muted) 72%, transparent) 75%
+    );
+    background-size: 200% 100%;
+    animation: wakatime-skeleton 1.4s ease-in-out infinite;
+  }
+
+  wakatime-graph :global(.wakatime-skeleton-icon) {
+    inline-size: 1.25rem;
+    border-radius: var(--radius-full);
+  }
+
+  wakatime-graph :global(.wakatime-skeleton-bar) {
+    inline-size: var(--skeleton-width);
+  }
+
+  @keyframes wakatime-skeleton {
+    from {
+      background-position: 100% 0;
+    }
+
+    to {
+      background-position: -100% 0;
+    }
+  }
+
+  wakatime-graph[data-error] :global(.wakatime-skeleton-icon),
+  wakatime-graph[data-error] :global(.wakatime-skeleton-bar) {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    wakatime-graph :global(.wakatime-skeleton-icon),
+    wakatime-graph :global(.wakatime-skeleton-bar) {
+      animation: none;
+    }
+  }
+</style>

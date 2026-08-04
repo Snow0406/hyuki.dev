@@ -1,34 +1,27 @@
-import type { IconMap, SocialLink, Site } from '@/types'
+import type { SvgComponent } from "astro/types"
+import Email from "@/assets/icons/email.svg"
+import GitHub from "@/assets/icons/github.svg"
+import RSS from "@/assets/icons/rss.svg"
+import Twitter from "@/assets/icons/twitter.svg"
 
-export const SITE: Site = {
-  title: 'hyuki.dev',
+export const SITE = {
+  title: "hy",
   description: "hy's Personal Blog",
-  href: 'https://hyuki.dev',
-  author: 'hy',
-  locale: 'ko_KR',
-  featuredPostCount: 1,
-  postsPerPage: 4,
-}
+  locale: "ko-KR",
+  dir: "ltr",
+  defaultPageImage: "/static/twitter-card.png",
+  defaultPostImage: "/static/twitter-card.png",
+} as const
 
-export const NAV_LINKS: SocialLink[] = [
-  { href: '/', label: 'home' },
-  { href: '/blog', label: 'blog' },
-  { href: '/project', label: 'project' },
-  { href: '/tags', label: 'tags' },
+export const NAVIGATION = [
+  { href: "/blog", label: "Blog" },
+  { href: "/project", label: "Project" },
+  { href: "/about", label: "About" },
 ]
 
-export const SOCIAL_LINKS: SocialLink[] = [
-  { href: 'https://github.com/snow0406', label: 'GitHub' },
-  { href: 'https://x.com/hyuki_dev', label: 'Twitter' },
-  { href: 'mailto:snow@hyuki.dev', label: 'Email' },
-  { href: '/rss.xml', label: 'RSS' },
+export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [
+  { href: "https://github.com/snow0406", label: "GitHub", icon: GitHub },
+  { href: "https://x.com/hyuki_dev", label: "Twitter", icon: Twitter },
+  { href: "mailto:snow@hyuki.dev", label: "Email", icon: Email },
+  { href: "/rss.xml", label: "RSS", icon: RSS },
 ]
-
-export const ICON_MAP: IconMap = {
-  Website: 'lucide:globe',
-  GitHub: 'lucide:github',
-  LinkedIn: 'lucide:linkedin',
-  Twitter: 'lucide:twitter',
-  Email: 'lucide:mail',
-  RSS: 'lucide:rss',
-}
