@@ -23,10 +23,11 @@ import { SITE } from "@/consts"
 
 type Props = {
   crumbs?: { label: string; href: string }[]
+  disableSnowfall?: boolean
   wide?: boolean
 }
 
-const { crumbs, wide } = Astro.props
+const { crumbs, disableSnowfall = false, wide } = Astro.props
 ---
 
 <html lang={SITE.locale} dir={SITE.dir}>
@@ -34,7 +35,7 @@ const { crumbs, wide } = Astro.props
     <slot name="head" />
   </MetaHead>
   <body>
-    <SnowfallEffect />
+    {!disableSnowfall && <SnowfallEffect />}
     <page-grid>
       <page-header>
         <page-nav>

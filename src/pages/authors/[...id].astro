@@ -24,7 +24,7 @@ const posts = (await getPosts()).filter((post) =>
 )
 ---
 
-<Layout crumbs={[{ label: name, href: `/authors/${author.id}` }]}>
+<Layout crumbs={[{ label: name, href: `/authors/${author.id}` }]} disableSnowfall>
   <MetaPage slot="head" title={`${name} (Author)`} description={bio} noindex />
   <header>
     <ul>

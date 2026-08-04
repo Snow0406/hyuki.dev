@@ -32,7 +32,7 @@ const crumbs = [
 ]
 ---
 
-<Layout crumbs={crumbs}>
+<Layout crumbs={crumbs} disableSnowfall>
   <MetaPage slot="head" title={name} description={description} image={image} />
   {tocHeadings.length > 0 && (
       <TableOfContents
