@@ -27,7 +27,7 @@ Division1D는 2022년 공개된 **좀비고등학교 스토리 모드 시즌 2: 
 
 Division1D는 세 개의 애플리케이션으로 구성했습니다.
 
-![division_architecture](.\assets\division_server_architecture.png)
+![division_architecture](./assets/division_server_architecture.png)
 
 ## 핵심 기술 문제 해결
 
@@ -95,7 +95,7 @@ ownerTransform.position = Vector3.MoveTowards(
 그리드는 후보를 줄이는 Broad Phase로만 사용하고, 최종 가시성은 실제 거리 제곱으로 판정합니다. 
 적이 경계에서 반복적으로 나타났다 사라지는 현상을 막기 위해 진입 반경은 18m, 이탈 반경은 22m로 다르게 설정했습니다.
 
-![division_aoi](.\assets\division_aoi.png)
+![division_aoi](./assets/division_aoi.png)
 
 가까운 적의 Transform은 20Hz, 먼 적은 2Hz로 전송합니다. Spawn·Despawn·상태·공격·Transform 변경은 Dirty Flag로 구분하고, 
 해당 적을 볼 수 있는 플레이어가 없다면 직렬화 자체를 수행하지 않습니다.
