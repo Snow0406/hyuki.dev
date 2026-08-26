@@ -10,8 +10,8 @@ export const SITE = {
   description: "hy's Personal Blog",
   locale: "ko-KR",
   dir: "ltr",
-  defaultPageImage: "/static/twitter-card.png",
-  defaultPostImage: "/static/twitter-card.png",
+  defaultPageImage: "/static/twitter-card-v2.png",
+  defaultPostImage: "/static/twitter-card-v2.png",
 } as const
 
 export const NAVIGATION = [
