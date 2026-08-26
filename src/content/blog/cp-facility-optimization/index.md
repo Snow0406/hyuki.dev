@@ -311,4 +311,4 @@ ECS 구조를 한번에 도입하지 않고, 당시 요구 성능을 만족한 �
 앞으로 설비 규모가 더 커지면 변화가 있는 설비만 처리하는 event-driven 시뮬레이션을 완성하고,
 그다음 Native 데이터와 Burst를 적용해 ECS 전환을 이어갈 예정입니다.
 
-<small><dim-span>다음부터는 최적화 할때 Profiler 원본 기록해야겟다... 옵치하러가야지</dim-span></small>
+<small><dim-span>다음부터는 최적화 할때 Profiler 원본 기록해야겟다...</dim-span></small>

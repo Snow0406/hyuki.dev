@@ -7,8 +7,8 @@ import Layout from "@/layouts/Layout.astro"
 import { getCollection } from "astro:content"
 
 const featuredProjectDescriptions = new Map([
-  ["division1d", "서버·Gateway·실시간 네트워크 설계 및 구현"],
   ["crimson-pandemic", "Unity 성능 최적화 및 시스템 개발"],
+  ["division1d", "서버·Gateway·실시간 네트워크 설계 및 구현"],
 ])
 
 const featuredProjects = (await getCollection("projects"))
@@ -18,26 +18,13 @@ const featuredProjects = (await getCollection("projects"))
       [...featuredProjectDescriptions.keys()].indexOf(a.id) -
       [...featuredProjectDescriptions.keys()].indexOf(b.id),
   )
-
-const skills = [
-  {
-    category: "Languages",
-    items: ["C#", "C++", "C", "JavaScript", "TypeScript", "Lua"],
-  },
-  {
-    category: "Client",
-    items: ["Unity", "Mirror", "Steamworks", "Reflex", "ECS", "Burst"],
-  },
-  { category: "Server", items: [".NET", "Redis", "Oracle", "TCP/UDP"] },
-  { category: "Infra", items: ["Docker", "CI/CD"] },
-]
 ---
 
 <Layout crumbs={[{ label: "About", href: "/about" }]}>
   <MetaPage
     slot="head"
-    title="About"
-    description="서브컬쳐와 코딩을 좋아하는 개발자 hy의 소개입니다."
+    title="Unity 클라이언트 · 성능 최적화 / 게임 서버 개발자"
+    description="Unity 게임 클라이언트 개발과 성능 최적화, 실시간 게임 서버를 개발하는 개발자 hy 입니다."
   />
 
   <article data-url="/about">
@@ -52,33 +39,18 @@ const skills = [
         <p class="eyebrow">Hello, I&rsquo;m</p>
         <h1>hy</h1>
         <p class="summary">
-          안녕하세요! 서브컬처 서브컬쳐와 코딩을 좋아하는 개발자입니다.
+          안녕하세요! 서브컬처와 코딩을 좋아하는 개발자입니다.
         </p>
-        <SocialIcons links={SOCIALS} />
+        <SocialIcons links={SOCIALS.filter(({ label }) => label !== "RSS")} />
       </div>
     </header>
 
     <section aria-labelledby="now-heading">
       <h2 id="now-heading">What I do</h2>
       <p>
-        대학교에서 공부하며 Unity 게임 개발과 최적화를 주로 하고 있습니다.
-        새로운 기술은 직접 부딪혀보며 배우는 편이고, 팀 프로젝트에서는 최적화와
-        네트워크를 설계하고 구현했습니다.
+        Unity 게임 클라이언트와 .NET 기반 실시간 서버를 개발하며,
+        성능 최적화와 네트워크를 주로 맡고 있습니다.
       </p>
-    </section>
-
-    <section aria-labelledby="skills-heading">
-      <h2 id="skills-heading">Skills</h2>
-      <div class="skill-groups">
-        {skills.map((group) => (
-          <div class="skill-group">
-            <h3>{group.category}</h3>
-            <ul>
-              {group.items.map((item) => <li>{item}</li>)}
-            </ul>
-          </div>
-        ))}
-      </div>
     </section>
 
     <section aria-labelledby="projects-heading">
@@ -198,35 +170,6 @@ const skills = [
     }
   }
 
-  .skill-groups {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-s);
-  }
-
-  .skill-group {
-    h3 {
-      margin-block: 0 var(--space-2xs);
-      color: var(--muted-foreground);
-      font-size: var(--step--1);
-      font-weight: var(--font-weight-medium);
-    }
-
-    ul {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3xs);
-    }
-
-    li {
-      padding: 0.2rem var(--space-2xs);
-      color: var(--muted-foreground);
-      background-color: color-mix(in oklab, var(--muted) 50%, transparent);
-      border-radius: var(--radius-full);
-      font-size: var(--step--1);
-    }
-  }
-
   .featured-projects {
     display: flex;
     flex-direction: column;
@@ -241,10 +184,6 @@ const skills = [
         inline-size: 5rem;
         block-size: 5rem;
       }
-    }
-
-    .skill-groups {
-      grid-template-columns: 1fr;
     }
   }
 </style>

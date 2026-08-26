@@ -1,4 +1,5 @@
 import type { SvgComponent } from "astro/types"
+import Discord from "@/assets/icons/discord.svg"
 import Email from "@/assets/icons/email.svg"
 import GitHub from "@/assets/icons/github.svg"
 import RSS from "@/assets/icons/rss.svg"
@@ -22,6 +23,7 @@ export const NAVIGATION = [
 export const SOCIALS: { href: string; label: string; icon: SvgComponent }[] = [
   { href: "https://github.com/snow0406", label: "GitHub", icon: GitHub },
   { href: "https://x.com/hyuki_dev", label: "Twitter", icon: Twitter },
+  { href: "https://discord.com/users/453729488191094809", label: "Discord", icon: Discord },
   { href: "mailto:snow@hyuki.dev", label: "Email", icon: Email },
   { href: "/rss.xml", label: "RSS", icon: RSS },
 ]
