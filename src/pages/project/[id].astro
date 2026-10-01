@@ -1,5 +1,7 @@
 ---
+import DiscordIcon from "@/assets/icons/discord.svg"
 import ExternalIcon from "@/assets/icons/external.svg"
+import SteamIcon from "@/assets/icons/steam.svg"
 import MetaPage from "@/components/MetaPage.astro"
 import ScrollToTop from "@/components/ScrollToTop.astro"
 import TableOfContents from "@/components/TableOfContents.astro"
@@ -19,6 +21,7 @@ export async function getStaticPaths() {
 
 type Props = { project: CollectionEntry<"projects"> }
 
+const linkIcons = { discord: DiscordIcon, steam: SteamIcon }
 const { project } = Astro.props
 const { Content, headings } = await render(project)
 const { name, description, image, startDate, endDate, tags, links } =
@@ -49,12 +52,16 @@ const crumbs = [
       <p>{description}</p>
       {links && links.length > 0 && (
           <project-actions>
-            {links.map(({ label, url }) => (
-              <a href={url} target="_blank" rel="noreferrer">
-                {label}
-                <ExternalIcon aria-hidden="true" />
-              </a>
-            ))}
+            {links.map(({ label, url, icon }) => {
+              const Icon = icon ? linkIcons[icon] : undefined
+              return (
+                <a href={url} target="_blank" rel="noreferrer">
+                  {Icon && <Icon aria-hidden="true" />}
+                  {label}
+                  <ExternalIcon aria-hidden="true" />
+                </a>
+              )
+            })}
           </project-actions>
         )}
     </header>

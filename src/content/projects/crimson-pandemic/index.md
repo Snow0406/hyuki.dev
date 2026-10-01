@@ -7,8 +7,12 @@ tags:
   - Optimization
 startDate: "2025-09-17"
 links:
-  - label: "Discord Server"
+  - label: "Discord"
     url: "https://discord.gg/jcm4ktGQUu"
+    icon: "discord"
+  - label: "Steam"
+    url: "https://store.steampowered.com/app/4943110/CRIMSON_PANDEMIC/"
+    icon: "steam"
 ---
 
 ## 프로젝트 개요
@@ -22,7 +26,7 @@ links:
 - 과도한 메모리 사용(GC) 문제 해결
 - 키 바인딩 및 다국어 지원 등 유틸리티 시스템 구현
 - 커스텀 에디터 툴 개발로 개발 생산성 향상
-- 일부 로직 구조 설계
+- 설비 및 일부 로직 구조 설계
 
 ## Credits
 

@@ -54,6 +54,7 @@ const projects = defineCollection({
           z.object({
             label: z.string(),
             url: z.url(),
+            icon: z.enum(["discord", "steam"]).optional(),
           }),
         )
         .optional(),
